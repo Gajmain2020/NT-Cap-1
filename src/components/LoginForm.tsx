@@ -2,6 +2,8 @@ import { Eye, EyeOff, Mail } from "lucide-react";
 import { Input } from "./ui/input";
 import { useState } from "react";
 import { Button } from "./ui/button";
+import { loginSchema } from "@/utils/validationSchema";
+import { toast } from "sonner";
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -13,7 +15,15 @@ export default function LoginForm() {
   };
 
   const handleLogin = () => {
-    console.log("login", email, password);
+    const result = loginSchema.safeParse({ email, password });
+
+    if (!result.success) {
+      result.error.issues.map((err) => toast.error(err.message));
+      return;
+    }
+
+    //api to be integrated here
+    console.log("Login successful", email, password);
   };
   return (
     <div className="w-full max-w-xl h-full mx-auto bg-gray-200 rounded-lg shadow-lg p-8 flex flex-col gap-6">
