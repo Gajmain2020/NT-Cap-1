@@ -46,6 +46,7 @@ function App() {
             }
           >
             <Route index element={<Homepage />} />
+            <Route path="past-interviews" element={<>Past interview Page</>} />
           </Route>
 
           {/* Protected Routes for faculty */}
