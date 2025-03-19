@@ -11,6 +11,7 @@ import UserTypeCheck from "./utils/UserTypeCheck";
 import Layout from "./components/Layout/Layout";
 import NotFound from "./pages/NotFound";
 import NotAuthorized from "./pages/NotAuthorized";
+import Landing from "./pages/Landing";
 
 function App() {
   const { authToken, userType, id } = useAuthStore();
@@ -27,11 +28,7 @@ function App() {
           <Route
             path="/"
             element={
-              isLoggedIn ? (
-                <Navigate to={userRoute} replace />
-              ) : (
-                <>Hello world</>
-              )
+              isLoggedIn ? <Navigate to={userRoute} replace /> : <Landing />
             }
           />
           <Route path="/test" element={<>Route testing</>} />
