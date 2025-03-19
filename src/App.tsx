@@ -12,6 +12,7 @@ import Layout from "./components/Layout/Layout";
 import NotFound from "./pages/NotFound";
 import NotAuthorized from "./pages/NotAuthorized";
 import Landing from "./pages/Landing";
+import Homepage from "./pages/HR/Homepage";
 
 function App() {
   const { authToken, userType, id } = useAuthStore();
@@ -44,7 +45,7 @@ function App() {
               </ProtectedRoutes>
             }
           >
-            <Route index element={<>HR Admin Homepage</>} />
+            <Route index element={<Homepage />} />
           </Route>
 
           {/* Protected Routes for faculty */}

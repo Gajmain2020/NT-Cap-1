@@ -4,8 +4,13 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { loginSchema } from "@/utils/validationSchema";
 import { toast } from "sonner";
+import useAuthStore from "@/store/userAuthStore";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginForm() {
+  const navigate = useNavigate();
+  const { setName, setAuthToken, setId, setUserType } = useAuthStore();
+
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,6 +28,15 @@ export default function LoginForm() {
     }
 
     //api to be integrated here
+
+    //! setting dummy user as hr for the time being
+    setName(email);
+    setUserType("hr");
+    setAuthToken("123");
+    setId("hr1");
+
+    navigate(`hr/${email}`);
+
     console.log("Login successful", email, password);
   };
   return (

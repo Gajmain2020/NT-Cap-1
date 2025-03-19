@@ -11,8 +11,8 @@ export default function Landing() {
     >
       <div className="mx-4 sm:mx-8 md:mx-16 lg:mx-24 xl:mx-32 min-h-screen flex items-center justify-center flex-col">
         <div className="flex items-center justify-center py-12 flex-col gap-2 ">
-          <div className="font-light text-gray-600">Welcome to</div>
-          <div className="text-3xl text-gray-800 text-center">
+          <div className="font-light text-gray-600 text-lg">Welcome to</div>
+          <div className="lg:text-3xl text-xl text-gray-800 text-center font-semibold">
             INTERVIEW FEEDBACK MANAGEMENT SYSTEM
           </div>
         </div>
