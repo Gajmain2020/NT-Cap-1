@@ -19,10 +19,15 @@ export default function Layout() {
         </div>
 
         {/* Main content area */}
-        <SidebarInset className="flex flex-col h-full flex-1 items-center justify-center p-2 bg-cover bg-center relative overflow-y-auto">
+        <SidebarInset className="flex flex-col h-full flex-1 overflow-hidden p-2 bg-cover bg-center relative">
           {/* <MobileNavbar /> */}
-          <main className="flex-1 bg-red-500 w-full overflow-y-auto  no-scrollbar">
-            <Outlet />
+          <main className="flex-1 w-full overflow-auto no-scrollbar flex flex-col gap-4">
+            <div className="lg:text-3xl sticky bg-gray-300/30 backdrop-blur shadow top-0 text-xl text-gray-800 text-center font-semibold">
+              INTERVIEW FEEDBACK <br /> MANAGEMENT SYSTEM
+            </div>
+            <div>
+              <Outlet />
+            </div>
           </main>
         </SidebarInset>
       </div>
