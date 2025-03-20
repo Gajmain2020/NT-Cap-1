@@ -74,7 +74,9 @@ export function AppSidebar() {
             <SidebarMenu>
               {navItems.map((item) => {
                 const path = `${basePath}${item.url}`;
-                const isHome = item.url === "/" && activePath === basePath; // Fix for Home being active only on exact match
+                const isHome =
+                  item.url === "/" &&
+                  (activePath === basePath || activePath === `${basePath}/`);
                 const isActive =
                   isHome || (activePath.startsWith(path) && item.url !== "/"); // Prevent "Home" from being active when in other pages
 
