@@ -1,4 +1,3 @@
-import CalendarView from "@/components/HR/CalendarView";
 import InterviewTable from "@/components/HR/InterviewTable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -111,10 +110,6 @@ export default function Homepage() {
       {/* Interview Table Component */}
       <div className="w-full max-w-4xl">
         <InterviewTable interviews={interviews} />
-      </div>
-
-      <div className="w-full max-w-4xl">
-        <CalendarView interviews={interviews} />
       </div>
     </div>
   );

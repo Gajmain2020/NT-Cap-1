@@ -13,6 +13,9 @@ import NotFound from "./pages/NotFound";
 import NotAuthorized from "./pages/NotAuthorized";
 import Landing from "./pages/Landing";
 import Homepage from "./pages/HR/Homepage";
+import Calendar from "./pages/HR/Calendar";
+import PastInterviews from "./pages/HR/PastInterviews";
+import Report from "./pages/HR/Report";
 
 function App() {
   const { authToken, userType, id } = useAuthStore();
@@ -46,7 +49,9 @@ function App() {
             }
           >
             <Route index element={<Homepage />} />
-            <Route path="past-interviews" element={<>Past interview Page</>} />
+            <Route path="past-interviews" element={<PastInterviews />} />
+            <Route path="past-interviews/:reportId" element={<Report />} />
+            <Route path="calendar" element={<Calendar />} />
           </Route>
 
           {/* Protected Routes for faculty */}
