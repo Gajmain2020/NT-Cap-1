@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 
 export default function FeedbackForm() {
   const navigate = useNavigate();
-  const [feedback, setFeedback] = useState([
+  const [feedback, setFeedback] = useState<FeedbackEntry[]>([
     { id: 1, skill: "Basic Algorithm", rating: "", topics: [], comments: "" },
     { id: 2, skill: "Code and Syntax", rating: "", topics: [], comments: "" },
     { id: 3, skill: "Design Patterns", rating: "", topics: [], comments: "" },
@@ -31,7 +31,17 @@ export default function FeedbackForm() {
     },
     { id: 9, skill: "Communication", rating: "", topics: [], comments: "" },
   ]);
-  const [newSkill, setNewSkill] = useState("");
+  const [newSkill, setNewSkill] = useState<{
+    skill: string;
+    rating: string;
+    topics: string[];
+    comment: string;
+  }>({
+    skill: "",
+    rating: "",
+    topics: [],
+    comment: "",
+  });
 
   const ratingOptions = [
     "Average",
@@ -53,34 +63,45 @@ export default function FeedbackForm() {
   };
 
   const handleAddSkill = () => {
-    if (newSkill.trim() !== "") {
-      setFeedback([
-        ...feedback,
-        {
-          id: feedback.length + 1,
-          skill: newSkill,
-          rating: "",
-          topics: [],
-          comments: "",
-        },
-      ]);
-      setNewSkill("");
-    }
+    setFeedback([
+      ...feedback,
+      {
+        id: feedback.length + 1,
+        skill: newSkill.skill,
+        rating: newSkill.rating,
+        topics: newSkill.topics,
+        comments: newSkill.comment,
+      },
+    ]);
+    setNewSkill({
+      skill: "",
+      rating: "",
+      topics: [],
+      comment: "",
+    });
   };
 
   // const handleDeleteSkill = (index) => {
   //   setFeedback(feedback.filter((_, i) => i !== index));
   // };
 
-  const handleAddTopic = (index, topic) => {
-    const updatedFeedback = [...feedback];
+  interface FeedbackEntry {
+    id: number;
+    skill: string;
+    rating: string;
+    topics: string[];
+    comments: string;
+  }
+
+  const handleAddTopic = (index: number, topic: string): void => {
+    const updatedFeedback: FeedbackEntry[] = [...feedback];
     if (!updatedFeedback[index].topics.includes(topic)) {
       updatedFeedback[index].topics.push(topic);
       setFeedback(updatedFeedback);
     }
   };
 
-  const handleRemoveTopic = (index, topic) => {
+  const handleRemoveTopic = (index: number, topic: string) => {
     const updatedFeedback = [...feedback];
     updatedFeedback[index].topics = updatedFeedback[index].topics.filter(
       (t) => t !== topic
@@ -156,24 +177,41 @@ export default function FeedbackForm() {
                       list={`topics-${entry.id}`}
                       onChange={(e) => {
                         const value = e.target.value;
-                        if (topicOptions[entry.skill]?.includes(value)) {
-                          handleAddTopic(index, value);
+                        if (
+                          entry.skill in topicOptions &&
+                          topicOptions[
+                            entry.skill as keyof typeof topicOptions
+                          ]?.includes(value)
+                        ) {
+                          setNewSkill((skills) => ({
+                            ...skills,
+                            topics: [...skills.topics, value],
+                          }));
                           e.target.value = "";
                         }
                       }}
                       onKeyDown={(e) => {
                         if (
                           e.key === "Enter" &&
-                          e.target.value.trim() !== "" &&
-                          !topicOptions[entry.skill]?.includes(e.target.value)
+                          (e.target as HTMLInputElement).value.trim() !== "" &&
+                          !topicOptions[
+                            entry.skill as keyof typeof topicOptions
+                          ]?.includes((e.target as HTMLInputElement).value)
                         ) {
-                          handleAddTopic(index, e.target.value.trim());
-                          e.target.value = "";
+                          handleAddTopic(
+                            index,
+                            (e.target as HTMLInputElement).value.trim()
+                          );
+                          (e.target as HTMLInputElement).value = "";
                         }
                       }}
                     />
                     <datalist id={`topics-${entry.id}`}>
-                      {(topicOptions[entry.skill] || []).map((topic) => (
+                      {(
+                        topicOptions[
+                          entry.skill as keyof typeof topicOptions
+                        ] || []
+                      ).map((topic) => (
                         <option key={topic} value={topic} />
                       ))}
                     </datalist>
@@ -202,20 +240,126 @@ export default function FeedbackForm() {
               ))}
             </tbody>
           </table>
-          <div className="mt-4 flex gap-2">
-            <Input
-              type="text"
-              placeholder="New Skill"
-              value={newSkill}
-              onChange={(e) => setNewSkill(e.target.value)}
-            />
-            <Button onClick={handleAddSkill}>Add Skill</Button>
-          </div>
+          <NewSkillForm
+            newSkill={newSkill}
+            setNewSkill={setNewSkill}
+            // ratingOptions={ratingOptions}
+            handleAddSkill={handleAddSkill}
+          />
+
           <Button className="mt-6" onClick={() => navigate("/submit-feedback")}>
             Submit Feedback
           </Button>
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+interface NewSkillFormProps {
+  newSkill: {
+    skill: string;
+    rating: string;
+    topics: string[];
+    comment: string;
+  };
+  setNewSkill: React.Dispatch<
+    React.SetStateAction<{
+      skill: string;
+      rating: string;
+      topics: string[];
+      comment: string;
+    }>
+  >;
+  handleAddSkill: () => void;
+}
+
+function NewSkillForm({
+  newSkill,
+  setNewSkill,
+  handleAddSkill,
+}: NewSkillFormProps) {
+  return (
+    <div className="border border-gray-300 p-4 rounded-lg mt-6">
+      <h2 className="text-lg font-semibold mb-3">Add New Skill</h2>
+      <div className="grid grid-cols-2 gap-4">
+        {/* Skill Name */}
+        <Input
+          type="text"
+          placeholder="Enter Skill Name"
+          value={newSkill.skill}
+          onChange={(e) =>
+            setNewSkill((prev) => ({ ...prev, skill: e.target.value }))
+          }
+        />
+
+        {/* Rating */}
+        <Input
+          type="text"
+          placeholder="Enter Rating"
+          value={newSkill.rating}
+          onChange={(e) =>
+            setNewSkill((prev) => ({ ...prev, rating: e.target.value }))
+          }
+        />
+
+        <div>
+          <div className="flex flex-wrap gap-2 mb-2">
+            {newSkill.topics.map((topic, topicIndex) => (
+              <Badge
+                key={topic}
+                className="cursor-pointer"
+                onClick={() => {
+                  const updatedTopics = newSkill.topics.filter(
+                    (_, i) => i !== topicIndex
+                  );
+                  setNewSkill((skill) => ({
+                    ...skill,
+                    topics: updatedTopics,
+                  }));
+                }}
+              >
+                {topic} ×
+              </Badge>
+            ))}
+          </div>
+          <Input
+            type="text"
+            placeholder="Select or Type"
+            onKeyDown={(e) => {
+              if (
+                e.key === "Enter" &&
+                (e.target as HTMLInputElement).value.trim() !== "" &&
+                !newSkill.topics?.includes((e.target as HTMLInputElement).value)
+              ) {
+                setNewSkill((skills) => ({
+                  ...skills,
+                  topics: [
+                    ...skills.topics,
+                    (e.target as HTMLInputElement).value,
+                  ],
+                }));
+                (e.target as HTMLInputElement).value = "";
+              }
+            }}
+          />
+        </div>
+
+        {/* Comment */}
+        <Input
+          type="text"
+          placeholder="Enter Comment"
+          value={newSkill.comment}
+          onChange={(e) =>
+            setNewSkill((prev) => ({ ...prev, comment: e.target.value }))
+          }
+        />
+      </div>
+
+      {/* Add Skill Button */}
+      <Button className="mt-4" onClick={handleAddSkill}>
+        Add Skill
+      </Button>
     </div>
   );
 }
