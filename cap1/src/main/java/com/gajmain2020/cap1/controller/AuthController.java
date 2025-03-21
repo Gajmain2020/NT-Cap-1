@@ -15,6 +15,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/user")
+@CrossOrigin(origins = "http://localhost:5173")
 public class AuthController {
 
     private final UserRepository userRepository;
@@ -38,6 +39,7 @@ public class AuthController {
         Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
 
         if (existingUser.isPresent()) {
+            System.out.println("hello world fuck off");
             throw new DuplicateResourceException("Email already exists: " + user.getEmail());
         }
 
