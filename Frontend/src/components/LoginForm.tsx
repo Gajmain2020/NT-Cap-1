@@ -2,8 +2,6 @@ import { Eye, EyeOff, Mail, User } from "lucide-react";
 import { Input } from "./ui/input";
 import { useState } from "react";
 import { Button } from "./ui/button";
-import { loginSchema, registerSchema } from "@/utils/validationSchema";
-import { toast } from "sonner";
 import useAuthStore from "@/store/userAuthStore";
 import { useNavigate } from "react-router-dom";
 import {
@@ -13,7 +11,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import { RegisterUserApi } from "@/api/userApis";
+import {
+  handleUserLogin,
+  handleUserRegistration,
+} from "@/services/userService";
 
 export default function AuthForm() {
   const navigate = useNavigate();
@@ -32,49 +33,24 @@ export default function AuthForm() {
     setShowPassword(!showPassword);
   };
 
-  const handleLogin = () => {
-    // parse for any error in the input
-    const result = loginSchema.safeParse({ email, password });
-
-    if (!result.success) {
-      result.error.issues.map((err) => toast.error(err.message));
-      return;
-    }
-
-    //api to be integrated here
-    setName(email);
-    setUserType("interviewer");
-    setAuthToken("123");
-    setId("i1");
-
-    navigate(`hr/${email}`);
-    console.log("Login successful", email, password);
+  const handleLogin = async () => {
+    await handleUserLogin(
+      { email, password },
+      setLoading,
+      setName,
+      setUserType,
+      setAuthToken,
+      setId,
+      navigate
+    );
   };
 
   const handleRegister = async () => {
-    setLoading(true);
-    try {
-      const result = registerSchema.safeParse({ name, email, role, password });
-
-      if (!result.success) {
-        result.error.issues.map((err) => toast.error(err.message));
-        return;
-      }
-
-      const response = await RegisterUserApi({ name, email, role, password });
-
-      if (!response.success) {
-        toast.error(response.message);
-        return;
-      }
-
-      toast.success("Registration successful! Please login.");
-      setIsRegister(false);
-    } catch (error) {
-      console.log("error", error);
-    } finally {
-      setLoading(false);
-    }
+    await handleUserRegistration(
+      { name, email, role, password },
+      setLoading,
+      setIsRegister
+    );
   };
 
   return (

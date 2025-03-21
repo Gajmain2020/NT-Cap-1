@@ -73,9 +73,10 @@ public class AuthController {
 
         // Include the user ID, name, and token in the response
         Map<String, Object> userData = new HashMap<>();
-        userData.put("id", user.getId()); // Assuming `getId()` method exists in User model
-        userData.put("name", user.getName()); // Assuming `getName()` method exists in User model
+        userData.put("id", user.getId());
+        userData.put("name", user.getName());
         userData.put("email", user.getEmail());
+        userData.put("role", user.getRole());
         userData.put("token", token);
 
         response.put("data", userData);
