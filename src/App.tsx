@@ -13,7 +13,10 @@ import NotFound from "./pages/NotFound";
 import NotAuthorized from "./pages/NotAuthorized";
 import Landing from "./pages/Landing";
 import Homepage from "./pages/HR/Homepage";
-import Calendar from "./pages/HR/Calendar";
+import InterviewerHome from "./pages/Interviewer/Homepage";
+import FeedbackForm from "./pages/Interviewer/FeedbackForm";
+import InterviewerCalendar from "./pages/Interviewer/Calendar";
+import HRCalendar from "./pages/HR/Calendar";
 import PastInterviews from "./pages/HR/PastInterviews";
 import Report from "./pages/HR/Report";
 
@@ -51,7 +54,7 @@ function App() {
             <Route index element={<Homepage />} />
             <Route path="past-interviews" element={<PastInterviews />} />
             <Route path="past-interviews/:reportId" element={<Report />} />
-            <Route path="calendar" element={<Calendar />} />
+            <Route path="calendar" element={<HRCalendar />} />
           </Route>
 
           {/* Protected Routes for faculty */}
@@ -65,7 +68,9 @@ function App() {
               </ProtectedRoutes>
             }
           >
-            <Route index element={<>Interviewer Homepage</>} />
+            <Route index element={<InterviewerHome />} />
+            <Route path="feedback" element={<FeedbackForm />} />
+            <Route path="calendar" element={<InterviewerCalendar />} />
           </Route>
 
           {/* Not Authorized Page */}

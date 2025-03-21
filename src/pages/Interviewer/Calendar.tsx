@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { IInterview } from "@/utils/types";
 import {
   format,
   startOfMonth,
@@ -19,8 +18,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { DummyInterviewSchedule } from "@/utils/dummyData";
+import { IInterview } from "@/utils/types";
 
-export default function HRCalendar() {
+export default function InterviewerCalendar() {
   const [interviews, setInterviews] = useState(DummyInterviewSchedule);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -123,10 +123,10 @@ export default function HRCalendar() {
                             Name: {interview.intervieweeName}
                           </p>
                           <p className="text-sm text-gray-500">
-                            Position: {interview.position}
+                            Email: {"hello@mail.com"}
                           </p>
                           <p className="text-sm text-gray-500">
-                            Interviewer: {interview.interviewer}
+                            Position: {interview.position}
                           </p>
                           <p className="text-xs text-gray-400">
                             {format(new Date(interview.schedule), "hh:mm a")}
