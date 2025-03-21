@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 import {
   Select,
   SelectTrigger,
@@ -11,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
+import NewSkillForm from "@/components/Interviewer/NewSkillForm";
 
 export default function FeedbackForm() {
   const navigate = useNavigate();
@@ -81,10 +88,6 @@ export default function FeedbackForm() {
     });
   };
 
-  // const handleDeleteSkill = (index) => {
-  //   setFeedback(feedback.filter((_, i) => i !== index));
-  // };
-
   interface FeedbackEntry {
     id: number;
     skill: string;
@@ -112,11 +115,11 @@ export default function FeedbackForm() {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Submit Feedback</h1>
-      <Card>
+      <Card className="flex flex-col gap-6">
         <CardHeader>
           <CardTitle>Feedback Form</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="overflow-x-auto">
           <table className="w-full border-collapse border border-gray-300">
             <thead>
               <tr className="bg-gray-100">
@@ -228,138 +231,26 @@ export default function FeedbackForm() {
                       }}
                     />
                   </td>
-                  {/* <td className="border border-gray-300 px-4 py-2">
-                    <Button
-                      variant="destructive"
-                      onClick={() => handleDeleteSkill(index)}
-                    >
-                      Delete
-                    </Button>
-                  </td> */}
                 </tr>
               ))}
             </tbody>
           </table>
+        </CardContent>
+        <CardContent>
           <NewSkillForm
             newSkill={newSkill}
             setNewSkill={setNewSkill}
-            // ratingOptions={ratingOptions}
+            ratingOptions={ratingOptions}
             handleAddSkill={handleAddSkill}
           />
+        </CardContent>
 
+        <CardFooter>
           <Button className="mt-6" onClick={() => navigate("/submit-feedback")}>
             Submit Feedback
           </Button>
-        </CardContent>
+        </CardFooter>
       </Card>
-    </div>
-  );
-}
-
-interface NewSkillFormProps {
-  newSkill: {
-    skill: string;
-    rating: string;
-    topics: string[];
-    comment: string;
-  };
-  setNewSkill: React.Dispatch<
-    React.SetStateAction<{
-      skill: string;
-      rating: string;
-      topics: string[];
-      comment: string;
-    }>
-  >;
-  handleAddSkill: () => void;
-}
-
-function NewSkillForm({
-  newSkill,
-  setNewSkill,
-  handleAddSkill,
-}: NewSkillFormProps) {
-  return (
-    <div className="border border-gray-300 p-4 rounded-lg mt-6">
-      <h2 className="text-lg font-semibold mb-3">Add New Skill</h2>
-      <div className="grid grid-cols-2 gap-4">
-        {/* Skill Name */}
-        <Input
-          type="text"
-          placeholder="Enter Skill Name"
-          value={newSkill.skill}
-          onChange={(e) =>
-            setNewSkill((prev) => ({ ...prev, skill: e.target.value }))
-          }
-        />
-
-        {/* Rating */}
-        <Input
-          type="text"
-          placeholder="Enter Rating"
-          value={newSkill.rating}
-          onChange={(e) =>
-            setNewSkill((prev) => ({ ...prev, rating: e.target.value }))
-          }
-        />
-
-        <div>
-          <div className="flex flex-wrap gap-2 mb-2">
-            {newSkill.topics.map((topic, topicIndex) => (
-              <Badge
-                key={topic}
-                className="cursor-pointer"
-                onClick={() => {
-                  const updatedTopics = newSkill.topics.filter(
-                    (_, i) => i !== topicIndex
-                  );
-                  setNewSkill((skill) => ({
-                    ...skill,
-                    topics: updatedTopics,
-                  }));
-                }}
-              >
-                {topic} ×
-              </Badge>
-            ))}
-          </div>
-          <Input
-            type="text"
-            placeholder="Select or Type"
-            onKeyDown={(e) => {
-              if (
-                e.key === "Enter" &&
-                (e.target as HTMLInputElement).value.trim() !== "" &&
-                !newSkill.topics?.includes((e.target as HTMLInputElement).value)
-              ) {
-                setNewSkill((skills) => ({
-                  ...skills,
-                  topics: [
-                    ...skills.topics,
-                    (e.target as HTMLInputElement).value,
-                  ],
-                }));
-                (e.target as HTMLInputElement).value = "";
-              }
-            }}
-          />
-        </div>
-
-        {/* Comment */}
-        <Input
-          type="text"
-          placeholder="Enter Comment"
-          value={newSkill.comment}
-          onChange={(e) =>
-            setNewSkill((prev) => ({ ...prev, comment: e.target.value }))
-          }
-        />
-      </div>
-
-      {/* Add Skill Button */}
-      <Button className="mt-4" onClick={handleAddSkill}>
-        Add Skill
-      </Button>
     </div>
   );
 }
