@@ -2,9 +2,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { passwordChangeSchema } from "@/utils/validationSchema";
-import { toast } from "sonner";
-import { ChangeUserPasswordApi } from "@/api/userApis";
+import { changePassword } from "@/services/userService";
 
 function PasswordChangeDialog({
   open,
@@ -21,34 +19,7 @@ function PasswordChangeDialog({
   const [loading, setLoading] = useState(false);
 
   const handlePasswordChange = async () => {
-    setLoading(true);
-    try {
-      const checkSchema = passwordChangeSchema.safeParse(passwords);
-
-      if (!checkSchema.success) {
-        checkSchema.error.issues.forEach((err) => toast.error(err.message));
-        return;
-      }
-
-      if (passwords.newPassword !== passwords.confirmPassword) {
-        toast.error("New password and Confirm password must match.");
-        return;
-      }
-
-      const response = await ChangeUserPasswordApi(passwords);
-
-      if (!response.success) {
-        toast.error(response.message);
-        return;
-      }
-
-      toast.success("Password changed successfully!");
-      setOpen(false);
-    } catch (error) {
-      console.log("hello world", error);
-    } finally {
-      setLoading(false);
-    }
+    await changePassword(passwords, setLoading, setOpen);
   };
 
   return (

@@ -65,7 +65,7 @@ export async function ChangeUserPasswordApi(passwords: {
       url:
         baseUrl +
         `/change-password?oldPassword=${passwords.oldPassword}&newPassword=${passwords.newPassword}&confirmPassword=${passwords.confirmPassword}`,
-      method: "POST",
+      method: "PUT",
     });
     return response.data;
   } catch (error) {
