@@ -90,6 +90,11 @@ export async function changePassword(
     newPassword: string;
     confirmPassword: string;
   },
+  setPasswords: (passwords: {
+    oldPassword: string;
+    newPassword: string;
+    confirmPassword: string;
+  }) => void,
   setLoading: (loading: boolean) => void,
   setOpen: (open: boolean) => void
 ) {
@@ -115,6 +120,7 @@ export async function changePassword(
     }
 
     toast.success("Password changed successfully!");
+    setPasswords({ oldPassword: "", newPassword: "", confirmPassword: "" });
     setOpen(false);
   } catch (error) {
     console.error("Password Change Error:", error);

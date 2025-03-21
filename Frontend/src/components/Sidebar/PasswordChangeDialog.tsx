@@ -19,7 +19,7 @@ function PasswordChangeDialog({
   const [loading, setLoading] = useState(false);
 
   const handlePasswordChange = async () => {
-    await changePassword(passwords, setLoading, setOpen);
+    await changePassword(passwords, setPasswords, setLoading, setOpen);
   };
 
   return (
