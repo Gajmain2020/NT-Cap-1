@@ -15,6 +15,7 @@ import Landing from "./pages/Landing";
 import Homepage from "./pages/HR/Homepage";
 import InterviewerHome from "./pages/Interviewer/Homepage";
 import FeedbackForm from "./pages/Interviewer/FeedbackForm";
+import Calendar from "./pages/Interviewer/Calendar";
 
 function App() {
   const { authToken, userType, id } = useAuthStore();
@@ -63,6 +64,7 @@ function App() {
           >
             <Route index element={<InterviewerHome />} />
             <Route path="feedback" element={<FeedbackForm />} />
+            <Route path="calendar" element={<Calendar />} />
           </Route>
 
           {/* Not Authorized Page */}
