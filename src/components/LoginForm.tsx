@@ -31,9 +31,9 @@ export default function LoginForm() {
 
     //! setting dummy user as hr for the time being
     setName(email);
-    setUserType("hr");
+    setUserType("interviewer");
     setAuthToken("123");
-    setId("hr1");
+    setId("i1");
 
     navigate(`hr/${email}`);
 

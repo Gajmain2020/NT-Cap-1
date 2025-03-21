@@ -13,6 +13,8 @@ import NotFound from "./pages/NotFound";
 import NotAuthorized from "./pages/NotAuthorized";
 import Landing from "./pages/Landing";
 import Homepage from "./pages/HR/Homepage";
+import InterviewerHome from "./pages/Interviewer/Homepage";
+import FeedbackForm from "./pages/Interviewer/FeedbackForm";
 
 function App() {
   const { authToken, userType, id } = useAuthStore();
@@ -59,7 +61,8 @@ function App() {
               </ProtectedRoutes>
             }
           >
-            <Route index element={<>Interviewer Homepage</>} />
+            <Route index element={<InterviewerHome />} />
+            <Route path="feedback" element={<FeedbackForm />} />
           </Route>
 
           {/* Not Authorized Page */}

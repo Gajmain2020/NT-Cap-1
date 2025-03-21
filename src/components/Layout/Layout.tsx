@@ -21,7 +21,7 @@ export default function Layout() {
         {/* Main content area */}
         <SidebarInset className="flex flex-col h-full flex-1 items-center justify-center p-2 bg-cover bg-center relative overflow-y-auto">
           {/* <MobileNavbar /> */}
-          <main className="flex-1 bg-red-500 w-full overflow-y-auto  no-scrollbar">
+          <main className="flex-1 w-full overflow-y-auto  no-scrollbar">
             <Outlet />
           </main>
         </SidebarInset>
