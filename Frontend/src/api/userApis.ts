@@ -7,7 +7,21 @@ export async function LoginUserApi(loginData: {
   email: string;
   password: string;
 }) {
-  console.log(loginData);
+  try {
+    const response = await axios({
+      url:
+        baseUrl +
+        `/login?email=${loginData.email}&password=${loginData.password}`,
+      method: "POST",
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      return error?.response?.data;
+    } else {
+      toast.error("An unexpected error occurred");
+    }
+  }
 }
 
 export async function RegisterUserApi(registerData: {
