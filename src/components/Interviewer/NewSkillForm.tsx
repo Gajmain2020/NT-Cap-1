@@ -42,7 +42,7 @@ export default function NewSkillForm({
         {/* Skill Name */}
         <Input
           type="text"
-          placeholder="Skill Name"
+          placeholder="Skill Name*"
           value={newSkill.skill}
           onChange={(e) =>
             setNewSkill((prev) => ({ ...prev, skill: e.target.value }))
@@ -56,7 +56,7 @@ export default function NewSkillForm({
           }}
         >
           <SelectTrigger className="w-full">
-            <SelectValue placeholder="Select Rating" />
+            <SelectValue placeholder="Select Rating*" />
           </SelectTrigger>
           <SelectContent>
             {ratingOptions.map((option) => (

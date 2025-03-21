@@ -16,9 +16,30 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
-import { Badge } from "@/components/ui/badge";
 import NewSkillForm from "@/components/Interviewer/NewSkillForm";
 import { Checkbox } from "@/components/ui/checkbox";
+import IntervieweeDetails from "@/components/Interviewer/IntervieweeDetails";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
+
+const topicOptions = {
+  "Basic Algorithm": ["Search Algorithms", "Sorting", "Recursion"],
+  "Code and Syntax": ["Code Optimization", "Algorithm Implementation"],
+  "Design Patterns": ["Singleton", "Factory", "Observer"],
+  SQL: ["Joins", "Subqueries", "Indexing", "Normalization"],
+  Git: ["Git Commands", "Branching", "Merging"],
+  "Overall Attitude": ["Attitude during interview"],
+  "Learning Ability": ["Learning New Concepts"],
+  "Resume Explanation": ["Relevant Experience", "Projects"],
+  Communication: ["Clarity of Thoughts", "Communication Skills"],
+};
 
 export default function FeedbackForm() {
   const navigate = useNavigate();
@@ -55,6 +76,8 @@ export default function FeedbackForm() {
     comment: "",
   });
 
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
   const handleCheckboxChange = (id: number, checked: boolean) => {
     setCheckedItems((prev) => ({ ...prev, [id]: checked }));
   };
@@ -66,19 +89,14 @@ export default function FeedbackForm() {
     "Poor",
     "Very Good",
   ];
-  const topicOptions = {
-    "Basic Algorithm": ["Search Algorithms", "Sorting", "Recursion"],
-    "Code and Syntax": ["Code Optimization", "Algorithm Implementation"],
-    "Design Patterns": ["Singleton", "Factory", "Observer"],
-    SQL: ["Joins", "Subqueries", "Indexing", "Normalization"],
-    Git: ["Git Commands", "Branching", "Merging"],
-    "Overall Attitude": ["Attitude during interview"],
-    "Learning Ability": ["Learning New Concepts"],
-    "Resume Explanation": ["Relevant Experience", "Projects"],
-    Communication: ["Clarity of Thoughts", "Communication Skills"],
-  };
 
   const handleAddSkill = () => {
+    console.log(newSkill.rating);
+
+    if (newSkill.rating === "" || newSkill.skill === "") {
+      toast.error("Please fill in all required fields.");
+      return;
+    }
     setFeedback([
       ...feedback,
       {
@@ -96,14 +114,7 @@ export default function FeedbackForm() {
       comment: "",
     });
   };
-
-  interface FeedbackEntry {
-    id: number;
-    skill: string;
-    rating: string;
-    topics: string[];
-    comments: string;
-  }
+  console.log(feedback);
 
   const handleAddTopic = (index: number, topic: string): void => {
     const updatedFeedback: FeedbackEntry[] = [...feedback];
@@ -120,14 +131,42 @@ export default function FeedbackForm() {
     );
     setFeedback(updatedFeedback);
   };
+  interface FeedbackEntry {
+    id: number;
+    skill: string;
+    rating: string;
+    topics: string[];
+    comments: string;
+  }
+
+  const handleSubmit = () => {
+    const isValid = feedback.some(
+      (entry) => entry.rating || entry.topics.length > 0 || entry.comments
+    );
+
+    if (isValid) {
+      setIsDialogOpen(true);
+    } else {
+      toast.error("Please provide feedback for at least one skill.");
+    }
+  };
+
+  const confirmSubmit = () => {
+    console.log("Submitted Feedback:", feedback);
+    setIsDialogOpen(false);
+    navigate("/submit-feedback");
+  };
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Submit Feedback</h1>
       <Card className="flex flex-col gap-6">
+        <IntervieweeDetails />
+
         <CardHeader>
           <CardTitle>Feedback Form</CardTitle>
         </CardHeader>
+
         <CardContent className="overflow-x-auto">
           <table className="w-full border-collapse border border-gray-300">
             <thead>
@@ -139,7 +178,6 @@ export default function FeedbackForm() {
                   Topics Used for Evaluation
                 </th>
                 <th className="border border-gray-300 px-4 py-2">Comments</th>
-                {/* <th className="border border-gray-300 px-4 py-2">Action</th> */}
               </tr>
             </thead>
             <tbody>
@@ -159,6 +197,7 @@ export default function FeedbackForm() {
                   <td className="border border-gray-300 px-4 py-2">
                     <Select
                       disabled={!checkedItems[entry.id]}
+                      value={feedback[index].rating || undefined}
                       onValueChange={(value) => {
                         const updatedFeedback = [...feedback];
                         updatedFeedback[index].rating = value;
@@ -169,6 +208,7 @@ export default function FeedbackForm() {
                         <SelectValue placeholder="Select Rating" />
                       </SelectTrigger>
                       <SelectContent>
+                        SelectD
                         {ratingOptions.map((option) => (
                           <SelectItem key={option} value={option}>
                             {option}
@@ -202,10 +242,7 @@ export default function FeedbackForm() {
                             entry.skill as keyof typeof topicOptions
                           ]?.includes(value)
                         ) {
-                          setNewSkill((skills) => ({
-                            ...skills,
-                            topics: [...skills.topics, value],
-                          }));
+                          handleAddTopic(index, value);
                           e.target.value = "";
                         }
                       }}
@@ -239,7 +276,7 @@ export default function FeedbackForm() {
                     <Input
                       disabled={!checkedItems[entry.id]}
                       type="text"
-                      placeholder="Add specific comments"
+                      placeholder="Comments"
                       value={entry.comments}
                       onChange={(e) => {
                         const updatedFeedback = [...feedback];
@@ -253,6 +290,7 @@ export default function FeedbackForm() {
             </tbody>
           </table>
         </CardContent>
+
         <CardContent>
           <NewSkillForm
             newSkill={newSkill}
@@ -263,11 +301,27 @@ export default function FeedbackForm() {
         </CardContent>
 
         <CardFooter>
-          <Button className="mt-6" onClick={() => navigate("/submit-feedback")}>
+          <Button className="mt-6" onClick={handleSubmit}>
             Submit Feedback
           </Button>
         </CardFooter>
       </Card>
+
+      {/* Confirmation Modal */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Submission</DialogTitle>
+          </DialogHeader>
+          <p>Are you sure you want to submit the feedback?</p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={confirmSubmit}>Confirm</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
