@@ -1,6 +1,5 @@
 package com.gajmain2020.cap1.models;
 
-
 import com.gajmain2020.cap1.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;

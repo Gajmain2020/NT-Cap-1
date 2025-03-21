@@ -13,10 +13,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import { RegisterUserApi } from "@/api/userApis";
 
 export default function AuthForm() {
   const navigate = useNavigate();
   const { setName, setAuthToken, setId, setUserType } = useAuthStore();
+
+  const [loading, setLoading] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
   const [isRegister, setIsRegister] = useState(false);
@@ -48,18 +51,30 @@ export default function AuthForm() {
     console.log("Login successful", email, password);
   };
 
-  const handleRegister = () => {
-    const result = registerSchema.safeParse({ name, email, role, password });
+  const handleRegister = async () => {
+    setLoading(true);
+    try {
+      const result = registerSchema.safeParse({ name, email, role, password });
 
-    if (!result.success) {
-      result.error.issues.map((err) => toast.error(err.message));
-      return;
+      if (!result.success) {
+        result.error.issues.map((err) => toast.error(err.message));
+        return;
+      }
+
+      const response = await RegisterUserApi({ name, email, role, password });
+
+      if (!response.success) {
+        toast.error(response.message);
+        return;
+      }
+
+      toast.success("Registration successful! Please login.");
+      setIsRegister(false);
+    } catch (error) {
+      console.log("error", error);
+    } finally {
+      setLoading(false);
     }
-
-    //api to be integrated here
-
-    toast.success("Registration successful! Please login.");
-    setIsRegister(false);
   };
 
   return (
@@ -100,8 +115,8 @@ export default function AuthForm() {
               <SelectValue placeholder="Select Role" />
             </SelectTrigger>
             <SelectContent className="w-full flex">
-              <SelectItem value="hr">HR</SelectItem>
-              <SelectItem value="interviewer">Interviewer</SelectItem>
+              <SelectItem value="HR">HR</SelectItem>
+              <SelectItem value="INTERVIEWER">Interviewer</SelectItem>
             </SelectContent>
           </Select>
         )}
@@ -131,10 +146,17 @@ export default function AuthForm() {
 
       {/* Submit Button */}
       <Button
+        disabled={loading}
         onClick={isRegister ? handleRegister : handleLogin}
         className="cursor-pointer w-full bg-teal-500 hover:bg-teal-600 hover:shadow text-white font-medium py-2 px-4 rounded-lg"
       >
-        {isRegister ? "Register" : "Login"}
+        {isRegister
+          ? loading
+            ? "Registering..."
+            : "Register"
+          : loading
+          ? "Logging you in..."
+          : "Login"}
       </Button>
 
       {/* Toggle Button */}

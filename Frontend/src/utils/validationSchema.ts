@@ -21,7 +21,7 @@ export const interviewSchema = z.object({
 export const registerSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters long"),
   email: z.string().email("Invalid email address"),
-  role: z.enum(["hr", "interviewer"], {
+  role: z.enum(["HR", "INTERVIEWER"], {
     errorMap: () => ({ message: "Role must be either HR or Interviewer" }),
   }),
   password: z
