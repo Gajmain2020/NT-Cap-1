@@ -18,9 +18,14 @@ import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import NewSkillForm from "@/components/Interviewer/NewSkillForm";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function FeedbackForm() {
   const navigate = useNavigate();
+
+  const [checkedItems, setCheckedItems] = useState<{ [key: number]: boolean }>(
+    {}
+  );
   const [feedback, setFeedback] = useState<FeedbackEntry[]>([
     { id: 1, skill: "Basic Algorithm", rating: "", topics: [], comments: "" },
     { id: 2, skill: "Code and Syntax", rating: "", topics: [], comments: "" },
@@ -49,6 +54,10 @@ export default function FeedbackForm() {
     topics: [],
     comment: "",
   });
+
+  const handleCheckboxChange = (id: number, checked: boolean) => {
+    setCheckedItems((prev) => ({ ...prev, [id]: checked }));
+  };
 
   const ratingOptions = [
     "Average",
@@ -123,7 +132,7 @@ export default function FeedbackForm() {
           <table className="w-full border-collapse border border-gray-300">
             <thead>
               <tr className="bg-gray-100">
-                <th className="border border-gray-300 px-4 py-2">Sr No.</th>
+                <th className="border border-gray-300 px-4 py-2">Select</th>
                 <th className="border border-gray-300 px-4 py-2">Skill</th>
                 <th className="border border-gray-300 px-4 py-2">Rating</th>
                 <th className="border border-gray-300 px-4 py-2">
@@ -137,13 +146,19 @@ export default function FeedbackForm() {
               {feedback.map((entry, index) => (
                 <tr key={entry.id}>
                   <td className="border border-gray-300 px-4 py-2">
-                    {index + 1}
+                    <Checkbox
+                      className="cursor-pointer"
+                      onCheckedChange={(checked) =>
+                        handleCheckboxChange(entry.id, Boolean(checked))
+                      }
+                    />
                   </td>
                   <td className="border border-gray-300 px-4 py-2">
                     {entry.skill}
                   </td>
                   <td className="border border-gray-300 px-4 py-2">
                     <Select
+                      disabled={!checkedItems[entry.id]}
                       onValueChange={(value) => {
                         const updatedFeedback = [...feedback];
                         updatedFeedback[index].rating = value;
@@ -175,6 +190,7 @@ export default function FeedbackForm() {
                       ))}
                     </div>
                     <Input
+                      disabled={!checkedItems[entry.id]}
                       type="text"
                       placeholder="Select or Type"
                       list={`topics-${entry.id}`}
@@ -221,6 +237,7 @@ export default function FeedbackForm() {
                   </td>
                   <td className="border border-gray-300 px-4 py-2">
                     <Input
+                      disabled={!checkedItems[entry.id]}
                       type="text"
                       placeholder="Add specific comments"
                       value={entry.comments}
