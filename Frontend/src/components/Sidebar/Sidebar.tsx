@@ -53,7 +53,7 @@ const SidebarNavItem = ({ item, isActive, path }: ISidebarNavItem) => (
 
 export function AppSidebar() {
   const navigate = useNavigate();
-  const { name, id, userType } = useAuthStore();
+  const { name, id, userType, reset } = useAuthStore();
   const { state } = useSidebar();
 
   const location = useLocation();
@@ -61,6 +61,15 @@ export function AppSidebar() {
   const activePath = location.pathname;
   const basePath = `/user/${userType}/${id}`;
   const navItems = userType === "hr" ? hrNavItems : interviewerNavItems;
+
+  function handleLogout() {
+    reset();
+
+    //! using setTimeout just for considering hydration issue
+    setTimeout(() => {
+      navigate("/", { replace: true });
+    }, 0);
+  }
 
   return (
     <Sidebar>
@@ -120,7 +129,7 @@ export function AppSidebar() {
                   <span>Change Password</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => console.log("logout requested")}
+                  onClick={() => handleLogout()}
                   className="cursor-pointer"
                 >
                   <span>Sign out</span>
