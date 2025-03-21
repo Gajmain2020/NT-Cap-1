@@ -1,7 +1,15 @@
 import { toast } from "sonner";
 
-import { loginSchema, registerSchema } from "@/utils/validationSchema";
-import { LoginUserApi, RegisterUserApi } from "@/api/userApis";
+import {
+  loginSchema,
+  passwordChangeSchema,
+  registerSchema,
+} from "@/utils/validationSchema";
+import {
+  ChangeUserPasswordApi,
+  LoginUserApi,
+  RegisterUserApi,
+} from "@/api/userApis";
 
 export async function handleUserRegistration(
   registerData: { email: string; password: string; name: string; role: string },
@@ -71,6 +79,52 @@ export async function handleUserLogin(
   } catch (error) {
     console.error("Login Error:", error);
     toast.error("Failed to login. Please check your credentials.");
+  } finally {
+    setLoading(false);
+  }
+}
+
+export async function changePassword(
+  passwords: {
+    oldPassword: string;
+    newPassword: string;
+    confirmPassword: string;
+  },
+  setPasswords: (passwords: {
+    oldPassword: string;
+    newPassword: string;
+    confirmPassword: string;
+  }) => void,
+  setLoading: (loading: boolean) => void,
+  setOpen: (open: boolean) => void
+) {
+  setLoading(true);
+  try {
+    const checkSchema = passwordChangeSchema.safeParse(passwords);
+
+    if (!checkSchema.success) {
+      checkSchema.error.issues.forEach((err) => toast.error(err.message));
+      return;
+    }
+
+    if (passwords.newPassword !== passwords.confirmPassword) {
+      toast.error("New password and Confirm password must match.");
+      return;
+    }
+
+    const response = await ChangeUserPasswordApi(passwords);
+
+    if (!response.success) {
+      toast.error(response.message);
+      return;
+    }
+
+    toast.success("Password changed successfully!");
+    setPasswords({ oldPassword: "", newPassword: "", confirmPassword: "" });
+    setOpen(false);
+  } catch (error) {
+    console.error("Password Change Error:", error);
+    toast.error("Failed to change password. Please try again.");
   } finally {
     setLoading(false);
   }

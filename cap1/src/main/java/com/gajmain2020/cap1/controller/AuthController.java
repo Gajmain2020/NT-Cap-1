@@ -5,6 +5,7 @@ import com.gajmain2020.cap1.exception.InvalidCredentialsException;
 import com.gajmain2020.cap1.models.User;
 import com.gajmain2020.cap1.repositories.UserRepository;
 import com.gajmain2020.cap1.security.JwtUtil;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -83,4 +84,60 @@ public class AuthController {
 
         return ResponseEntity.ok(response);
     }
+
+    @PutMapping("/change-password")
+    public ResponseEntity<Map<String, Object>> changePassword(
+            @RequestParam String oldPassword,
+            @RequestParam String newPassword,
+            @RequestParam String confirmPassword,
+            @RequestHeader("Authorization") String authHeader) {
+
+        // Extract token from Authorization header
+        if (!authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+                    "success", false,
+                    "message", "Invalid authorization token."
+            ));
+        }
+
+        String token = authHeader.substring(7);
+        String email = jwtUtil.extractEmail(token); // Extract email from JWT token
+
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                    "success", false,
+                    "message", "User not found."
+            ));
+        }
+
+        User user = userOptional.get();
+
+        // Verify old password
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                    "success", false,
+                    "message", "Old password is incorrect."
+            ));
+        }
+
+        // Check if new password matches confirmation
+        if (!newPassword.equals(confirmPassword)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                    "success", false,
+                    "message", "New password and confirm password must match."
+            ));
+        }
+
+        // Hash the new password and update the user
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("message", "Password Changed successfully.");
+
+        return ResponseEntity.ok(response);
+    }
+
 }
