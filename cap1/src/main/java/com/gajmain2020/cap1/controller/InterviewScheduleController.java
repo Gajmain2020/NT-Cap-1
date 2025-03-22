@@ -119,4 +119,80 @@ public class InterviewScheduleController {
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    @PutMapping("/edit-scheduled-interview/{id}")
+    public ResponseEntity<Map<String, Object>> editInterview(
+            @PathVariable Long id,
+            @Valid @RequestBody InterviewRequest interviewRequest,
+            BindingResult result) {
+        Map<String, Object> response = new HashMap<>();
+
+        // Check for validation errors
+        if (result.hasErrors()) {
+            response.put("message", result.getFieldError().getDefaultMessage());
+            response.put("success", false);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+
+        Optional<InterviewSchedule> optionalInterview = interviewScheduleRepository.findById(id);
+
+        if (optionalInterview.isEmpty()) {
+            response.put("message", "Interview not found.");
+            response.put("success", false);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        InterviewSchedule interview = optionalInterview.get();
+
+        Optional<User> optionalInterviewer = userRepository.findByEmail(interviewRequest.getInterviewerEmail());
+
+        if (optionalInterviewer.isEmpty()) {
+            response.put("message", "Interviewer email does not exist.");
+            response.put("success", false);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+
+        User interviewer = optionalInterviewer.get();
+
+        if (interviewer.getRole() != Role.INTERVIEWER) {
+            response.put("message", "User is not an INTERVIEWER.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+        }
+
+        // Parse start and end time
+        LocalTime start = LocalTime.parse(interviewRequest.getStartTime());
+        LocalTime end = LocalTime.parse(interviewRequest.getEndTime());
+
+        // Calculate duration in minutes
+        int duration = (int) Duration.between(start, end).toMinutes();
+
+        // Validate duration
+        if (duration < 0) {
+            response.put("message", "Start time cannot be after end time.");
+            response.put("success", false);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+
+        // Update interview details
+        interview.setIntervieweeName(interviewRequest.getIntervieweeName());
+        interview.setIntervieweeEmail(interviewRequest.getIntervieweeEmail());
+        interview.setPosition(interviewRequest.getPosition());
+        interview.setDate(interviewRequest.getDate());
+        interview.setStartTime(interviewRequest.getStartTime());
+        interview.setEndTime(interviewRequest.getEndTime());
+        interview.setMeetLink(interviewRequest.getMeetLink());
+        interview.setResumeLink(interviewRequest.getResumeLink());
+        interview.setInterviewerEmail(interviewRequest.getInterviewerEmail());
+        interview.setInterviewer(interviewer);
+        interview.setDuration(duration);
+
+        interviewScheduleRepository.save(interview);
+
+        response.put("message", "Interview updated successfully.");
+        response.put("success", true);
+
+        return ResponseEntity.ok(response);
+    }
+
+
 }

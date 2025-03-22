@@ -50,10 +50,12 @@ export async function GetUpcomingInterviewHrAPI() {
 export async function EditScheduleInterviewAPI(
   data: IScheduleInterview & { id: string }
 ) {
+  const interviewId = data.id;
+
   try {
     const response = await axios({
       headers,
-      url: baseUrl + "/edit-scheduled-interview",
+      url: baseUrl + `/edit-scheduled-interview/${interviewId}`,
       method: "PUT",
       data,
     });
