@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getUpcomingInterviewHr } from "@/services/interviewService";
-import { ExtendedInterview } from "@/utils/types";
+import { ExtendedInterview, ExtendedScheduledInterview } from "@/utils/types";
 import {
   Select,
   SelectContent,
@@ -19,7 +19,7 @@ export default function InterviewTable({
 }: {
   interviews: ExtendedInterview[];
   setInterviews: (
-    update: (prev: ExtendedInterview[]) => ExtendedInterview[]
+    update: (prev: ExtendedScheduledInterview[]) => ExtendedScheduledInterview[]
   ) => void;
 }) {
   const navigate = useNavigate();

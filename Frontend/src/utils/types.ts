@@ -9,6 +9,8 @@ export interface IInterview {
   meetLink: string;
 }
 
+export type ExtendedScheduledInterview = IScheduleInterview & { id: string };
+
 export interface IScheduleInterview {
   intervieweeName: string;
   intervieweeEmail: string;

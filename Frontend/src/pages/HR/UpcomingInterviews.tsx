@@ -17,24 +17,27 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getUpcomingInterviewHr } from "@/services/interviewService";
-import { ExtendedInterview, IScheduleInterview } from "@/utils/types";
+import { IScheduleInterview } from "@/utils/types";
 import { calculateDuration } from "@/utils/utils";
 import { editScheduledSchema } from "@/utils/validationSchema";
 import { Dialog } from "@radix-ui/react-dialog";
 import { FilePen } from "lucide-react";
 import { toast } from "sonner";
 
+type ExtendedScheduledInterview = IScheduleInterview & { id: string };
+
 export default function UpcomingInterviews() {
-  const [interviews, setInterviews] = useState<ExtendedInterview[]>([]);
+  const [interviews, setInterviews] = useState<ExtendedScheduledInterview[]>(
+    []
+  );
   const [search, setSearch] = useState("");
   const [filterPosition, setFilterPosition] = useState("");
   const [loading, setLoading] = useState(true);
   const [numberOfRowsToShow, setNumberOfRowsToShow] = useState(10);
   const [rescheduling, setRescheduling] = useState(false);
 
-  const [selectedInterview, setSelectedInterview] = useState<
-    (IScheduleInterview & { id: string }) | null
-  >(null);
+  const [selectedInterview, setSelectedInterview] =
+    useState<ExtendedScheduledInterview | null>(null);
 
   useEffect(() => {
     const fetchUpcomingInterviews = async () => {
@@ -266,8 +269,8 @@ function EditDialog({
   loading,
   handleReschedule,
 }: {
-  selectedInterview: IScheduleInterview | null;
-  setSelectedInterview: (args: IScheduleInterview | null) => void;
+  selectedInterview: ExtendedScheduledInterview | null;
+  setSelectedInterview: (args: ExtendedScheduledInterview | null) => void;
   loading: boolean;
   handleReschedule: () => void;
 }) {

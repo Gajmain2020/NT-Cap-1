@@ -1,6 +1,6 @@
 import InterviewTable from "@/components/HR/InterviewTable";
 import ScheduleInterview from "@/components/HR/ScheduleInterview";
-import { ExtendedInterview, IInterview } from "@/utils/types";
+import { ExtendedScheduledInterview, IInterview } from "@/utils/types";
 import { useState } from "react";
 
 export default function Homepage() {
@@ -15,20 +15,9 @@ export default function Homepage() {
     meetLink: "",
   });
 
-  const [interviews, setInterviews] = useState<ExtendedInterview[]>([]);
-
-  // {
-  //     "intervieweeName": "testing",
-  //     "intervieweeEmail": "testing@mail.com",
-  //     "resumeLink": "",
-  //     "position": "sde",
-  //     "date": "2025-03-23",
-  //     "startTime": "17:15",
-  //     "endTime": "18:30",
-  //     "meetLink": "",
-  //     "interviewerName": "Gajju",
-  //     "interviewerEmail": "test@mail.com"
-  // }
+  const [interviews, setInterviews] = useState<ExtendedScheduledInterview[]>(
+    []
+  );
 
   const handleChange = (e: { target: { name: string; value: string } }) => {
     const { name, value } = e.target;

@@ -1,7 +1,9 @@
+import { scheduleInterview } from "@/services/interviewService";
+import { ExtendedScheduledInterview, IInterview } from "@/utils/types";
+import { interviewScheduleSchema } from "@/utils/validationSchema";
 import { useState } from "react";
-import { ExtendedInterview, IInterview } from "@/utils/types";
+import { toast } from "sonner";
 import { Button } from "../ui/button";
-import { Input } from "../ui/input";
 import {
   Dialog,
   DialogContent,
@@ -9,9 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
-import { interviewScheduleSchema } from "@/utils/validationSchema";
-import { toast } from "sonner";
-import { scheduleInterview } from "@/services/interviewService";
+import { Input } from "../ui/input";
 
 export default function ScheduleInterview({
   formData,
@@ -21,7 +21,9 @@ export default function ScheduleInterview({
 }: {
   formData: IInterview;
   setFormData: (data: IInterview) => void;
-  setInterviews: React.Dispatch<React.SetStateAction<ExtendedInterview[]>>;
+  setInterviews: React.Dispatch<
+    React.SetStateAction<ExtendedScheduledInterview[]>
+  >;
   handleChange: (e: { target: { name: string; value: string } }) => void;
 }) {
   const [loading, setLoading] = useState(false);
