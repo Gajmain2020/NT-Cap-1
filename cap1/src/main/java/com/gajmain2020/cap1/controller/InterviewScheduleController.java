@@ -7,11 +7,15 @@ import com.gajmain2020.cap1.models.InterviewSchedule;
 import com.gajmain2020.cap1.models.User;
 import com.gajmain2020.cap1.repositories.InterviewScheduleRepository;
 import com.gajmain2020.cap1.repositories.UserRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -32,15 +36,21 @@ public class InterviewScheduleController {
     }
 
     @PostMapping("/add-interview")
-    public ResponseEntity<Map<String, Object>> addInterview(@RequestBody InterviewRequest interviewRequest) {
+    public ResponseEntity<Map<String, Object>> addInterview(@Valid @RequestBody InterviewRequest interviewRequest, BindingResult result) {
         Map<String, Object> response = new HashMap<>();
 
+        // Check for validation errors
+        if (result.hasErrors()) {
+            response.put("message", result.getFieldError().getDefaultMessage());
+            response.put("success", false);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
 
         Optional<User> optionalInterviewer = userRepository.findByEmail(interviewRequest.getInterviewerEmail());
 
         if (optionalInterviewer.isEmpty()) {
             response.put("message", "Interviewer email does not exist.");
-            response.put("success",false);
+            response.put("success", false);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
@@ -49,6 +59,20 @@ public class InterviewScheduleController {
         if (interviewer.getRole() != Role.INTERVIEWER) {
             response.put("message", "User is not an INTERVIEWER.");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+        }
+
+        // Parse start and end time
+        LocalTime start = LocalTime.parse(interviewRequest.getStartTime());  // e.g., "14:45"
+        LocalTime end = LocalTime.parse(interviewRequest.getEndTime());      // e.g., "13:45"
+
+        // Calculate duration in minutes
+        int duration = (int) Duration.between(start, end).toMinutes();
+
+        // Validate duration
+        if (duration < 0) {
+            response.put("message", "Start time cannot be after end time.");
+            response.put("success", false);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
         // Create and save interview
@@ -63,13 +87,13 @@ public class InterviewScheduleController {
                 .resumeLink(interviewRequest.getResumeLink())
                 .interviewerEmail(interviewRequest.getInterviewerEmail())
                 .interviewer(interviewer)
+                .duration(duration)  // Set calculated duration
                 .build();
 
         interviewScheduleRepository.save(interview);
 
         response.put("message", "Interview scheduled successfully.");
-        response.put("interviewId", interview.getId());
-        response.put("success",true);
+        response.put("success", true);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
