@@ -4,7 +4,10 @@ export interface IInterview {
   resumeLink: string;
   position: string;
   interviewer: string;
-  schedule: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  meetLink: string;
 }
 
 export interface INavItem {
