@@ -17,8 +17,6 @@ export default function Homepage() {
 
   const [interviews, setInterviews] = useState<ExtendedInterview[]>([]);
 
-  console.log(interviews);
-
   // {
   //     "intervieweeName": "testing",
   //     "intervieweeEmail": "testing@mail.com",
@@ -53,7 +51,7 @@ export default function Homepage() {
 
       {/* Interview Table Component */}
       <div className="w-full max-w-6xl">
-        <InterviewTable interviews={interviews} />
+        <InterviewTable setInterviews={setInterviews} interviews={interviews} />
       </div>
     </div>
   );

@@ -5,20 +5,21 @@ import {
   Routes,
 } from "react-router-dom";
 import { Toaster } from "sonner";
+import Layout from "./components/Layout/Layout";
+import HRCalendar from "./pages/HR/Calendar";
+import Homepage from "./pages/HR/Homepage";
+import PastInterviews from "./pages/HR/PastInterviews";
+import Report from "./pages/HR/Report";
+import UpcomingInterviews from "./pages/HR/UpcomingInterviews";
+import InterviewerCalendar from "./pages/Interviewer/Calendar";
+import FeedbackForm from "./pages/Interviewer/FeedbackForm";
+import InterviewerHome from "./pages/Interviewer/Homepage";
+import Landing from "./pages/Landing";
+import NotAuthorized from "./pages/NotAuthorized";
+import NotFound from "./pages/NotFound";
 import useAuthStore from "./store/userAuthStore";
 import ProtectedRoutes from "./utils/ProtectedRoutes";
 import UserTypeCheck from "./utils/UserTypeCheck";
-import Layout from "./components/Layout/Layout";
-import NotFound from "./pages/NotFound";
-import NotAuthorized from "./pages/NotAuthorized";
-import Landing from "./pages/Landing";
-import Homepage from "./pages/HR/Homepage";
-import InterviewerHome from "./pages/Interviewer/Homepage";
-import FeedbackForm from "./pages/Interviewer/FeedbackForm";
-import InterviewerCalendar from "./pages/Interviewer/Calendar";
-import HRCalendar from "./pages/HR/Calendar";
-import PastInterviews from "./pages/HR/PastInterviews";
-import Report from "./pages/HR/Report";
 
 function App() {
   const { authToken, userType, id } = useAuthStore();
@@ -52,6 +53,10 @@ function App() {
             }
           >
             <Route index element={<Homepage />} />
+            <Route
+              path="upcoming-interviews"
+              element={<UpcomingInterviews />}
+            />
             <Route path="past-interviews" element={<PastInterviews />} />
             <Route path="past-interviews/:reportId" element={<Report />} />
             <Route path="calendar" element={<HRCalendar />} />

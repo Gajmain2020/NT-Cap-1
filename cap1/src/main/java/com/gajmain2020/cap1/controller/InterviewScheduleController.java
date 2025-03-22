@@ -15,10 +15,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/schedules")
@@ -97,5 +97,26 @@ public class InterviewScheduleController {
         response.put("success", true);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping("/upcoming-interviews-hr")
+    public ResponseEntity<Map<String, Object>> getUpcomingInterviews() {
+        Map<String, Object> response = new HashMap<>();
+
+        LocalDate today = LocalDate.now();  // Get current date
+
+        // Fetch upcoming interviews directly with optimized query
+        List<Map<String, Object>> interviews = interviewScheduleRepository.findUpcomingInterviews(today.toString());
+
+        if (interviews.isEmpty()) {
+            response.put("message", "No upcoming interviews found.");
+            response.put("success", false);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        response.put("interviews", interviews);
+        response.put("success", true);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
