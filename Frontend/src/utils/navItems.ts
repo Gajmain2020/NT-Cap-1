@@ -1,4 +1,11 @@
-import { BadgePlus, Calendar, History, Home, Inbox } from "lucide-react";
+import {
+  BadgePlus,
+  Calendar,
+  CalendarCheck,
+  History,
+  Home,
+  Inbox,
+} from "lucide-react";
 
 // Menu items.
 export const hrNavItems = [
@@ -6,6 +13,11 @@ export const hrNavItems = [
     title: "Home",
     url: "/",
     icon: Home,
+  },
+  {
+    title: "Upcoming Interviews",
+    url: "/upcoming-interviews",
+    icon: CalendarCheck,
   },
   {
     title: "Past Interviews",
