@@ -105,8 +105,8 @@ public class InterviewScheduleController {
 
         LocalDate today = LocalDate.now();  // Get current date
 
-        // Fetch interviews on or after today
-        List<InterviewSchedule> interviews = interviewScheduleRepository.findByDateGreaterThanEqual(today.toString());
+        // Fetch upcoming interviews directly with optimized query
+        List<Map<String, Object>> interviews = interviewScheduleRepository.findUpcomingInterviews(today.toString());
 
         if (interviews.isEmpty()) {
             response.put("message", "No upcoming interviews found.");
@@ -114,30 +114,7 @@ public class InterviewScheduleController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
-        // Sort by date first, then by start time
-        List<Map<String, Object>> sortedInterviews = interviews.stream()
-                .sorted(Comparator.comparing(InterviewSchedule::getDate)  // Sort by date (ascending)
-                        .thenComparing(InterviewSchedule::getStartTime))       // If same date, sort by start time (ascending)
-                .map(interview -> {
-                    Map<String, Object> interviewMap = new HashMap<>();
-                    interviewMap.put("intervieweeName", interview.getIntervieweeName());
-                    interviewMap.put("intervieweeEmail", interview.getIntervieweeEmail());
-                    interviewMap.put("position", interview.getPosition());
-                    interviewMap.put("date", interview.getDate());
-                    interviewMap.put("startTime", interview.getStartTime());
-                    interviewMap.put("endTime", interview.getEndTime());
-                    interviewMap.put("meetLink", interview.getMeetLink());
-                    interviewMap.put("resumeLink", interview.getResumeLink());
-                    interviewMap.put("interviewerEmail", interview.getInterviewerEmail());
-
-                    // Fetch interviewer details
-                    Optional<User> interviewer = userRepository.findByEmail(interview.getInterviewerEmail());
-                    interviewMap.put("interviewerName", interviewer.map(User::getName).orElse("Unknown"));
-
-                    return interviewMap;
-                }).collect(Collectors.toList());
-
-        response.put("interviews", sortedInterviews);
+        response.put("interviews", interviews);
         response.put("success", true);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
