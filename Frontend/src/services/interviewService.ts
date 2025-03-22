@@ -1,7 +1,35 @@
-import { ScheduleInterviewAPI } from "@/api/interviewApis";
+import {
+  GetUpcomingInterviewHrAPI,
+  ScheduleInterviewAPI,
+} from "@/api/interviewApis";
 import { ExtendedInterview, IInterview } from "@/utils/types";
 import { interviewConfirmSchema } from "@/utils/validationSchema";
 import { toast } from "sonner";
+
+export const getUpcomingInterviewHr = async (
+  setLoading: (arg: boolean) => void,
+  setInterviews: (
+    update: (prev: ExtendedInterview[]) => ExtendedInterview[]
+  ) => void
+) => {
+  try {
+    const response = await GetUpcomingInterviewHrAPI();
+
+    if (!response.success) {
+      toast.error(response.message);
+      return;
+    }
+
+    setInterviews(() => response.interviews);
+  } catch (error) {
+    console.error("Interview Schedule Error:", error);
+    toast.error(
+      "Failed to fetch upcoming interviews. Please try refresh again."
+    );
+  } finally {
+    setLoading(false);
+  }
+};
 
 export const scheduleInterview = async (
   formData: IInterview,

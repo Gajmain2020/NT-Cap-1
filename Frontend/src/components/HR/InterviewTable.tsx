@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,14 +9,27 @@ import {
   SelectValue,
 } from "../ui/select";
 import { ExtendedInterview } from "@/utils/types";
+import { getUpcomingInterviewHr } from "@/services/interviewService";
 
 export default function InterviewTable({
   interviews,
+  setInterviews,
 }: {
   interviews: ExtendedInterview[];
+  setInterviews: (
+    update: (prev: ExtendedInterview[]) => ExtendedInterview[]
+  ) => void;
 }) {
   const [search, setSearch] = useState("");
   const [filterPosition, setFilterPosition] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUpcomingInterviews = async () => {
+      await getUpcomingInterviewHr(setLoading, setInterviews);
+    };
+    fetchUpcomingInterviews();
+  }, []);
 
   const calculateDuration = (startTime: string, endTime: string) => {
     const [startHour, startMinute] = startTime.split(":").map(Number);
@@ -93,58 +106,74 @@ export default function InterviewTable({
               <th className="p-2 border">Resume</th>
             </tr>
           </thead>
-          <tbody>
-            {filteredInterviews.length > 0 ? (
-              filteredInterviews.map((interview, index) => (
-                <tr key={index} className="text-center border-b">
-                  <td className="p-2 border">
-                    <div className="flex flex-col">
-                      <span>{interview.intervieweeName}</span>
-                      <span className="text-xs">
-                        ({interview.intervieweeEmail})
-                      </span>
-                    </div>
-                  </td>
-                  <td className="p-2 border">{interview.position}</td>
-                  <td className="p-2 border">
-                    <div className="flex flex-col">
-                      <span>{interview.interviewerName}</span>
-                      <span className="text-xs">
-                        ({interview.interviewerEmail})
-                      </span>
-                    </div>
-                  </td>
-                  <td className="p-2 border">{interview.date}</td>
-                  <td className="p-2 border">
-                    {interview.startTime} - {interview.endTime}
-                  </td>
-                  <td className="p-2 border">
-                    {calculateDuration(interview.startTime, interview.endTime)}
-                  </td>
-                  <td className="p-2 border">
-                    {interview.resumeLink ? (
-                      <Button
-                        variant="ghost"
-                        onClick={() =>
-                          window.open(interview.resumeLink, "_blank")
-                        }
-                      >
-                        Open Resume
-                      </Button>
-                    ) : (
-                      "N/A"
-                    )}
-                  </td>
-                </tr>
-              ))
-            ) : (
+          {loading ? (
+            <tbody>
               <tr>
-                <td colSpan={8} className="p-4 text-center text-gray-500">
-                  No interviews scheduled
+                <td
+                  colSpan={8}
+                  className="p-4 text-center text-gray-500 animate-pulse"
+                >
+                  Loading...
                 </td>
               </tr>
-            )}
-          </tbody>
+            </tbody>
+          ) : (
+            <tbody>
+              {filteredInterviews.length > 0 ? (
+                filteredInterviews.map((interview, index) => (
+                  <tr key={index} className="text-center border-b">
+                    <td className="p-2 border">
+                      <div className="flex flex-col">
+                        <span>{interview.intervieweeName}</span>
+                        <span className="text-xs">
+                          ({interview.intervieweeEmail})
+                        </span>
+                      </div>
+                    </td>
+                    <td className="p-2 border">{interview.position}</td>
+                    <td className="p-2 border">
+                      <div className="flex flex-col">
+                        <span>{interview.interviewerName}</span>
+                        <span className="text-xs">
+                          ({interview.interviewerEmail})
+                        </span>
+                      </div>
+                    </td>
+                    <td className="p-2 border">{interview.date}</td>
+                    <td className="p-2 border">
+                      {interview.startTime} - {interview.endTime}
+                    </td>
+                    <td className="p-2 border">
+                      {calculateDuration(
+                        interview.startTime,
+                        interview.endTime
+                      )}
+                    </td>
+                    <td className="p-2 border">
+                      {interview.resumeLink ? (
+                        <Button
+                          variant="ghost"
+                          onClick={() =>
+                            window.open(interview.resumeLink, "_blank")
+                          }
+                        >
+                          Open Resume
+                        </Button>
+                      ) : (
+                        "N/A"
+                      )}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={8} className="p-4 text-center text-gray-500">
+                    No interviews scheduled
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          )}
         </table>
       </div>
     </div>

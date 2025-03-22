@@ -99,7 +99,7 @@ public class InterviewScheduleController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/upcoming-interviews")
+    @GetMapping("/upcoming-interviews-hr")
     public ResponseEntity<Map<String, Object>> getUpcomingInterviews() {
         Map<String, Object> response = new HashMap<>();
 

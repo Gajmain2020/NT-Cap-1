@@ -29,3 +29,20 @@ export async function ScheduleInterviewAPI(data: IScheduleInterview) {
     }
   }
 }
+
+export async function GetUpcomingInterviewHrAPI() {
+  try {
+    const response = await axios({
+      headers,
+      url: baseUrl + "/upcoming-interviews-hr",
+      method: "GET",
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      return error?.response?.data;
+    } else {
+      toast.error("An unexpected error occurred");
+    }
+  }
+}
