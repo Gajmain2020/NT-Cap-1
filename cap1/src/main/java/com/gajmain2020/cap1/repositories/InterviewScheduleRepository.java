@@ -15,6 +15,7 @@ public interface InterviewScheduleRepository extends JpaRepository<InterviewSche
     // Joins the User table with the interview schedule
     @Query("""
         SELECT new map(
+            i.id as id,
             i.intervieweeName as intervieweeName,
             i.intervieweeEmail as intervieweeEmail,
             i.position as position,

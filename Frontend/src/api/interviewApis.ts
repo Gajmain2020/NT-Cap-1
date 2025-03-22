@@ -1,6 +1,6 @@
-import { toast } from "sonner";
-import axios from "axios";
 import { IScheduleInterview } from "@/utils/types";
+import axios from "axios";
+import { toast } from "sonner";
 
 const baseUrl = "http://localhost:8080/api/v1/schedules";
 
@@ -36,6 +36,28 @@ export async function GetUpcomingInterviewHrAPI() {
       headers,
       url: baseUrl + "/upcoming-interviews-hr",
       method: "GET",
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      return error?.response?.data;
+    } else {
+      toast.error("An unexpected error occurred");
+    }
+  }
+}
+
+export async function EditScheduleInterviewAPI(
+  data: IScheduleInterview & { id: string }
+) {
+  const interviewId = data.id;
+
+  try {
+    const response = await axios({
+      headers,
+      url: baseUrl + `/edit-scheduled-interview/${interviewId}`,
+      method: "PUT",
+      data,
     });
     return response.data;
   } catch (error) {
