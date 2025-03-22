@@ -33,3 +33,8 @@ export interface ISidebarNavItem {
   onClick: () => void;
   path: string;
 }
+
+export type ExtendedInterview = IInterview & {
+  interviewerName: string;
+  interviewerEmail: string;
+};

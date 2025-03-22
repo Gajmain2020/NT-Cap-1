@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { IInterview } from "@/utils/types";
+import { ExtendedInterview, IInterview } from "@/utils/types";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import {
@@ -9,12 +9,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
-import {
-  interviewConfirmSchema,
-  interviewScheduleSchema,
-} from "@/utils/validationSchema";
+import { interviewScheduleSchema } from "@/utils/validationSchema";
 import { toast } from "sonner";
-import { ScheduleInterviewAPI } from "@/api/interviewApis";
+import { scheduleInterview } from "@/services/interviewService";
 
 export default function ScheduleInterview({
   formData,
@@ -24,7 +21,7 @@ export default function ScheduleInterview({
 }: {
   formData: IInterview;
   setFormData: (data: IInterview) => void;
-  setInterviews: React.Dispatch<React.SetStateAction<IInterview[]>>;
+  setInterviews: React.Dispatch<React.SetStateAction<ExtendedInterview[]>>;
   handleChange: (e: { target: { name: string; value: string } }) => void;
 }) {
   const [loading, setLoading] = useState(false);
@@ -48,56 +45,15 @@ export default function ScheduleInterview({
 
   // to handle main thing of adding the data into the database
   const handleConfirmSchedule = async () => {
-    setLoading(true);
-    try {
-      const isValidInterviewer = interviewConfirmSchema.safeParse(interviewer);
-
-      if (!isValidInterviewer.success) {
-        isValidInterviewer.error.issues.forEach((err) =>
-          toast.error(err.message)
-        );
-        return;
-      }
-
-      const finalData = {
-        ...formData,
-        interviewerName: interviewer.interviewerName,
-        interviewerEmail: interviewer.interviewerEmail,
-      };
-
-      const response = await ScheduleInterviewAPI(finalData);
-
-      if (!response.success) {
-        toast.error(response.message);
-        return;
-      }
-
-      toast.success("Interview scheduled successfully!");
-      setInterviews((prevInterviews: IInterview[]) => [
-        ...prevInterviews,
-        finalData,
-      ]);
-      setFormData({
-        intervieweeName: "",
-        intervieweeEmail: "",
-        resumeLink: "",
-        position: "",
-        date: "",
-        startTime: "",
-        endTime: "",
-        meetLink: "",
-      });
-      setInterviewer({
-        interviewerName: "",
-        interviewerEmail: "",
-      });
-      setDialogOpen(false);
-    } catch (error) {
-      console.error("Interview Schedule Error:", error);
-      toast.error("Failed to schedule interview. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+    await scheduleInterview(
+      formData,
+      interviewer,
+      setLoading,
+      setInterviews,
+      setFormData,
+      setInterviewer,
+      setDialogOpen
+    );
   };
 
   return (

@@ -1,6 +1,6 @@
 import InterviewTable from "@/components/HR/InterviewTable";
 import ScheduleInterview from "@/components/HR/ScheduleInterview";
-import { IInterview } from "@/utils/types";
+import { ExtendedInterview, IInterview } from "@/utils/types";
 import { useState } from "react";
 
 export default function Homepage() {
@@ -15,11 +15,31 @@ export default function Homepage() {
     meetLink: "",
   });
 
-  const [interviews, setInterviews] = useState<IInterview[]>([]);
+  const [interviews, setInterviews] = useState<ExtendedInterview[]>([]);
+
+  console.log(interviews);
+
+  // {
+  //     "intervieweeName": "testing",
+  //     "intervieweeEmail": "testing@mail.com",
+  //     "resumeLink": "",
+  //     "position": "sde",
+  //     "date": "2025-03-23",
+  //     "startTime": "17:15",
+  //     "endTime": "18:30",
+  //     "meetLink": "",
+  //     "interviewerName": "Gajju",
+  //     "interviewerEmail": "test@mail.com"
+  // }
 
   const handleChange = (e: { target: { name: string; value: string } }) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+      interviewerName: "Default Name", // Provide default values
+      interviewerEmail: "default@mail.com",
+    }));
   };
 
   return (
@@ -32,7 +52,7 @@ export default function Homepage() {
       />
 
       {/* Interview Table Component */}
-      <div className="w-full max-w-4xl">
+      <div className="w-full max-w-6xl">
         <InterviewTable interviews={interviews} />
       </div>
     </div>
