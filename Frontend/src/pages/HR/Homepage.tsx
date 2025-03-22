@@ -24,7 +24,12 @@ export default function Homepage() {
 
   return (
     <div className="flex flex-col items-center bg-gray-100 p-2 min-h-screen gap-10">
-      <ScheduleInterview formData={formData} handleChange={handleChange} />
+      <ScheduleInterview
+        setFormData={setFormData}
+        formData={formData}
+        handleChange={handleChange}
+        setInterviews={setInterviews}
+      />
 
       {/* Interview Table Component */}
       <div className="w-full max-w-4xl">

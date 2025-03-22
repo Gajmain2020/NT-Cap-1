@@ -9,6 +9,19 @@ export interface IInterview {
   meetLink: string;
 }
 
+export interface IScheduleInterview {
+  intervieweeName: string;
+  intervieweeEmail: string;
+  resumeLink: string;
+  position: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  meetLink: string;
+  interviewerName: string;
+  interviewerEmail: string;
+}
+
 export interface INavItem {
   title: string;
   icon: React.ComponentType;

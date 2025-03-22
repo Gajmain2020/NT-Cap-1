@@ -22,6 +22,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/schedules")
+@CrossOrigin(origins = "http://localhost:5173")
 public class InterviewScheduleController {
 
     @Autowired
