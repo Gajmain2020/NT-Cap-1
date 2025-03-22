@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { getUpcomingInterviewHr } from "@/services/interviewService";
+import { ExtendedInterview } from "@/utils/types";
 import {
   Select,
   SelectContent,
@@ -10,8 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { ExtendedInterview } from "@/utils/types";
-import { getUpcomingInterviewHr } from "@/services/interviewService";
 
 export default function InterviewTable({
   interviews,
