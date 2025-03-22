@@ -58,3 +58,18 @@ export const interviewConfirmSchema = z.object({
   interviewerEmail: z.string().email("Invalid email."),
   interviewerName: z.string().min(1, "Please provide interviewer name."),
 });
+
+export const editScheduledSchema = z.object({
+  intervieweeName: z.string().min(1, "Please provide interviewee name."),
+  intervieweeEmail: z.string().email("Please provide a valid email."),
+  resumeLink: z.string().optional(),
+  position: z.string().min(1, "Please provide the position applied for."),
+  date: z.string().refine((date) => new Date(date) >= today, {
+    message: "Interview date cannot be in the past.",
+  }),
+  startTime: z.string().min(1, "Please provide start time."),
+  endTime: z.string().min(1, "Please provide end time."),
+  meetLink: z.string().optional(),
+  interviewerEmail: z.string().email("Invalid email."),
+  interviewerName: z.string().min(1, "Please provide interviewer name."),
+});

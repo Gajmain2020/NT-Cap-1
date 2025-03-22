@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { EditScheduleInterviewAPI } from "@/api/interviewApis";
 import { Button } from "@/components/ui/button";
 import {
   DialogContent,
@@ -16,9 +17,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getUpcomingInterviewHr } from "@/services/interviewService";
-import { ExtendedInterview } from "@/utils/types";
+import { ExtendedInterview, IScheduleInterview } from "@/utils/types";
+import { calculateDuration } from "@/utils/utils";
+import { editScheduledSchema } from "@/utils/validationSchema";
 import { Dialog } from "@radix-ui/react-dialog";
 import { FilePen } from "lucide-react";
+import { toast } from "sonner";
 
 export default function UpcomingInterviews() {
   const [interviews, setInterviews] = useState<ExtendedInterview[]>([]);
@@ -26,9 +30,11 @@ export default function UpcomingInterviews() {
   const [filterPosition, setFilterPosition] = useState("");
   const [loading, setLoading] = useState(true);
   const [numberOfRowsToShow, setNumberOfRowsToShow] = useState(10);
+  const [rescheduling, setRescheduling] = useState(false);
 
-  const [selectedInterview, setSelectedInterview] =
-    useState<ExtendedInterview | null>(null);
+  const [selectedInterview, setSelectedInterview] = useState<
+    (IScheduleInterview & { id: string }) | null
+  >(null);
 
   useEffect(() => {
     const fetchUpcomingInterviews = async () => {
@@ -36,17 +42,6 @@ export default function UpcomingInterviews() {
     };
     fetchUpcomingInterviews();
   }, []);
-
-  const calculateDuration = (startTime: string, endTime: string) => {
-    const [startHour, startMinute] = startTime.split(":").map(Number);
-    const [endHour, endMinute] = endTime.split(":").map(Number);
-
-    const start = startHour * 60 + startMinute;
-    const end = endHour * 60 + endMinute;
-    const duration = end - start;
-
-    return `${Math.floor(duration / 60)}h ${duration % 60}m`;
-  };
 
   const filteredInterviews = interviews
     .filter(
@@ -67,6 +62,37 @@ export default function UpcomingInterviews() {
       if (a.date !== b.date) return a.date.localeCompare(b.date);
       return a.startTime.localeCompare(b.startTime);
     });
+
+  const handleEditScheduledInterview = async () => {
+    try {
+      const validateData = editScheduledSchema.safeParse(selectedInterview);
+      if (!validateData.success) {
+        validateData.error.issues.forEach((err) => toast.error(err.message));
+        return;
+      }
+
+      if (!selectedInterview) {
+        return;
+      }
+
+      const response = await EditScheduleInterviewAPI(selectedInterview);
+
+      if (!response.success) {
+        toast.error(response.message);
+        return;
+      }
+
+      // change the data in the state as well
+
+      toast.success("Interview schedule updated successfully.");
+      setSelectedInterview(null);
+    } catch (error) {
+      console.error("Interview Schedule Error:", error);
+      toast.error("Failed to schedule interview. Please try again.");
+    } finally {
+      setRescheduling(false);
+    }
+  };
 
   return (
     <>
@@ -196,7 +222,12 @@ export default function UpcomingInterviews() {
                           </td>
                           <td className="p-2 border">
                             <Button
-                              onClick={() => setSelectedInterview(interview)}
+                              onClick={() =>
+                                setSelectedInterview({
+                                  ...interview,
+                                  id: interview.id || "default-id",
+                                })
+                              }
                               variant="ghost"
                             >
                               <FilePen />
@@ -218,7 +249,30 @@ export default function UpcomingInterviews() {
         </div>
       </div>
 
-      {/* Confirmation Dialog */}
+      {/* Edit scheduled interview */}
+      <EditDialog
+        selectedInterview={selectedInterview}
+        setSelectedInterview={setSelectedInterview}
+        loading={rescheduling}
+        handleReschedule={handleEditScheduledInterview}
+      />
+    </>
+  );
+}
+
+function EditDialog({
+  selectedInterview,
+  setSelectedInterview,
+  loading,
+  handleReschedule,
+}: {
+  selectedInterview: IScheduleInterview | null;
+  setSelectedInterview: (args: IScheduleInterview | null) => void;
+  loading: boolean;
+  handleReschedule: () => void;
+}) {
+  return (
+    <>
       {selectedInterview && (
         <Dialog
           open={selectedInterview !== null}
@@ -417,7 +471,7 @@ export default function UpcomingInterviews() {
               >
                 Cancel
               </Button>
-              <Button disabled={loading} onClick={() => console.log("hello")}>
+              <Button disabled={loading} onClick={handleReschedule}>
                 {loading ? "Rescheduling..." : "Confirm Reschedule"}
               </Button>
             </DialogFooter>
