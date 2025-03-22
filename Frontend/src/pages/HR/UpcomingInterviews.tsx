@@ -79,6 +79,12 @@ export default function UpcomingInterviews() {
         return;
       }
 
+      setInterviews((interviews) =>
+        interviews.map((i) =>
+          i.id !== selectedInterview.id ? i : selectedInterview
+        )
+      );
+
       // change the data in the state as well
 
       toast.success("Interview schedule updated successfully.");
