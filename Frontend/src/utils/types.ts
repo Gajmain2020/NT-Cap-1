@@ -3,7 +3,6 @@ export interface IInterview {
   intervieweeEmail: string;
   resumeLink: string;
   position: string;
-  interviewer: string;
   date: string;
   startTime: string;
   endTime: string;

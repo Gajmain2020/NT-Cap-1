@@ -1,9 +1,7 @@
 import InterviewTable from "@/components/HR/InterviewTable";
 import ScheduleInterview from "@/components/HR/ScheduleInterview";
 import { IInterview } from "@/utils/types";
-import { interviewSchema } from "@/utils/validationSchema";
 import { useState } from "react";
-import { toast } from "sonner";
 
 export default function Homepage() {
   const [formData, setFormData] = useState<IInterview>({
@@ -11,7 +9,6 @@ export default function Homepage() {
     intervieweeEmail: "",
     resumeLink: "",
     position: "",
-    interviewer: "",
     date: "",
     startTime: "",
     endTime: "",

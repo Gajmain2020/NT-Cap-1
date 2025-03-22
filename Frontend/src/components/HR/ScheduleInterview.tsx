@@ -9,6 +9,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
+import {
+  interviewConfirmSchema,
+  interviewScheduleSchema,
+} from "@/utils/validationSchema";
+import { toast } from "sonner";
 
 export default function ScheduleInterview({
   formData,
@@ -18,18 +23,40 @@ export default function ScheduleInterview({
   handleChange: (e: { target: { name: string; value: string } }) => void;
 }) {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [interviewer, setInterviewer] = useState({ name: "", email: "" });
+  const [interviewer, setInterviewer] = useState({
+    interviewerName: "",
+    interviewerEmail: "",
+  });
 
+  // only to handle the data of schedule
   const handleScheduleInterview = () => {
+    const isSchemaValid = interviewScheduleSchema.safeParse(formData);
+
+    if (!isSchemaValid.success) {
+      isSchemaValid.error.issues.forEach((err) => toast.error(err.message));
+      return;
+    }
+
     setDialogOpen(true);
   };
 
+  // to handle main thing of adding the data into the database
   const handleConfirmSchedule = () => {
+    const isValidInterviewer = interviewConfirmSchema.safeParse(interviewer);
+
+    if (!isValidInterviewer.success) {
+      isValidInterviewer.error.issues.forEach((err) =>
+        toast.error(err.message)
+      );
+      return;
+    }
+
     const finalData = {
       ...formData,
-      interviewerName: interviewer.name,
-      interviewerEmail: interviewer.email,
+      interviewerName: interviewer.interviewerName,
+      interviewerEmail: interviewer.interviewerEmail,
     };
+
     console.log(finalData);
     setDialogOpen(false);
   };
@@ -52,6 +79,13 @@ export default function ScheduleInterview({
           name="intervieweeEmail"
           placeholder="Interviewee Email *"
           value={formData.intervieweeEmail}
+          onChange={handleChange}
+        />
+        <Input
+          type="text"
+          name="position"
+          placeholder="Position*"
+          value={formData.position}
           onChange={handleChange}
         />
         <Input
@@ -129,17 +163,23 @@ export default function ScheduleInterview({
             <Input
               type="text"
               placeholder="Interviewer Name *"
-              value={interviewer.name}
+              value={interviewer.interviewerName}
               onChange={(e) =>
-                setInterviewer({ ...interviewer, name: e.target.value })
+                setInterviewer({
+                  ...interviewer,
+                  interviewerName: e.target.value,
+                })
               }
             />
             <Input
               type="email"
               placeholder="Interviewer Email *"
-              value={interviewer.email}
+              value={interviewer.interviewerEmail}
               onChange={(e) =>
-                setInterviewer({ ...interviewer, email: e.target.value })
+                setInterviewer({
+                  ...interviewer,
+                  interviewerEmail: e.target.value,
+                })
               }
             />
           </div>
