@@ -3,8 +3,23 @@ export interface IInterview {
   intervieweeEmail: string;
   resumeLink: string;
   position: string;
-  interviewer: string;
-  schedule: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  meetLink: string;
+}
+
+export interface IScheduleInterview {
+  intervieweeName: string;
+  intervieweeEmail: string;
+  resumeLink: string;
+  position: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  meetLink: string;
+  interviewerName: string;
+  interviewerEmail: string;
 }
 
 export interface INavItem {
@@ -18,3 +33,8 @@ export interface ISidebarNavItem {
   onClick: () => void;
   path: string;
 }
+
+export type ExtendedInterview = IInterview & {
+  interviewerName: string;
+  interviewerEmail: string;
+};

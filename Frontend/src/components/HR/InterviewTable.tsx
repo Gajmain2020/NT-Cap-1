@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
-import { IInterview } from "@/utils/types";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -8,14 +8,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { ExtendedInterview } from "@/utils/types";
 
 export default function InterviewTable({
   interviews,
 }: {
-  interviews: IInterview[];
+  interviews: ExtendedInterview[];
 }) {
   const [search, setSearch] = useState("");
   const [filterPosition, setFilterPosition] = useState("");
+
+  const calculateDuration = (startTime: string, endTime: string) => {
+    const [startHour, startMinute] = startTime.split(":").map(Number);
+    const [endHour, endMinute] = endTime.split(":").map(Number);
+
+    const start = startHour * 60 + startMinute;
+    const end = endHour * 60 + endMinute;
+    const duration = end - start;
+
+    return `${Math.floor(duration / 60)}h ${duration % 60}m`;
+  };
 
   const filteredInterviews = interviews
     .filter(
@@ -31,9 +43,11 @@ export default function InterviewTable({
     .filter((interview) =>
       filterPosition ? interview.position === filterPosition : true
     )
-    .sort(
-      (a, b) => new Date(a.schedule).getTime() - new Date(b.schedule).getTime()
-    );
+    .sort((a, b) => {
+      // Sort by date first, then by start time
+      if (a.date !== b.date) return a.date.localeCompare(b.date);
+      return a.startTime.localeCompare(b.startTime);
+    });
 
   return (
     <div className="bg-white shadow-lg rounded-lg p-4">
@@ -70,37 +84,62 @@ export default function InterviewTable({
         <table className="min-w-full border-collapse">
           <thead>
             <tr className="bg-gray-200 text-gray-700">
-              <th className="p-2 border">Name</th>
-              <th className="p-2 border">Email</th>
+              <th className="p-2 border">Interviewee</th>
               <th className="p-2 border">Position</th>
               <th className="p-2 border">Interviewer</th>
               <th className="p-2 border">Date</th>
               <th className="p-2 border">Time</th>
+              <th className="p-2 border">Duration</th>
+              <th className="p-2 border">Resume</th>
             </tr>
           </thead>
           <tbody>
             {filteredInterviews.length > 0 ? (
               filteredInterviews.map((interview, index) => (
                 <tr key={index} className="text-center border-b">
-                  <td className="p-2 border">{interview.intervieweeName}</td>
-                  <td className="p-2 border">{interview.intervieweeEmail}</td>
-                  <td className="p-2 border">{interview.position}</td>
-                  <td className="p-2 border">{interview.interviewer}</td>
                   <td className="p-2 border">
-                    {new Date(interview.schedule).toLocaleDateString("en-IN", {
-                      day: "2-digit",
-                      month: "2-digit",
-                      year: "numeric",
-                    })}
+                    <div className="flex flex-col">
+                      <span>{interview.intervieweeName}</span>
+                      <span className="text-xs">
+                        ({interview.intervieweeEmail})
+                      </span>
+                    </div>
+                  </td>
+                  <td className="p-2 border">{interview.position}</td>
+                  <td className="p-2 border">
+                    <div className="flex flex-col">
+                      <span>{interview.interviewerName}</span>
+                      <span className="text-xs">
+                        ({interview.interviewerEmail})
+                      </span>
+                    </div>
+                  </td>
+                  <td className="p-2 border">{interview.date}</td>
+                  <td className="p-2 border">
+                    {interview.startTime} - {interview.endTime}
                   </td>
                   <td className="p-2 border">
-                    {new Date(interview.schedule).toLocaleTimeString()}
+                    {calculateDuration(interview.startTime, interview.endTime)}
+                  </td>
+                  <td className="p-2 border">
+                    {interview.resumeLink ? (
+                      <Button
+                        variant="ghost"
+                        onClick={() =>
+                          window.open(interview.resumeLink, "_blank")
+                        }
+                      >
+                        Open Resume
+                      </Button>
+                    ) : (
+                      "N/A"
+                    )}
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={6} className="p-4 text-center text-gray-500">
+                <td colSpan={8} className="p-4 text-center text-gray-500">
                   No interviews scheduled
                 </td>
               </tr>
