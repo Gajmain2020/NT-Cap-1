@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getUpcomingInterviewHr } from "@/services/interviewService";
-import { ExtendedInterview, ExtendedScheduledInterview } from "@/utils/types";
+import type { ExtendedScheduledInterview } from "@/utils/types";
 import {
   Select,
   SelectContent,
@@ -17,7 +17,7 @@ export default function InterviewTable({
   interviews,
   setInterviews,
 }: {
-  interviews: ExtendedInterview[];
+  interviews: ExtendedScheduledInterview[];
   setInterviews: (
     update: (prev: ExtendedScheduledInterview[]) => ExtendedScheduledInterview[]
   ) => void;
@@ -119,6 +119,7 @@ export default function InterviewTable({
         <table className="min-w-full border-collapse">
           <thead>
             <tr className="bg-gray-200 text-gray-700">
+              <th className="p-2 border">Stage</th>
               <th className="p-2 border">Interviewee</th>
               <th className="p-2 border">Position</th>
               <th className="p-2 border">Interviewer</th>
@@ -146,6 +147,7 @@ export default function InterviewTable({
                   .slice(0, numberOfRowsToShow)
                   .map((interview, index) => (
                     <tr key={index} className="text-center border-b">
+                      <td className="p-2 border">{interview.stage}</td>
                       <td className="p-2 border">
                         <div className="flex flex-col">
                           <span>{interview.intervieweeName}</span>

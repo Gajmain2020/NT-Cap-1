@@ -2,11 +2,9 @@ import {
   GetUpcomingInterviewHrAPI,
   ScheduleInterviewAPI,
 } from "@/api/interviewApis";
-import { IInterview, IScheduleInterview } from "@/utils/types";
+import { ExtendedScheduledInterview, IInterview } from "@/utils/types";
 import { interviewConfirmSchema } from "@/utils/validationSchema";
 import { toast } from "sonner";
-
-type ExtendedScheduledInterview = IScheduleInterview & { id: string };
 
 export const getUpcomingInterviewHr = async (
   setLoading: (arg: boolean) => void,

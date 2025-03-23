@@ -31,10 +31,10 @@ public interface InterviewScheduleRepository extends JpaRepository<InterviewSche
         )
         FROM InterviewSchedule i
         JOIN User u ON i.interviewerEmail = u.email
-        WHERE i.date >= :date
+        WHERE (i.date > :date OR (i.date = :date AND i.startTime > :time))
         ORDER BY i.date ASC, i.startTime ASC
     """)
-    List<Map<String, Object>> findUpcomingInterviews(String date);
+    List<Map<String, Object>> findUpcomingInterviews(String date, String time);
 
     @Query("""
         SELECT new map(
