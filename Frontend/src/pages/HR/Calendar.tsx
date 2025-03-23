@@ -1,11 +1,6 @@
 import { FetchInterviewsAPI } from "@/api/interviewApis";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import InterviewOnDateDialog from "@/components/HR/InterviewOnDateDialog";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { ExtendedScheduledInterview } from "@/utils/types";
 import {
   addMonths,
@@ -61,7 +56,7 @@ export default function HRCalendar() {
   });
 
   return (
-    <div className="flex flex-col items-center bg-gray-100 p-2 min-h-screen gap-10">
+    <div className=" bg-gray-100 p-2  gap-10">
       <div className="bg-white shadow-lg rounded-lg p-4">
         {/* Calendar Header */}
         <div className="flex justify-between items-center mb-4">
@@ -125,42 +120,10 @@ export default function HRCalendar() {
                     )}
                   </div>
                 </DialogTrigger>
-
-                {/* Interview Details Dialog */}
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>
-                      Interviews on {format(day, "dd MMM yyyy")}
-                    </DialogTitle>
-                  </DialogHeader>
-                  <div className="max-h-60 overflow-y-auto space-y-2">
-                    {interviewsOnDay.length > 0 ? (
-                      interviewsOnDay.map((interview, index) => (
-                        <div
-                          key={index}
-                          className="p-3 border rounded-lg shadow-sm"
-                        >
-                          <p className="font-medium text-gray-700">
-                            Name: {interview.intervieweeName}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            Position: {interview.position}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            {/* Interviewer: {interview.interviewer} */}
-                          </p>
-                          <p className="text-xs text-gray-400">
-                            {/* {format(new Date(interview.schedule), "hh:mm a")} */}
-                          </p>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-gray-500 text-center py-4">
-                        No interviews scheduled.
-                      </p>
-                    )}
-                  </div>
-                </DialogContent>
+                <InterviewOnDateDialog
+                  day={selectedDate || new Date()}
+                  interviewsOnDay={interviewsOnDay}
+                />
               </Dialog>
             );
           })}
