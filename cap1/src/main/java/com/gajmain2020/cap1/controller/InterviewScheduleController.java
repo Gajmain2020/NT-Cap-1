@@ -125,9 +125,10 @@ public class InterviewScheduleController {
         Map<String, Object> response = new HashMap<>();
 
         LocalDate today = LocalDate.now();  // Get current date
+        LocalTime currentTime = LocalTime.now();
 
         // Fetch upcoming interviews directly with optimized query
-        List<Map<String, Object>> interviews = interviewScheduleRepository.findUpcomingInterviews(today.toString());
+        List<Map<String, Object>> interviews = interviewScheduleRepository.findUpcomingInterviews(today.toString(), currentTime.toString());
 
         if (interviews.isEmpty()) {
             response.put("message", "No upcoming interviews found.");
