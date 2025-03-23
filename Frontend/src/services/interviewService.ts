@@ -1,7 +1,4 @@
-import {
-  GetUpcomingInterviewHrAPI,
-  ScheduleInterviewAPI,
-} from "@/api/interviewApis";
+import { GetUpcomingInterviewHrAPI, ScheduleInterviewAPI } from "@/api/hrApis";
 import { ExtendedScheduledInterview, IInterview } from "@/utils/types";
 import { interviewConfirmSchema } from "@/utils/validationSchema";
 import { toast } from "sonner";

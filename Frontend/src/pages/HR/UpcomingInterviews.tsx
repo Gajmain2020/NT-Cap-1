@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { EditScheduleInterviewAPI } from "@/api/interviewApis";
+import { EditScheduleInterviewAPI } from "@/api/hrApis";
 import EditDialog from "@/components/HR/EditScheduledInterview";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
