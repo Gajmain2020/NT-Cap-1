@@ -1,29 +1,45 @@
-import { useState } from "react";
-import { IInterview } from "@/utils/types";
+import { FetchInterviewsAPI } from "@/api/interviewApis";
+import InterviewOnDateDialog from "@/components/HR/InterviewOnDateDialog";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { ExtendedScheduledInterview } from "@/utils/types";
 import {
-  format,
-  startOfMonth,
-  endOfMonth,
-  startOfWeek,
-  endOfWeek,
   addMonths,
-  subMonths,
   eachDayOfInterval,
+  endOfMonth,
+  endOfWeek,
+  format,
   isSameMonth,
+  startOfMonth,
+  startOfWeek,
+  subMonths,
 } from "date-fns";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { DummyInterviewSchedule } from "@/utils/dummyData";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function HRCalendar() {
-  const [interviews, setInterviews] = useState(DummyInterviewSchedule);
+  const [interviews, setInterviews] = useState<ExtendedScheduledInterview[]>(
+    []
+  );
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
+  useEffect(() => {
+    const fetchInterviews = async () => {
+      try {
+        const response = await FetchInterviewsAPI();
+
+        if (!response.success) {
+          toast.error(response.message);
+          return;
+        }
+        setInterviews(response.interviews);
+      } catch (error) {
+        console.log("Error occurred", error);
+        toast.error("Failed to fetch interviews. Please refresh.");
+      }
+    };
+    fetchInterviews();
+  }, []);
 
   // Generate the date range for the calendar
   const days = eachDayOfInterval({
@@ -32,15 +48,15 @@ export default function HRCalendar() {
   });
 
   // Organize interviews by date
-  const interviewsByDate: Record<string, IInterview[]> = {};
+  const interviewsByDate: Record<string, ExtendedScheduledInterview[]> = {};
   interviews.forEach((interview) => {
-    const dateKey = format(new Date(interview.schedule), "yyyy-MM-dd");
+    const dateKey = format(new Date(interview.date), "yyyy-MM-dd");
     if (!interviewsByDate[dateKey]) interviewsByDate[dateKey] = [];
     interviewsByDate[dateKey].push(interview);
   });
 
   return (
-    <div className="flex flex-col items-center bg-gray-100 p-2 min-h-screen gap-10">
+    <div className=" bg-gray-100 p-2  gap-10">
       <div className="bg-white shadow-lg rounded-lg p-4">
         {/* Calendar Header */}
         <div className="flex justify-between items-center mb-4">
@@ -104,42 +120,10 @@ export default function HRCalendar() {
                     )}
                   </div>
                 </DialogTrigger>
-
-                {/* Interview Details Dialog */}
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>
-                      Interviews on {format(day, "dd MMM yyyy")}
-                    </DialogTitle>
-                  </DialogHeader>
-                  <div className="max-h-60 overflow-y-auto space-y-2">
-                    {interviewsOnDay.length > 0 ? (
-                      interviewsOnDay.map((interview, index) => (
-                        <div
-                          key={index}
-                          className="p-3 border rounded-lg shadow-sm"
-                        >
-                          <p className="font-medium text-gray-700">
-                            Name: {interview.intervieweeName}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            Position: {interview.position}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            Interviewer: {interview.interviewer}
-                          </p>
-                          <p className="text-xs text-gray-400">
-                            {format(new Date(interview.schedule), "hh:mm a")}
-                          </p>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-gray-500 text-center py-4">
-                        No interviews scheduled.
-                      </p>
-                    )}
-                  </div>
-                </DialogContent>
+                <InterviewOnDateDialog
+                  day={selectedDate || new Date()}
+                  interviewsOnDay={interviewsOnDay}
+                />
               </Dialog>
             );
           })}
