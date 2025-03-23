@@ -86,12 +86,18 @@ export default function UpcomingInterviews() {
                       {interview.startTime} - {interview.endTime}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
-                      <Button
-                        variant={"ghost"}
-                        onClick={() => navigate(`/interview/${interview.id}`)}
-                      >
-                        View
-                      </Button>
+                      {interview.resumeLink === "" ? (
+                        "N/A"
+                      ) : (
+                        <Button
+                          variant={"ghost"}
+                          onClick={() =>
+                            window.open(interview.resumeLink, "_blank")
+                          }
+                        >
+                          View
+                        </Button>
+                      )}
                     </td>
                   </tr>
                 ))}
