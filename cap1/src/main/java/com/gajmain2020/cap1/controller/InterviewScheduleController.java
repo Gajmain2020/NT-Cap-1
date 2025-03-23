@@ -99,6 +99,27 @@ public class InterviewScheduleController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @GetMapping("/interviews-hr")
+    public ResponseEntity<Map<String,Object>> getAllInterviews(){
+        Map<String, Object> response = new HashMap<>();
+
+        LocalDate today = LocalDate.now();  // Get current date
+
+        // Fetch upcoming interviews directly with optimized query
+        List<Map<String, Object>> interviews = interviewScheduleRepository.findAllInterviews();
+
+        if (interviews.isEmpty()) {
+            response.put("message", "No interviews found.");
+            response.put("success", false);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        response.put("interviews", interviews);
+        response.put("success", true);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
     @GetMapping("/upcoming-interviews-hr")
     public ResponseEntity<Map<String, Object>> getUpcomingInterviews() {
         Map<String, Object> response = new HashMap<>();

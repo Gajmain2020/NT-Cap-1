@@ -16,6 +16,7 @@ public interface InterviewScheduleRepository extends JpaRepository<InterviewSche
     @Query("""
         SELECT new map(
             i.id as id,
+            i.stage as stage,
             i.intervieweeName as intervieweeName,
             i.intervieweeEmail as intervieweeEmail,
             i.position as position,
@@ -34,4 +35,28 @@ public interface InterviewScheduleRepository extends JpaRepository<InterviewSche
         ORDER BY i.date ASC, i.startTime ASC
     """)
     List<Map<String, Object>> findUpcomingInterviews(String date);
+
+    @Query("""
+        SELECT new map(
+            i.id as id,
+            i.stage as stage,
+            i.intervieweeName as intervieweeName,
+            i.intervieweeEmail as intervieweeEmail,
+            i.position as position,
+            i.date as date,
+            i.startTime as startTime,
+            i.endTime as endTime,
+            i.duration as duration,
+            i.meetLink as meetLink,
+            i.resumeLink as resumeLink,
+            i.interviewerEmail as interviewerEmail,
+            u.name as interviewerName
+        )
+        FROM InterviewSchedule i
+        JOIN User u ON i.interviewerEmail = u.email
+        ORDER BY i.date ASC, i.startTime ASC
+    """)
+    List<Map<String,Object>> findAllInterviews();
+
+
 }

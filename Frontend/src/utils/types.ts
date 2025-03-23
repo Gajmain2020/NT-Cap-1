@@ -9,7 +9,10 @@ export interface IInterview {
   meetLink: string;
 }
 
-export type ExtendedScheduledInterview = IScheduleInterview & { id: string };
+export type ExtendedScheduledInterview = IScheduleInterview & {
+  stage: string;
+  id: string;
+};
 
 export interface IScheduleInterview {
   intervieweeName: string;

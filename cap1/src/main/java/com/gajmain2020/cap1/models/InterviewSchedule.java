@@ -1,6 +1,7 @@
 package com.gajmain2020.cap1.models;
 
 
+import com.gajmain2020.cap1.enums.InterviewStage;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -51,4 +52,8 @@ public class InterviewSchedule {
     @ManyToOne
     @JoinColumn(name = "interviewerEmail", referencedColumnName = "email", insertable = false, updatable = false)
     private User interviewer;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "VARCHAR(10) DEFAULT 'L1'")
+    private InterviewStage stage = InterviewStage.L1; // Default value
 }

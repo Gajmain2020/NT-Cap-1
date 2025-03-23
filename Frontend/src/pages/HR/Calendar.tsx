@@ -1,29 +1,50 @@
-import { useState } from "react";
-import { IInterview } from "@/utils/types";
-import {
-  format,
-  startOfMonth,
-  endOfMonth,
-  startOfWeek,
-  endOfWeek,
-  addMonths,
-  subMonths,
-  eachDayOfInterval,
-  isSameMonth,
-} from "date-fns";
+import { FetchInterviewsAPI } from "@/api/interviewApis";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
-import { DummyInterviewSchedule } from "@/utils/dummyData";
+import { ExtendedScheduledInterview } from "@/utils/types";
+import {
+  addMonths,
+  eachDayOfInterval,
+  endOfMonth,
+  endOfWeek,
+  format,
+  isSameMonth,
+  startOfMonth,
+  startOfWeek,
+  subMonths,
+} from "date-fns";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function HRCalendar() {
-  const [interviews, setInterviews] = useState(DummyInterviewSchedule);
+  const [interviews, setInterviews] = useState<ExtendedScheduledInterview[]>(
+    []
+  );
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
+  useEffect(() => {
+    const fetchInterviews = async () => {
+      try {
+        const response = await FetchInterviewsAPI();
+
+        if (!response.success) {
+          toast.error(response.message);
+          return;
+        }
+        setInterviews(response.interviews);
+      } catch (error) {
+        console.log("Error occurred", error);
+        toast.error("Failed to fetch interviews. Please refresh.");
+      }
+    };
+    fetchInterviews();
+  }, []);
 
   // Generate the date range for the calendar
   const days = eachDayOfInterval({
@@ -32,9 +53,9 @@ export default function HRCalendar() {
   });
 
   // Organize interviews by date
-  const interviewsByDate: Record<string, IInterview[]> = {};
+  const interviewsByDate: Record<string, ExtendedScheduledInterview[]> = {};
   interviews.forEach((interview) => {
-    const dateKey = format(new Date(interview.schedule), "yyyy-MM-dd");
+    const dateKey = format(new Date(interview.date), "yyyy-MM-dd");
     if (!interviewsByDate[dateKey]) interviewsByDate[dateKey] = [];
     interviewsByDate[dateKey].push(interview);
   });
@@ -126,10 +147,10 @@ export default function HRCalendar() {
                             Position: {interview.position}
                           </p>
                           <p className="text-sm text-gray-500">
-                            Interviewer: {interview.interviewer}
+                            {/* Interviewer: {interview.interviewer} */}
                           </p>
                           <p className="text-xs text-gray-400">
-                            {format(new Date(interview.schedule), "hh:mm a")}
+                            {/* {format(new Date(interview.schedule), "hh:mm a")} */}
                           </p>
                         </div>
                       ))
