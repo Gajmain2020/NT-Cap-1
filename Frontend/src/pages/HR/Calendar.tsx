@@ -1,4 +1,4 @@
-import { FetchInterviewsAPI } from "@/api/interviewApis";
+import { FetchInterviewsAPI } from "@/api/hrApis";
 import InterviewOnDateDialog from "@/components/HR/InterviewOnDateDialog";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { ExtendedScheduledInterview } from "@/utils/types";

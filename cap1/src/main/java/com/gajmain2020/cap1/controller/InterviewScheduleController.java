@@ -7,7 +7,9 @@ import com.gajmain2020.cap1.models.InterviewSchedule;
 import com.gajmain2020.cap1.models.User;
 import com.gajmain2020.cap1.repositories.InterviewScheduleRepository;
 import com.gajmain2020.cap1.repositories.UserRepository;
+import com.gajmain2020.cap1.security.JwtUtil;
 import jakarta.validation.Valid;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,9 +28,13 @@ import java.util.stream.Collectors;
 public class InterviewScheduleController {
 
     @Autowired
+    private JwtUtil jwtUtil;
+    @Autowired
     private UserRepository userRepository;
     @Autowired
     private InterviewScheduleRepository interviewScheduleRepository;
+
+
 
     @GetMapping
     public boolean HealthCheck(){
@@ -120,8 +126,52 @@ public class InterviewScheduleController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @GetMapping("/upcoming-interviews-interviewer")
+    public ResponseEntity<Map<String, Object>> getUpcomingInterviewerInterviews(@RequestHeader("Authorization") String authHeader){
+        Map<String, Object> response = new HashMap<>();
+
+        // Extract token from Authorization header
+        if (!authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+                    "success", false,
+                    "message", "Invalid authorization token."
+            ));
+        }
+
+        String token = authHeader.substring(7);
+        String email = jwtUtil.extractEmail(token); // Extract email from JWT token
+
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                    "success", false,
+                    "message", "User not found."
+            ));
+        }
+
+
+        LocalTime currentTime = LocalTime.now();
+        LocalDate currentDate = LocalDate.now();
+
+        List<Map<String, Object>> interviews = interviewScheduleRepository.findUpcomingInterviewsViaEmail(email, currentDate.toString(), currentTime.toString());
+
+        if (interviews.isEmpty()) {
+            response.put("message", "No interviews found.");
+            response.put("success", false);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        response.put("interviews", interviews);
+        response.put("success", true);
+
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+
+
+    }
+
     @GetMapping("/upcoming-interviews-hr")
-    public ResponseEntity<Map<String, Object>> getUpcomingInterviews() {
+    public ResponseEntity<Map<String, Object>> getUpcomingHrInterviews() {
         Map<String, Object> response = new HashMap<>();
 
         LocalDate today = LocalDate.now();  // Get current date

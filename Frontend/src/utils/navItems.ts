@@ -1,11 +1,4 @@
-import {
-  BadgePlus,
-  Calendar,
-  CalendarCheck,
-  History,
-  Home,
-  Inbox,
-} from "lucide-react";
+import { Calendar, CalendarCheck, History, Home, Inbox } from "lucide-react";
 
 // Menu items.
 export const hrNavItems = [
@@ -38,9 +31,9 @@ export const interviewerNavItems = [
     icon: Home,
   },
   {
-    title: "Add Feedback",
-    url: "/add-feedback",
-    icon: BadgePlus,
+    title: "Upcoming Interviews",
+    url: "/upcoming-interviews",
+    icon: CalendarCheck,
   },
   {
     title: "Past Interviews",

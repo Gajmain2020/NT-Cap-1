@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { EditScheduleInterviewAPI } from "@/api/interviewApis";
+import { EditScheduleInterviewAPI } from "@/api/hrApis";
 import EditDialog from "@/components/HR/EditScheduledInterview";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,7 +18,10 @@ import { editScheduledSchema } from "@/utils/validationSchema";
 import { FilePen } from "lucide-react";
 import { toast } from "sonner";
 
-type ExtendedScheduledInterview = IScheduleInterview & { id: string };
+type ExtendedScheduledInterview = IScheduleInterview & {
+  id: string;
+  stage: string;
+};
 
 export default function UpcomingInterviews() {
   const [interviews, setInterviews] = useState<ExtendedScheduledInterview[]>(
