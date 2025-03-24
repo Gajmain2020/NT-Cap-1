@@ -105,7 +105,6 @@ public class InterviewScheduleController {
                 .endTime(interviewRequest.getEndTime())
                 .meetLink(interviewRequest.getMeetLink())
                 .resumeLink(interviewRequest.getResumeLink())
-                .interviewerEmail(interviewRequest.getInterviewerEmail())
                 .stage(InterviewStage.valueOf("L1"))
                 .interviewer(interviewer)
                 .duration(duration)  // Set calculated duration
@@ -309,7 +308,6 @@ public class InterviewScheduleController {
         interview.setEndTime(interviewRequest.getEndTime());
         interview.setMeetLink(interviewRequest.getMeetLink());
         interview.setResumeLink(interviewRequest.getResumeLink());
-        interview.setInterviewerEmail(interviewRequest.getInterviewerEmail());
         interview.setInterviewer(interviewer);
         interview.setDuration(duration);
 
@@ -378,9 +376,6 @@ public class InterviewScheduleController {
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Feedback saved successfully");
         response.put("success", true);
-        response.put("interviewId", interviewId);
-        response.put("feedbackId", serverFeedback.getId());
-        response.put("finalResult", serverFeedback.getFinalDecision());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
