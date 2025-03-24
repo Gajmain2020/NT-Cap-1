@@ -76,6 +76,7 @@ public interface InterviewScheduleRepository extends JpaRepository<InterviewSche
         )
         FROM InterviewSchedule i
         WHERE i.interviewerEmail = :email AND (i.date > :date OR (i.date = :date AND i.startTime > :time))
+        ORDER BY i.date ASC, i.startTime ASC
     """)
     List<Map<String, Object>> findUpcomingInterviewsViaEmail(String email,String date, String time);
 
