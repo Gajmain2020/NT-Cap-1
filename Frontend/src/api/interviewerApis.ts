@@ -27,3 +27,20 @@ export async function FetchUpcomingInterviewerInterviews() {
     }
   }
 }
+
+export async function FetchOngoingInterviewerInterviews() {
+  try {
+    const response = await axios({
+      headers,
+      url: baseUrl + `/ongoing-interviews-interviewer`,
+      method: "GET",
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      return error?.response?.data;
+    } else {
+      toast.error("An unexpected error occurred");
+    }
+  }
+}

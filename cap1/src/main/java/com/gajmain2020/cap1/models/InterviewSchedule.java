@@ -55,5 +55,5 @@ public class InterviewSchedule {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "VARCHAR(10) DEFAULT 'L1'")
-    private InterviewStage stage = InterviewStage.L1; // Default value
+    private InterviewStage stage;
 }

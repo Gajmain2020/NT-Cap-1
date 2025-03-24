@@ -80,4 +80,25 @@ public interface InterviewScheduleRepository extends JpaRepository<InterviewSche
     """)
     List<Map<String, Object>> findUpcomingInterviewsViaEmail(String email,String date, String time);
 
+    @Query("""
+            SELECT new map(
+            i.id as id,
+            i.stage as stage,
+            i.intervieweeName as intervieweeName,
+            i.intervieweeEmail as intervieweeEmail,
+            i.position as position,
+            i.date as date,
+            i.startTime as startTime,
+            i.endTime as endTime,
+            i.duration as duration,
+            i.meetLink as meetLink,
+            i.resumeLink as resumeLink,
+            i.interviewerEmail as interviewerEmail
+        )
+        FROM InterviewSchedule i
+        WHERE i.interviewerEmail = :email AND (i.date = :date AND :time BETWEEN i.startTime AND i.endTime)
+        ORDER BY i.date ASC, i.startTime ASC
+            """)
+    List<Map<String,Object>> findOngoingInterviewsViaEmail(String email,String date, String time);
+
 }

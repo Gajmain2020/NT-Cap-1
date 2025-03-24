@@ -1,3 +1,4 @@
+import OngoingInterview from "@/components/Interviewer/OngoingInterview";
 import UpcomingInterviews from "@/components/Interviewer/UpcomingInterviews";
 import { Button } from "@/components/ui/button";
 import {
@@ -39,72 +40,14 @@ export default function InterviewerHome() {
     },
   ];
 
-  const pendingFeedbacks = [
-    { id: 9, name: "Emily Brown", position: "Data Scientist" },
-    { id: 10, name: "Peter Parker", position: "Machine Learning Engineer" },
-    { id: 11, name: "Tony Stark", position: "Cloud Engineer" },
-    { id: 12, name: "Bruce Wayne", position: "Software Architect" },
-  ];
-
   const maxDisplay = 3;
 
   return (
     <div className="container mx-auto p-2 flex flex-col gap-6">
       <h1 className="text-2xl font-bold mb-6">Interviewer Dashboard</h1>
 
-      {/* Pending Feedbacks */}
-      <Card className="flex flex-col gap-6">
-        <CardHeader>
-          <CardTitle>Pending Feedbacks</CardTitle>
-        </CardHeader>
-        <CardContent className="overflow-auto">
-          {pendingFeedbacks.length === 0 ? (
-            <p>No pending feedbacks.</p>
-          ) : (
-            <>
-              <table className="w-full border-collapse border border-gray-300">
-                <thead>
-                  <tr className="bg-gray-100">
-                    <th className="border border-gray-300 px-4 py-2">
-                      Candidate
-                    </th>
-                    <th className="border border-gray-300 px-4 py-2">
-                      Position
-                    </th>
-                    <th className="border border-gray-300 px-4 py-2">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {pendingFeedbacks.slice(0, maxDisplay).map((feedback) => (
-                    <tr key={feedback.id} className="text-center">
-                      <td className="border border-gray-300 px-4 py-2">
-                        {feedback.name}
-                      </td>
-                      <td className="border border-gray-300 px-4 py-2">
-                        {feedback.position}
-                      </td>
-                      <td className="border border-gray-300 px-4 py-2">
-                        <Button
-                          onClick={() => navigate(`/feedback/${feedback.id}`)}
-                        >
-                          Submit Feedback
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </>
-          )}
-        </CardContent>
-        <CardFooter>
-          {pendingFeedbacks.length > maxDisplay && (
-            <Button onClick={() => navigate("/all-feedbacks")}>Show All</Button>
-          )}
-        </CardFooter>
-      </Card>
+      {/* Ongoing Feedbacks */}
+      <OngoingInterview />
 
       {/* Upcoming Interviews */}
       <UpcomingInterviews />
