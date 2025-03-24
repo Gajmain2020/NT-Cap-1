@@ -1,3 +1,4 @@
+import { FetchIntervieweeDetailsAPI } from "@/api/interviewerApis";
 import IntervieweeDetails from "@/components/Interviewer/IntervieweeDetails";
 import NewSkillForm from "@/components/Interviewer/NewSkillForm";
 import { Badge } from "@/components/ui/badge";
@@ -26,15 +27,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { fixedForm, ratingOptions, topicOptions } from "@/lib/utils";
-import { FeedbackEntry, ISkill } from "@/utils/types";
-import { useState } from "react";
+import { FeedbackEntry, IIntervieweeDetails, ISkill } from "@/utils/types";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 
 export default function FeedbackForm() {
   const [checkedItems, setCheckedItems] = useState<{ [key: number]: boolean }>(
     {}
   );
+
+  const { interviewId } = useParams<string>();
+
+  const [loading, setLoading] = useState(true);
+  const [interviewee, setInterviewee] = useState<IIntervieweeDetails>();
   const [feedback, setFeedback] = useState<FeedbackEntry[]>(fixedForm);
+  const [finalFeedback, setFinalFeedback] = useState("");
   const [newSkill, setNewSkill] = useState<ISkill>({
     skill: "",
     rating: "",
@@ -43,10 +51,6 @@ export default function FeedbackForm() {
   });
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  const handleCheckboxChange = (id: number, checked: boolean) => {
-    setCheckedItems((prev) => ({ ...prev, [id]: checked }));
-  };
 
   const handleAddSkill = () => {
     if (newSkill.rating === "" || newSkill.skill === "") {
@@ -104,17 +108,72 @@ export default function FeedbackForm() {
     setIsDialogOpen(false);
   };
 
+  useEffect(() => {
+    const fetchIntervieweeDetails = async (interviewId: string | undefined) => {
+      try {
+        if (!interviewId) {
+          toast.error("Invalid interviewee ID.");
+          return;
+        }
+
+        const response = await FetchIntervieweeDetailsAPI(interviewId);
+
+        if (!response.success) {
+          toast.error("Failed to fetch interviewee details.");
+          return;
+        }
+
+        setInterviewee(response.interviewee);
+      } catch (error) {
+        console.log("Error occurred: ", error);
+        toast.error(
+          "Error while fetching interviewee details. Please try again."
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchIntervieweeDetails(interviewId);
+  }, []);
+
+  const stageOptions =
+    interviewee?.stage === "L1"
+      ? ["L1 Passed", "L1 Passed with comments", "Rejected"]
+      : ["L2 Passed", "Rejected"];
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Submit Feedback</h1>
       <Card className="flex flex-col gap-6">
-        <IntervieweeDetails />
+        <IntervieweeDetails loading={loading} interviewee={interviewee} />
 
         <CardHeader>
           <CardTitle>Feedback Form</CardTitle>
         </CardHeader>
 
+        {/* Select Component for Stage Options */}
+        <CardContent>
+          <div>Final Result</div>
+          <Select
+            value={finalFeedback}
+            onValueChange={(value) => setFinalFeedback(value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select an Option" />
+            </SelectTrigger>
+            <SelectContent>
+              {stageOptions.map((option) => (
+                <SelectItem key={option} value={option}>
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </CardContent>
+
         <CardContent className="overflow-x-auto">
+          <div>Feedbacks</div>
           <table className="w-full border-collapse border border-gray-300">
             <thead>
               <tr className="bg-gray-100">
@@ -134,7 +193,10 @@ export default function FeedbackForm() {
                     <Checkbox
                       className="cursor-pointer"
                       onCheckedChange={(checked) =>
-                        handleCheckboxChange(entry.id, Boolean(checked))
+                        setCheckedItems((prev) => ({
+                          ...prev,
+                          [entry.id]: !!checked,
+                        }))
                       }
                     />
                   </td>
