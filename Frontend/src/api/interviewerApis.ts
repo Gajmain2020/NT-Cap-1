@@ -66,7 +66,8 @@ export async function FetchIntervieweeDetailsAPI(interviewId: string) {
 export async function SubmitFeedbackAPI(
   feedbackData: IFeedbackEntry[],
   interviewId: string | undefined,
-  finalResult: string
+  finalResult: string,
+  finalComment: string
 ) {
   try {
     //process the feedback data
@@ -75,13 +76,15 @@ export async function SubmitFeedbackAPI(
       topics: data.topics.join(", "),
     }));
 
-    console.log(transformedData);
-
     const response = await axios({
       headers,
       url: baseUrl + `/submit-feedback/${interviewId}`,
       method: "POST",
-      data: { finalResult: finalResult, feedback: transformedData },
+      data: {
+        finalResult,
+        feedback: transformedData,
+        finalComment,
+      },
     });
     return response.data;
   } catch (error) {
