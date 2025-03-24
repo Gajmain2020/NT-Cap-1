@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public interface InterviewScheduleRepository extends JpaRepository<InterviewSchedule, Long> {
@@ -100,5 +101,26 @@ public interface InterviewScheduleRepository extends JpaRepository<InterviewSche
         ORDER BY i.date ASC, i.startTime ASC
             """)
     List<Map<String,Object>> findOngoingInterviewsViaEmail(String email,String date, String time);
+
+
+    @Query("""
+    SELECT new map(
+        i.id as id,
+        i.intervieweeName as intervieweeName,
+        i.intervieweeEmail as intervieweeEmail,
+        i.stage as stage,
+        i.position as position,
+        i.date as date,
+        i.startTime as startTime,
+        i.endTime as endTime,
+        i.duration as duration,
+        i.meetLink as meetLink,
+        i.resumeLink as resumeLink
+    )
+    FROM InterviewSchedule i
+    WHERE i.id = :interviewId
+    """)
+    Optional<Map<String, Object>> findIntervieweeByInterviewId(Long interviewId);
+
 
 }

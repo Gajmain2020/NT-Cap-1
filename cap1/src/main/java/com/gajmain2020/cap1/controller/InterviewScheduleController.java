@@ -310,5 +310,22 @@ public class InterviewScheduleController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/interviewee-details/{interviewId}")
+    public ResponseEntity<Map<String,Object>> getIntervieweeDetails(@PathVariable Long interviewId){
+        Map<String, Object> response = new HashMap<>();
 
+        // Fetch upcoming interviews directly with optimized query
+        Optional<Map<String, Object>> interview = interviewScheduleRepository.findIntervieweeByInterviewId(interviewId);
+
+        if (interview.isEmpty()) {
+            response.put("message", "No upcoming interviews found.");
+            response.put("success", false);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        response.put("interviewee", interview);
+        response.put("success", true);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 }

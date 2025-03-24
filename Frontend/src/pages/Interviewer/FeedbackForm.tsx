@@ -1,24 +1,15 @@
-import { useState } from "react";
+import IntervieweeDetails from "@/components/Interviewer/IntervieweeDetails";
+import NewSkillForm from "@/components/Interviewer/NewSkillForm";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardHeader,
-  CardTitle,
   CardContent,
   CardFooter,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { useNavigate } from "react-router-dom";
-import NewSkillForm from "@/components/Interviewer/NewSkillForm";
 import { Checkbox } from "@/components/ui/checkbox";
-import IntervieweeDetails from "@/components/Interviewer/IntervieweeDetails";
 import {
   Dialog,
   DialogContent,
@@ -26,50 +17,25 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { fixedForm, ratingOptions, topicOptions } from "@/lib/utils";
+import { FeedbackEntry, ISkill } from "@/utils/types";
+import { useState } from "react";
 import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
-
-const topicOptions = {
-  "Basic Algorithm": ["Search Algorithms", "Sorting", "Recursion"],
-  "Code and Syntax": ["Code Optimization", "Algorithm Implementation"],
-  "Design Patterns": ["Singleton", "Factory", "Observer"],
-  SQL: ["Joins", "Subqueries", "Indexing", "Normalization"],
-  Git: ["Git Commands", "Branching", "Merging"],
-  "Overall Attitude": ["Attitude during interview"],
-  "Learning Ability": ["Learning New Concepts"],
-  "Resume Explanation": ["Relevant Experience", "Projects"],
-  Communication: ["Clarity of Thoughts", "Communication Skills"],
-};
 
 export default function FeedbackForm() {
-  const navigate = useNavigate();
-
   const [checkedItems, setCheckedItems] = useState<{ [key: number]: boolean }>(
     {}
   );
-  const [feedback, setFeedback] = useState<FeedbackEntry[]>([
-    { id: 1, skill: "Basic Algorithm", rating: "", topics: [], comments: "" },
-    { id: 2, skill: "Code and Syntax", rating: "", topics: [], comments: "" },
-    { id: 3, skill: "Design Patterns", rating: "", topics: [], comments: "" },
-    { id: 4, skill: "SQL", rating: "", topics: [], comments: "" },
-    { id: 5, skill: "Git", rating: "", topics: [], comments: "" },
-    { id: 6, skill: "Overall Attitude", rating: "", topics: [], comments: "" },
-    { id: 7, skill: "Learning Ability", rating: "", topics: [], comments: "" },
-    {
-      id: 8,
-      skill: "Resume Explanation",
-      rating: "",
-      topics: [],
-      comments: "",
-    },
-    { id: 9, skill: "Communication", rating: "", topics: [], comments: "" },
-  ]);
-  const [newSkill, setNewSkill] = useState<{
-    skill: string;
-    rating: string;
-    topics: string[];
-    comment: string;
-  }>({
+  const [feedback, setFeedback] = useState<FeedbackEntry[]>(fixedForm);
+  const [newSkill, setNewSkill] = useState<ISkill>({
     skill: "",
     rating: "",
     topics: [],
@@ -82,17 +48,7 @@ export default function FeedbackForm() {
     setCheckedItems((prev) => ({ ...prev, [id]: checked }));
   };
 
-  const ratingOptions = [
-    "Average",
-    "Good",
-    "Not Evaluated",
-    "Poor",
-    "Very Good",
-  ];
-
   const handleAddSkill = () => {
-    console.log(newSkill.rating);
-
     if (newSkill.rating === "" || newSkill.skill === "") {
       toast.error("Please fill in all required fields.");
       return;
@@ -114,7 +70,6 @@ export default function FeedbackForm() {
       comment: "",
     });
   };
-  console.log(feedback);
 
   const handleAddTopic = (index: number, topic: string): void => {
     const updatedFeedback: FeedbackEntry[] = [...feedback];
@@ -131,13 +86,6 @@ export default function FeedbackForm() {
     );
     setFeedback(updatedFeedback);
   };
-  interface FeedbackEntry {
-    id: number;
-    skill: string;
-    rating: string;
-    topics: string[];
-    comments: string;
-  }
 
   const handleSubmit = () => {
     const isValid = feedback.some(
@@ -154,7 +102,6 @@ export default function FeedbackForm() {
   const confirmSubmit = () => {
     console.log("Submitted Feedback:", feedback);
     setIsDialogOpen(false);
-    navigate("/submit-feedback");
   };
 
   return (
