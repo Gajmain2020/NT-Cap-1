@@ -1,4 +1,5 @@
 import {
+  CheckFeedbackFilledAPI,
   FetchIntervieweeDetailsAPI,
   SubmitFeedbackAPI,
 } from "@/api/interviewerApis";
@@ -63,6 +64,29 @@ export default function FeedbackForm() {
     interviewee?.stage === "L1"
       ? ["L1 Passed", "L1 Passed with comment", "Rejected"]
       : ["L2 Passed", "Rejected"];
+
+  useEffect(() => {
+    const checkIsFeedbackAlreadyFilled = async () => {
+      try {
+        if (!interviewId) {
+          toast.error("Invalid interviewee ID.");
+          return;
+        }
+        const response = await CheckFeedbackFilledAPI(interviewId);
+
+        if (!response.success) {
+          toast.error("Failed to fetch interviewee details.");
+          return;
+        }
+
+        setIsFeedbackFilled(response.status);
+      } catch (error) {
+        console.log("Error occurred", error);
+        toast.error("Error occurred while checking for feedback.");
+      }
+    };
+    checkIsFeedbackAlreadyFilled();
+  }, []);
 
   useEffect(() => {
     const fetchIntervieweeDetails = async (interviewId: string | undefined) => {
