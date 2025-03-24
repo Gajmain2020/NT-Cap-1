@@ -1,3 +1,4 @@
+import { IFeedbackEntry } from "@/utils/types";
 import axios from "axios";
 import { toast } from "sonner";
 
@@ -51,6 +52,36 @@ export async function FetchIntervieweeDetailsAPI(interviewId: string) {
       headers,
       url: baseUrl + `/interviewee-details/${interviewId}`,
       method: "GET",
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      return error?.response?.data;
+    } else {
+      toast.error("An unexpected error occurred");
+    }
+  }
+}
+
+export async function SubmitFeedbackAPI(
+  feedbackData: IFeedbackEntry[],
+  interviewId: string | undefined,
+  finalResult: string
+) {
+  try {
+    //process the feedback data
+    const transformedData = feedbackData.map((data) => ({
+      ...data,
+      topics: data.topics.join(", "),
+    }));
+
+    console.log(transformedData);
+
+    const response = await axios({
+      headers,
+      url: baseUrl + `/submit-feedback/${interviewId}`,
+      method: "POST",
+      data: { finalResult: finalResult, feedback: transformedData },
     });
     return response.data;
   } catch (error) {

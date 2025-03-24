@@ -1,11 +1,18 @@
 package com.gajmain2020.cap1.controller;
 
 
+import com.gajmain2020.cap1.dto.InterviewFeedbackRequest;
 import com.gajmain2020.cap1.dto.InterviewRequest;
+import com.gajmain2020.cap1.enums.FinalDecision;
 import com.gajmain2020.cap1.enums.InterviewStage;
+import com.gajmain2020.cap1.enums.Rating;
 import com.gajmain2020.cap1.enums.Role;
+import com.gajmain2020.cap1.models.InterviewFeedback;
+import com.gajmain2020.cap1.models.InterviewFeedbackDetail;
 import com.gajmain2020.cap1.models.InterviewSchedule;
 import com.gajmain2020.cap1.models.User;
+import com.gajmain2020.cap1.repositories.InterviewFeedbackDetailRepository;
+import com.gajmain2020.cap1.repositories.InterviewFeedbackRepository;
 import com.gajmain2020.cap1.repositories.InterviewScheduleRepository;
 import com.gajmain2020.cap1.repositories.UserRepository;
 import com.gajmain2020.cap1.security.JwtUtil;
@@ -34,6 +41,10 @@ public class InterviewScheduleController {
     private UserRepository userRepository;
     @Autowired
     private InterviewScheduleRepository interviewScheduleRepository;
+    @Autowired
+    private InterviewFeedbackRepository interviewFeedbackRepository;
+    @Autowired
+    private InterviewFeedbackDetailRepository interviewFeedbackDetailRepository;
 
 
     @GetMapping
@@ -311,7 +322,7 @@ public class InterviewScheduleController {
     }
 
     @GetMapping("/interviewee-details/{interviewId}")
-    public ResponseEntity<Map<String,Object>> getIntervieweeDetails(@PathVariable Long interviewId){
+    public ResponseEntity<Map<String, Object>> getIntervieweeDetails(@PathVariable Long interviewId) {
         Map<String, Object> response = new HashMap<>();
 
         // Fetch upcoming interviews directly with optimized query
@@ -328,4 +339,51 @@ public class InterviewScheduleController {
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    @PostMapping("/submit-feedback/{interviewId}")
+    public ResponseEntity<Map<String, Object>> submitFeedback(
+            @Valid @RequestBody InterviewFeedbackRequest feedbackRequest,
+            @PathVariable Long interviewId) {
+
+        // Fetch the InterviewSchedule entity
+        InterviewSchedule interviewSchedule = interviewScheduleRepository.findById(interviewId)
+                .orElseThrow(() -> new RuntimeException("Interview not found"));
+
+        // Convert DTO to InterviewFeedback entity and save
+        InterviewFeedback serverFeedback = InterviewFeedback.builder()
+                .interview(interviewSchedule)
+                .finalDecision(FinalDecision.valueOf(feedbackRequest.getFinalResult().toUpperCase().replace(" ", "_"))) // Convert String to Enum
+                .finalComment("Feedback provided")
+                .build();
+
+        // Save InterviewFeedback and get the persisted entity
+        serverFeedback = interviewFeedbackRepository.save(serverFeedback);
+
+        // Convert feedback list (SkillDto) to InterviewFeedbackDetail entities and save
+        InterviewFeedback finalServerFeedback = serverFeedback;
+        List<InterviewFeedbackDetail> feedbackDetails = feedbackRequest.getFeedback().stream()
+                .map(skillDto -> InterviewFeedbackDetail.builder()
+                        .feedback(finalServerFeedback) // Assign the saved InterviewFeedback
+                        .skill(skillDto.getSkill())
+                        .rating(Rating.valueOf(skillDto.getRating().toUpperCase())) // Convert String to Enum
+                        .topicsUsed(skillDto.getTopics())
+                        .comments(skillDto.getComments())
+                        .build())
+                .collect(Collectors.toList());
+
+        // Save all feedback details
+        interviewFeedbackDetailRepository.saveAll(feedbackDetails);
+
+        // Prepare Response
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Feedback saved successfully");
+        response.put("success", true);
+        response.put("interviewId", interviewId);
+        response.put("feedbackId", serverFeedback.getId());
+        response.put("finalResult", serverFeedback.getFinalDecision());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
 }
+
+

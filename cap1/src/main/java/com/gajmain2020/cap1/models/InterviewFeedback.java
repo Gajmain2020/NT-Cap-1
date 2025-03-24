@@ -19,7 +19,6 @@ public class InterviewFeedback {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Foreign key reference to InterviewSchedule
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "interview_id", nullable = false, referencedColumnName = "id")
     private InterviewSchedule interview;
@@ -32,5 +31,10 @@ public class InterviewFeedback {
     private String finalComment;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 }

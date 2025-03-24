@@ -1,4 +1,7 @@
-import { FetchIntervieweeDetailsAPI } from "@/api/interviewerApis";
+import {
+  FetchIntervieweeDetailsAPI,
+  SubmitFeedbackAPI,
+} from "@/api/interviewerApis";
 import IntervieweeDetails from "@/components/Interviewer/IntervieweeDetails";
 import NewSkillForm from "@/components/Interviewer/NewSkillForm";
 import { Badge } from "@/components/ui/badge";
@@ -27,7 +30,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { fixedForm, ratingOptions, topicOptions } from "@/lib/utils";
-import { FeedbackEntry, IIntervieweeDetails, ISkill } from "@/utils/types";
+import { IFeedbackEntry, IIntervieweeDetails, ISkill } from "@/utils/types";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -39,9 +42,10 @@ export default function FeedbackForm() {
 
   const { interviewId } = useParams<string>();
 
+  const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [interviewee, setInterviewee] = useState<IIntervieweeDetails>();
-  const [feedback, setFeedback] = useState<FeedbackEntry[]>(fixedForm);
+  const [feedback, setFeedback] = useState<IFeedbackEntry[]>(fixedForm);
   const [finalFeedback, setFinalFeedback] = useState("");
   const [newSkill, setNewSkill] = useState<ISkill>({
     skill: "",
@@ -52,61 +56,10 @@ export default function FeedbackForm() {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const handleAddSkill = () => {
-    if (newSkill.rating === "" || newSkill.skill === "") {
-      toast.error("Please fill in all required fields.");
-      return;
-    }
-    setFeedback([
-      ...feedback,
-      {
-        id: feedback.length + 1,
-        skill: newSkill.skill,
-        rating: newSkill.rating,
-        topics: newSkill.topics,
-        comments: newSkill.comment,
-      },
-    ]);
-    setNewSkill({
-      skill: "",
-      rating: "",
-      topics: [],
-      comment: "",
-    });
-  };
-
-  const handleAddTopic = (index: number, topic: string): void => {
-    const updatedFeedback: FeedbackEntry[] = [...feedback];
-    if (!updatedFeedback[index].topics.includes(topic)) {
-      updatedFeedback[index].topics.push(topic);
-      setFeedback(updatedFeedback);
-    }
-  };
-
-  const handleRemoveTopic = (index: number, topic: string) => {
-    const updatedFeedback = [...feedback];
-    updatedFeedback[index].topics = updatedFeedback[index].topics.filter(
-      (t) => t !== topic
-    );
-    setFeedback(updatedFeedback);
-  };
-
-  const handleSubmit = () => {
-    const isValid = feedback.some(
-      (entry) => entry.rating || entry.topics.length > 0 || entry.comments
-    );
-
-    if (isValid) {
-      setIsDialogOpen(true);
-    } else {
-      toast.error("Please provide feedback for at least one skill.");
-    }
-  };
-
-  const confirmSubmit = () => {
-    console.log("Submitted Feedback:", feedback);
-    setIsDialogOpen(false);
-  };
+  const stageOptions =
+    interviewee?.stage === "L1"
+      ? ["L1 Passed", "L1 Passed with comment", "Rejected"]
+      : ["L2 Passed", "Rejected"];
 
   useEffect(() => {
     const fetchIntervieweeDetails = async (interviewId: string | undefined) => {
@@ -137,19 +90,94 @@ export default function FeedbackForm() {
     fetchIntervieweeDetails(interviewId);
   }, []);
 
-  const stageOptions =
-    interviewee?.stage === "L1"
-      ? ["L1 Passed", "L1 Passed with comments", "Rejected"]
-      : ["L2 Passed", "Rejected"];
+  const handleAddSkill = () => {
+    if (newSkill.rating === "" || newSkill.skill === "") {
+      toast.error("Please fill in all required fields.");
+      return;
+    }
+    setFeedback([
+      ...feedback,
+      {
+        id: feedback.length + 1,
+        skill: newSkill.skill,
+        rating: newSkill.rating,
+        topics: newSkill.topics,
+        comments: newSkill.comment,
+      },
+    ]);
+    setNewSkill({
+      skill: "",
+      rating: "",
+      topics: [],
+      comment: "",
+    });
+  };
+
+  const handleAddTopic = (index: number, topic: string): void => {
+    const updatedFeedback: IFeedbackEntry[] = [...feedback];
+    if (!updatedFeedback[index].topics.includes(topic)) {
+      updatedFeedback[index].topics.push(topic);
+      setFeedback(updatedFeedback);
+    }
+  };
+
+  const handleRemoveTopic = (index: number, topic: string) => {
+    const updatedFeedback = [...feedback];
+    updatedFeedback[index].topics = updatedFeedback[index].topics.filter(
+      (t) => t !== topic
+    );
+    setFeedback(updatedFeedback);
+  };
+
+  const handleSubmit = () => {
+    const isValid = feedback.some(
+      (entry) => entry.rating || entry.topics.length > 0 || entry.comments
+    );
+    if (isValid) {
+      setIsDialogOpen(true);
+    } else {
+      toast.error("Please provide feedback for at least one skill.");
+    }
+  };
+
+  const confirmSubmit = async () => {
+    const feedbackData = Object.keys(checkedItems)
+      .filter((key) => checkedItems[Number(key)] === true) // Keep only checked items
+      .map((key) => feedback[Number(key) - 1]); // Get corresponding feedback values
+
+    try {
+      setSubmitting(true);
+
+      const response = await SubmitFeedbackAPI(
+        feedbackData,
+        interviewId,
+        finalFeedback
+      );
+
+      if (!response.success) {
+        toast.error(response.message);
+        return;
+      }
+
+      setIsDialogOpen(false);
+      toast.success("Feedback submitted successfully!");
+    } catch (error) {
+      console.log("Error occurred:", error);
+      toast.error("Can't submit the feedback not. Please try again later.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">Submit Feedback</h1>
       <Card className="flex flex-col gap-6">
         <IntervieweeDetails loading={loading} interviewee={interviewee} />
 
         <CardHeader>
-          <CardTitle>Feedback Form</CardTitle>
+          <CardTitle className="text-center text-xl underline">
+            Feedback Form
+          </CardTitle>
         </CardHeader>
 
         {/* Select Component for Stage Options */}
@@ -217,7 +245,6 @@ export default function FeedbackForm() {
                         <SelectValue placeholder="Select Rating" />
                       </SelectTrigger>
                       <SelectContent>
-                        SelectD
                         {ratingOptions.map((option) => (
                           <SelectItem key={option} value={option}>
                             {option}
@@ -324,10 +351,16 @@ export default function FeedbackForm() {
           </DialogHeader>
           <p>Are you sure you want to submit the feedback?</p>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+            <Button
+              variant="outline"
+              disabled={submitting}
+              onClick={() => setIsDialogOpen(false)}
+            >
               Cancel
             </Button>
-            <Button onClick={confirmSubmit}>Confirm</Button>
+            <Button disabled={submitting} onClick={confirmSubmit}>
+              {submitting ? "Submitting" : "Confirm"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

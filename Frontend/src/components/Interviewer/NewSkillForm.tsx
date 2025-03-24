@@ -1,6 +1,6 @@
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -8,22 +8,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ISkill } from "@/utils/types";
 
 interface NewSkillFormProps {
-  newSkill: {
-    skill: string;
-    rating: string;
-    topics: string[];
-    comment: string;
-  };
-  setNewSkill: React.Dispatch<
-    React.SetStateAction<{
-      skill: string;
-      rating: string;
-      topics: string[];
-      comment: string;
-    }>
-  >;
+  newSkill: ISkill;
+  setNewSkill: React.Dispatch<React.SetStateAction<ISkill>>;
   handleAddSkill: () => void;
   ratingOptions: string[];
 }
@@ -79,9 +68,9 @@ export default function NewSkillForm({
       </div>
 
       {/* Topics Input & Chips */}
-      <div className="mt-4">
+      <div className="">
         {/* Scrollable Topic Chips */}
-        <div className="flex flex-wrap gap-2 bg-gray-100 p-2 rounded-md min-h-[40px] max-h-[80px] overflow-y-auto">
+        <div className="flex flex-wrap gap-2 p-2 rounded-md  overflow-y-auto">
           {newSkill.topics.map((topic, topicIndex) => (
             <Badge
               key={topic}

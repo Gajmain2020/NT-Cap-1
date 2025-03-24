@@ -44,7 +44,7 @@ export type ExtendedInterview = IInterview & {
   interviewerEmail: string;
 };
 
-export interface FeedbackEntry {
+export interface IFeedbackEntry {
   id: number;
   skill: string;
   rating: string;
