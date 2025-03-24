@@ -46,9 +46,6 @@ public class InterviewSchedule {
     private String meetLink;  // Optional
     private String resumeLink; // Optional
 
-    @Column(nullable = false)
-    private String interviewerEmail;  // Store email but enforce FK at the DB level
-
     @ManyToOne
     @JoinColumn(name = "interviewerEmail", referencedColumnName = "email", insertable = false, updatable = false)
     private User interviewer;

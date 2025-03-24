@@ -43,3 +43,32 @@ export type ExtendedInterview = IInterview & {
   interviewerName: string;
   interviewerEmail: string;
 };
+
+export interface IFeedbackEntry {
+  id: number;
+  skill: string;
+  rating: string;
+  topics: string[];
+  comments: string;
+}
+
+export interface IIntervieweeDetails {
+  id: string;
+  intervieweeName: string;
+  intervieweeEmail: string;
+  position: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  duration: string;
+  meetLink: string;
+  stage: string;
+  resumeLink: string;
+}
+
+export interface ISkill {
+  skill: string;
+  rating: string;
+  topics: string[];
+  comment: string;
+}

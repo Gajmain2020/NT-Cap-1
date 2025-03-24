@@ -1,24 +1,19 @@
-import { useState } from "react";
+import {
+  FetchIntervieweeDetailsAPI,
+  SubmitFeedbackAPI,
+} from "@/api/interviewerApis";
+import IntervieweeDetails from "@/components/Interviewer/IntervieweeDetails";
+import NewSkillForm from "@/components/Interviewer/NewSkillForm";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardHeader,
-  CardTitle,
   CardContent,
   CardFooter,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { useNavigate } from "react-router-dom";
-import NewSkillForm from "@/components/Interviewer/NewSkillForm";
 import { Checkbox } from "@/components/ui/checkbox";
-import IntervieweeDetails from "@/components/Interviewer/IntervieweeDetails";
 import {
   Dialog,
   DialogContent,
@@ -26,50 +21,33 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { fixedForm, ratingOptions, topicOptions } from "@/lib/utils";
+import { IFeedbackEntry, IIntervieweeDetails, ISkill } from "@/utils/types";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
-
-const topicOptions = {
-  "Basic Algorithm": ["Search Algorithms", "Sorting", "Recursion"],
-  "Code and Syntax": ["Code Optimization", "Algorithm Implementation"],
-  "Design Patterns": ["Singleton", "Factory", "Observer"],
-  SQL: ["Joins", "Subqueries", "Indexing", "Normalization"],
-  Git: ["Git Commands", "Branching", "Merging"],
-  "Overall Attitude": ["Attitude during interview"],
-  "Learning Ability": ["Learning New Concepts"],
-  "Resume Explanation": ["Relevant Experience", "Projects"],
-  Communication: ["Clarity of Thoughts", "Communication Skills"],
-};
 
 export default function FeedbackForm() {
-  const navigate = useNavigate();
-
   const [checkedItems, setCheckedItems] = useState<{ [key: number]: boolean }>(
     {}
   );
-  const [feedback, setFeedback] = useState<FeedbackEntry[]>([
-    { id: 1, skill: "Basic Algorithm", rating: "", topics: [], comments: "" },
-    { id: 2, skill: "Code and Syntax", rating: "", topics: [], comments: "" },
-    { id: 3, skill: "Design Patterns", rating: "", topics: [], comments: "" },
-    { id: 4, skill: "SQL", rating: "", topics: [], comments: "" },
-    { id: 5, skill: "Git", rating: "", topics: [], comments: "" },
-    { id: 6, skill: "Overall Attitude", rating: "", topics: [], comments: "" },
-    { id: 7, skill: "Learning Ability", rating: "", topics: [], comments: "" },
-    {
-      id: 8,
-      skill: "Resume Explanation",
-      rating: "",
-      topics: [],
-      comments: "",
-    },
-    { id: 9, skill: "Communication", rating: "", topics: [], comments: "" },
-  ]);
-  const [newSkill, setNewSkill] = useState<{
-    skill: string;
-    rating: string;
-    topics: string[];
-    comment: string;
-  }>({
+
+  const { interviewId } = useParams<string>();
+
+  const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [interviewee, setInterviewee] = useState<IIntervieweeDetails>();
+  const [feedback, setFeedback] = useState<IFeedbackEntry[]>(fixedForm);
+  const [finalFeedback, setFinalFeedback] = useState("");
+  const [newSkill, setNewSkill] = useState<ISkill>({
     skill: "",
     rating: "",
     topics: [],
@@ -78,21 +56,41 @@ export default function FeedbackForm() {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const handleCheckboxChange = (id: number, checked: boolean) => {
-    setCheckedItems((prev) => ({ ...prev, [id]: checked }));
-  };
+  const stageOptions =
+    interviewee?.stage === "L1"
+      ? ["L1 Passed", "L1 Passed with comment", "Rejected"]
+      : ["L2 Passed", "Rejected"];
 
-  const ratingOptions = [
-    "Average",
-    "Good",
-    "Not Evaluated",
-    "Poor",
-    "Very Good",
-  ];
+  useEffect(() => {
+    const fetchIntervieweeDetails = async (interviewId: string | undefined) => {
+      try {
+        if (!interviewId) {
+          toast.error("Invalid interviewee ID.");
+          return;
+        }
+
+        const response = await FetchIntervieweeDetailsAPI(interviewId);
+
+        if (!response.success) {
+          toast.error("Failed to fetch interviewee details.");
+          return;
+        }
+
+        setInterviewee(response.interviewee);
+      } catch (error) {
+        console.log("Error occurred: ", error);
+        toast.error(
+          "Error while fetching interviewee details. Please try again."
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchIntervieweeDetails(interviewId);
+  }, []);
 
   const handleAddSkill = () => {
-    console.log(newSkill.rating);
-
     if (newSkill.rating === "" || newSkill.skill === "") {
       toast.error("Please fill in all required fields.");
       return;
@@ -114,10 +112,9 @@ export default function FeedbackForm() {
       comment: "",
     });
   };
-  console.log(feedback);
 
   const handleAddTopic = (index: number, topic: string): void => {
-    const updatedFeedback: FeedbackEntry[] = [...feedback];
+    const updatedFeedback: IFeedbackEntry[] = [...feedback];
     if (!updatedFeedback[index].topics.includes(topic)) {
       updatedFeedback[index].topics.push(topic);
       setFeedback(updatedFeedback);
@@ -131,19 +128,11 @@ export default function FeedbackForm() {
     );
     setFeedback(updatedFeedback);
   };
-  interface FeedbackEntry {
-    id: number;
-    skill: string;
-    rating: string;
-    topics: string[];
-    comments: string;
-  }
 
   const handleSubmit = () => {
     const isValid = feedback.some(
       (entry) => entry.rating || entry.topics.length > 0 || entry.comments
     );
-
     if (isValid) {
       setIsDialogOpen(true);
     } else {
@@ -151,23 +140,68 @@ export default function FeedbackForm() {
     }
   };
 
-  const confirmSubmit = () => {
-    console.log("Submitted Feedback:", feedback);
-    setIsDialogOpen(false);
-    navigate("/submit-feedback");
+  const confirmSubmit = async () => {
+    const feedbackData = Object.keys(checkedItems)
+      .filter((key) => checkedItems[Number(key)] === true) // Keep only checked items
+      .map((key) => feedback[Number(key) - 1]); // Get corresponding feedback values
+
+    try {
+      setSubmitting(true);
+
+      const response = await SubmitFeedbackAPI(
+        feedbackData,
+        interviewId,
+        finalFeedback
+      );
+
+      if (!response.success) {
+        toast.error(response.message);
+        return;
+      }
+
+      setIsDialogOpen(false);
+      toast.success("Feedback submitted successfully!");
+    } catch (error) {
+      console.log("Error occurred:", error);
+      toast.error("Can't submit the feedback not. Please try again later.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">Submit Feedback</h1>
       <Card className="flex flex-col gap-6">
-        <IntervieweeDetails />
+        <IntervieweeDetails loading={loading} interviewee={interviewee} />
 
         <CardHeader>
-          <CardTitle>Feedback Form</CardTitle>
+          <CardTitle className="text-center text-xl underline">
+            Feedback Form
+          </CardTitle>
         </CardHeader>
 
+        {/* Select Component for Stage Options */}
+        <CardContent>
+          <div>Final Result</div>
+          <Select
+            value={finalFeedback}
+            onValueChange={(value) => setFinalFeedback(value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select an Option" />
+            </SelectTrigger>
+            <SelectContent>
+              {stageOptions.map((option) => (
+                <SelectItem key={option} value={option}>
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </CardContent>
+
         <CardContent className="overflow-x-auto">
+          <div>Feedbacks</div>
           <table className="w-full border-collapse border border-gray-300">
             <thead>
               <tr className="bg-gray-100">
@@ -187,7 +221,10 @@ export default function FeedbackForm() {
                     <Checkbox
                       className="cursor-pointer"
                       onCheckedChange={(checked) =>
-                        handleCheckboxChange(entry.id, Boolean(checked))
+                        setCheckedItems((prev) => ({
+                          ...prev,
+                          [entry.id]: !!checked,
+                        }))
                       }
                     />
                   </td>
@@ -208,7 +245,6 @@ export default function FeedbackForm() {
                         <SelectValue placeholder="Select Rating" />
                       </SelectTrigger>
                       <SelectContent>
-                        SelectD
                         {ratingOptions.map((option) => (
                           <SelectItem key={option} value={option}>
                             {option}
@@ -315,10 +351,16 @@ export default function FeedbackForm() {
           </DialogHeader>
           <p>Are you sure you want to submit the feedback?</p>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+            <Button
+              variant="outline"
+              disabled={submitting}
+              onClick={() => setIsDialogOpen(false)}
+            >
               Cancel
             </Button>
-            <Button onClick={confirmSubmit}>Confirm</Button>
+            <Button disabled={submitting} onClick={confirmSubmit}>
+              {submitting ? "Submitting" : "Confirm"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

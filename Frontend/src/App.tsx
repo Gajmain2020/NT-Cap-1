@@ -79,7 +79,7 @@ function App() {
               path="upcoming-interviews"
               element={<InterviewerUpcomingInterviews />}
             />
-            <Route path="feedback" element={<FeedbackForm />} />
+            <Route path="feedback/:interviewId" element={<FeedbackForm />} />
             <Route path="calendar" element={<InterviewerCalendar />} />
           </Route>
 
