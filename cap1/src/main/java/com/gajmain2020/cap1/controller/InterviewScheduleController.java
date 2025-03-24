@@ -106,7 +106,7 @@ public class InterviewScheduleController {
                 .meetLink(interviewRequest.getMeetLink())
                 .resumeLink(interviewRequest.getResumeLink())
                 .stage(InterviewStage.valueOf("L1"))
-                .interviewer(interviewer)
+                .interviewer(optionalInterviewer.get())
                 .duration(duration)  // Set calculated duration
                 .build();
 
@@ -348,28 +348,38 @@ public class InterviewScheduleController {
                 .orElseThrow(() -> new RuntimeException("Interview not found"));
 
         // Convert DTO to InterviewFeedback entity and save
-        InterviewFeedback serverFeedback = InterviewFeedback.builder()
-                .interview(interviewSchedule)
-                .finalDecision(FinalDecision.valueOf(feedbackRequest.getFinalResult().toUpperCase().replace(" ", "_"))) // Convert String to Enum
-                .finalComment("Feedback provided")
-                .build();
+        InterviewFeedback savedFeedback = interviewFeedbackRepository.save(
+                InterviewFeedback.builder()
+                        .interview(interviewSchedule)
+                        .finalDecision(FinalDecision.valueOf(feedbackRequest.getFinalResult().toUpperCase().replace(" ", "_")))
+                        .finalComment(feedbackRequest.getFinalComment())
+                        .build()
+        );
 
-        // Save InterviewFeedback and get the persisted entity
-        serverFeedback = interviewFeedbackRepository.save(serverFeedback);
+        // Use a final variable inside the lambda
+        final InterviewFeedback finalServerFeedback = savedFeedback;
 
-        // Convert feedback list (SkillDto) to InterviewFeedbackDetail entities and save
-        InterviewFeedback finalServerFeedback = serverFeedback;
+        // Convert feedback list to InterviewFeedbackDetail entities
         List<InterviewFeedbackDetail> feedbackDetails = feedbackRequest.getFeedback().stream()
-                .map(skillDto -> InterviewFeedbackDetail.builder()
-                        .feedback(finalServerFeedback) // Assign the saved InterviewFeedback
-                        .skill(skillDto.getSkill())
-                        .rating(Rating.valueOf(skillDto.getRating().toUpperCase())) // Convert String to Enum
-                        .topicsUsed(skillDto.getTopics())
-                        .comments(skillDto.getComments())
-                        .build())
+                .map(skillDto -> {
+                    Rating rating;
+                    try {
+                        rating = Rating.valueOf(skillDto.getRating().toUpperCase().replace(" ", "_"));
+                    } catch (IllegalArgumentException e) {
+                        throw new RuntimeException("Invalid rating: " + skillDto.getRating());
+                    }
+
+                    return InterviewFeedbackDetail.builder()
+                            .feedback(finalServerFeedback) // Use final variable
+                            .skill(skillDto.getSkill())
+                            .rating(rating)
+                            .topicsUsed(skillDto.getTopics())
+                            .comments(Optional.ofNullable(skillDto.getComments()).orElse(""))
+                            .build();
+                })
                 .collect(Collectors.toList());
 
-        // Save all feedback details
+        // Save all feedback details separately
         interviewFeedbackDetailRepository.saveAll(feedbackDetails);
 
         // Prepare Response

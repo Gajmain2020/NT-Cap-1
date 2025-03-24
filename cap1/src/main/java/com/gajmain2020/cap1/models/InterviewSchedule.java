@@ -43,12 +43,12 @@ public class InterviewSchedule {
     @Column(nullable = false)
     private  int duration;
 
+    @ManyToOne
+    @JoinColumn(name = "interviewerEmail", referencedColumnName = "email", nullable = false)
+    private User interviewer;
+
     private String meetLink;  // Optional
     private String resumeLink; // Optional
-
-    @ManyToOne
-    @JoinColumn(name = "interviewerEmail", referencedColumnName = "email", insertable = false, updatable = false)
-    private User interviewer;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "VARCHAR(10) DEFAULT 'L1'")

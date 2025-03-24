@@ -32,27 +32,30 @@ import {
 import { fixedForm, ratingOptions, topicOptions } from "@/lib/utils";
 import { IFeedbackEntry, IIntervieweeDetails, ISkill } from "@/utils/types";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 
 export default function FeedbackForm() {
+  const navigate = useNavigate();
+  const { interviewId } = useParams<string>();
+
   const [checkedItems, setCheckedItems] = useState<{ [key: number]: boolean }>(
     {}
   );
-
-  const { interviewId } = useParams<string>();
-
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [interviewee, setInterviewee] = useState<IIntervieweeDetails>();
   const [feedback, setFeedback] = useState<IFeedbackEntry[]>(fixedForm);
   const [finalFeedback, setFinalFeedback] = useState("");
+  const [finalComment, setFinalComment] = useState("");
   const [newSkill, setNewSkill] = useState<ISkill>({
     skill: "",
     rating: "",
     topics: [],
     comment: "",
   });
+
+  const [isFeedbackFilled, setIsFeedbackFilled] = useState(false);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -105,6 +108,7 @@ export default function FeedbackForm() {
         comments: newSkill.comment,
       },
     ]);
+    setCheckedItems((items) => ({ ...items, [feedback.length + 1]: true }));
     setNewSkill({
       skill: "",
       rating: "",
@@ -130,6 +134,10 @@ export default function FeedbackForm() {
   };
 
   const handleSubmit = () => {
+    if (finalFeedback === "") {
+      toast.error("Please fill in your final feedback.");
+      return;
+    }
     const isValid = feedback.some(
       (entry) => entry.rating || entry.topics.length > 0 || entry.comments
     );
@@ -151,7 +159,8 @@ export default function FeedbackForm() {
       const response = await SubmitFeedbackAPI(
         feedbackData,
         interviewId,
-        finalFeedback
+        finalFeedback,
+        finalComment
       );
 
       if (!response.success) {
@@ -161,6 +170,7 @@ export default function FeedbackForm() {
 
       setIsDialogOpen(false);
       toast.success("Feedback submitted successfully!");
+      setIsFeedbackFilled(true);
     } catch (error) {
       console.log("Error occurred:", error);
       toast.error("Can't submit the feedback not. Please try again later.");
@@ -168,6 +178,31 @@ export default function FeedbackForm() {
       setSubmitting(false);
     }
   };
+
+  if (isFeedbackFilled) {
+    return (
+      <div className="flex items-center justify-center flex-col gap-4">
+        <img
+          className="w-72 rounded-lg shadow-xl"
+          src="https://static.vecteezy.com/system/resources/previews/044/085/145/non_2x/dependencies-filled-shadow-icon-vector.jpg"
+          alt=""
+        />
+        <div className="flex items-center justify-center flex-col gap-2">
+          <h1 className="text-2xl">Feedback successfully!!</h1>
+          <p className="text-center text-gray-600">
+            The feedback of{" "}
+            <i className="font-semibold underline">
+              {interviewee?.intervieweeName}
+            </i>{" "}
+            has been filled successfully.
+          </p>
+          <Button variant="secondary" onClick={() => navigate("/")}>
+            Go to homepage
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-4">
@@ -181,7 +216,7 @@ export default function FeedbackForm() {
         </CardHeader>
 
         {/* Select Component for Stage Options */}
-        <CardContent>
+        <CardContent className="flex flex-col gap-2">
           <div>Final Result</div>
           <Select
             value={finalFeedback}
@@ -198,6 +233,11 @@ export default function FeedbackForm() {
               ))}
             </SelectContent>
           </Select>
+          <Input
+            type="text"
+            onChange={(e) => setFinalComment(e.target.value)}
+            placeholder="Type overall comment if any."
+          />
         </CardContent>
 
         <CardContent className="overflow-x-auto">

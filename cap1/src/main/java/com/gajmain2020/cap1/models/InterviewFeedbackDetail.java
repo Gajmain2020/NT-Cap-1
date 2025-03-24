@@ -18,7 +18,7 @@ public class InterviewFeedbackDetail {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "feedback_id", nullable = false)
+    @JoinColumn(name = "feedbackId",referencedColumnName = "id", nullable = false)
     private InterviewFeedback feedback;
 
     @Column(nullable = false)
