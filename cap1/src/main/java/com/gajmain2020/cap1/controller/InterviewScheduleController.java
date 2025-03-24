@@ -106,7 +106,7 @@ public class InterviewScheduleController {
                 .meetLink(interviewRequest.getMeetLink())
                 .resumeLink(interviewRequest.getResumeLink())
                 .stage(InterviewStage.valueOf("L1"))
-                .interviewer(interviewer)
+                .interviewer(optionalInterviewer.get())
                 .duration(duration)  // Set calculated duration
                 .build();
 
