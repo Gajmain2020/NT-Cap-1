@@ -56,21 +56,35 @@ export default function OngoingInterview() {
                     Candidate
                   </th>
                   <th className="border border-gray-300 px-4 py-2">Position</th>
+                  <th className="border border-gray-300 px-4 py-2">Stage</th>
+                  <th className="border border-gray-300 px-4 py-2">Time</th>
                   <th className="border border-gray-300 px-4 py-2">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {ongoingInterviews.map((feedback) => (
-                  <tr key={feedback.id} className="text-center">
+                {ongoingInterviews.map((interview) => (
+                  <tr key={interview.id} className="text-center">
                     <td className="border border-gray-300 px-4 py-2">
-                      {feedback.intervieweeName}
+                      <p className="font-semibold">
+                        {interview.intervieweeName}
+                      </p>
+                      <p className="text-sm text-gray-800">
+                        {interview.intervieweeEmail}
+                      </p>
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
-                      {feedback.position}
+                      {interview.position}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {interview.stage}
+                    </td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      {interview.startTime} - {interview.endTime}
                     </td>
                     <td className="border border-gray-300 px-4 py-2">
                       <Button
-                        onClick={() => navigate(`/feedback/${feedback.id}`)}
+                        variant="secondary"
+                        onClick={() => navigate(`feedback/${interview.id}`)}
                       >
                         Submit Feedback
                       </Button>

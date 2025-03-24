@@ -42,6 +42,8 @@ public class InterviewScheduleController {
         return true;
     }
 
+
+    //API to schedule interview
     @PostMapping("/add-interview")
     public ResponseEntity<Map<String, Object>> addInterview(@Valid @RequestBody InterviewRequest interviewRequest, BindingResult result) {
         Map<String, Object> response = new HashMap<>();
