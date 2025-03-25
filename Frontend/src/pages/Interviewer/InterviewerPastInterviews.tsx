@@ -1,6 +1,8 @@
+import { FetchInterviewerPastFeedbacksAPI } from "@/api/interviewerApis";
 import { Button } from "@/components/ui/button";
 import { ExtendedScheduledInterview } from "@/utils/types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const dummyInterviews = [
   {
@@ -34,8 +36,31 @@ const dummyInterviews = [
 
 export default function InterviewerPastInterviews() {
   const [loading, setLoading] = useState(true);
-  const [pastInterviews, setPastInterviews] =
-    useState<ExtendedScheduledInterview[]>();
+  const [pastInterviews, setPastInterviews] = useState<
+    ExtendedScheduledInterview[]
+  >([]);
+
+  useEffect(() => {
+    const fetchPastInterview = async () => {
+      try {
+        const response = await FetchInterviewerPastFeedbacksAPI();
+
+        if (!response.success) {
+          toast.error(response.message);
+          return;
+        }
+
+        setPastInterviews(response.feedback);
+      } catch (error) {
+        console.log("Error occurred:", error);
+        toast.error("Error occurred while fetching past interview feedbacks. ");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPastInterview();
+  }, []);
 
   return (
     <div className="p-6">
@@ -52,31 +77,45 @@ export default function InterviewerPastInterviews() {
           </tr>
         </thead>
         <tbody>
-          {dummyInterviews.map((interview) => (
-            <tr key={interview.id} className="text-center border">
-              <td className="border p-2">
-                {interview.name}
-                <p className="text-sm text-gray-700">( {interview.email} )</p>
-              </td>
-              <td className="border p-2">{interview.position}</td>
-              <td className="border p-2">{interview.date}</td>
-              <td className="border p-2">{interview.time}</td>
-              <td className="border p-2 font-medium">{interview.status}</td>
-              <td className="border p-2">
-                <Button
-                  variant="secondary"
-                  onClick={() =>
-                    window.open(
-                      `${window.location}/feedback/${interview.id}`,
-                      "_blank"
-                    )
-                  }
-                >
-                  View
-                </Button>
+          {loading ? (
+            <p className="animate-pulse">Fetching past feedbacks...</p>
+          ) : pastInterviews?.length === 0 ? (
+            <tr>
+              <td colSpan={6} className="text-center py-2 text-gray-800">
+                No feedback submitted.
               </td>
             </tr>
-          ))}
+          ) : (
+            pastInterviews.map((interview) => (
+              <tr key={interview.id} className="text-center border">
+                <td className="border p-2">
+                  {interview.intervieweeName}
+                  <p className="text-sm text-gray-700">
+                    ( {interview.interviewerEmail} )
+                  </p>
+                </td>
+                <td className="border p-2">{interview.position}</td>
+                <td className="border p-2">{interview.date}</td>
+                <td className="border p-2">
+                  {interview.startTime} - {interview.endTime}
+                </td>
+                <td className="border p-2 font-medium">{interview.stage}</td>
+                <td className="border p-2">
+                  <Button
+                    variant="secondary"
+                    onClick={() =>
+                      window.open(
+                        `${window.location}/feedback/${interview.id}`,
+                        "_blank"
+                      )
+                    }
+                  >
+                    View
+                  </Button>
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
     </div>
