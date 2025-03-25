@@ -24,8 +24,10 @@ public interface InterviewFeedbackRepository extends JpaRepository<InterviewFeed
 
     @Query(value = """
         SELECT f.id AS feedbackId, f.final_decision AS finalDecision, f.final_comment AS finalComment, 
+               s.interviewee_name AS intervieweeName, s.interviewee_email AS intervieweeEmail, s.stage AS stage, s.position AS position,
                d.id AS id, d.skill AS skill, d.rating AS rating, d.topics_used AS topics, d.comments AS comments
         FROM interview_feedback f
+        JOIN interview_schedule s ON f.interview_id = s.id
         LEFT JOIN interview_feedback_details d ON f.id = d.feedback_id
         WHERE f.id = :feedbackId
     """, nativeQuery = true)

@@ -505,7 +505,7 @@ public class InterviewScheduleController {
         boolean isFeedbackAndEmailValid = interviewFeedbackRepository.validateFeedbackWithInterviewerEmail(email,feedbackId);
 
         if(!isFeedbackAndEmailValid){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of(
                     "success", false,
                     "message", "Logged in and the Feedback ID are not associated."
             ));
@@ -522,21 +522,31 @@ public class InterviewScheduleController {
         Map<String, Object> feedback = new HashMap<>();
         List<Map<String, Object>> feedbackEntries = new ArrayList<>();
 
+
         for (Object[] row : rawData) {
-            if (!response.containsKey("feedbackId")) {
+            if (!feedback.containsKey("feedbackId")) { // Fix: Use feedback, not response
                 feedback.put("feedbackId", row[0]);
                 feedback.put("finalDecision", row[1]);
                 feedback.put("finalComment", row[2]);
+
+                // Fix: Add interviewee details inside the `feedback` map
+                feedback.put("interviewee", Map.of(
+                        "name", row[3],
+                        "email", row[4],
+                        "stage", row[5],
+                        "position", row[6]
+                ));
+
                 feedback.put("details", feedbackEntries);
             }
 
-            if (row[3] != null) { // If feedback details exist
+            if (row[7] != null) { // If feedback details exist
                 Map<String, Object> feedbackEntry = new HashMap<>();
-                feedbackEntry.put("id", row[3]);
-                feedbackEntry.put("skill", row[4]);
-                feedbackEntry.put("rating", row[5]);
-                feedbackEntry.put("topics", Arrays.asList(row[6].toString().split(", "))); // Convert CSV topics to list
-                feedbackEntry.put("comments", row[7]);
+                feedbackEntry.put("id", row[7]);
+                feedbackEntry.put("skill", row[8]);
+                feedbackEntry.put("rating", row[9]);
+                feedbackEntry.put("topics", Arrays.asList(row[10] != null ? row[10].toString().split(", ") : new String[0])); // Handle null
+                feedbackEntry.put("comments", row[11]);
                 feedbackEntries.add(feedbackEntry);
             }
         }
