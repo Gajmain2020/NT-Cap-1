@@ -74,6 +74,16 @@ export default function PastInterviewFeedback() {
         <CardHeader>
           <CardTitle>Feedback Summary</CardTitle>
         </CardHeader>
+        <CardContent>
+          <div>
+            Status:{" "}
+            <span className="font-semibold">{feedback.finalDecision}</span>
+          </div>
+          <div>
+            Comment:{" "}
+            <span className="font-semibold">{feedback.finalComment}</span>
+          </div>
+        </CardContent>
         <CardContent className="overflow-x-auto">
           <table className="w-full border-collapse border border-gray-300">
             <thead>
