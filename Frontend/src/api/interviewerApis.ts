@@ -129,3 +129,37 @@ export async function GetAllInterviewsOfInterviewerAPI() {
     }
   }
 }
+
+export async function FetchInterviewerPastFeedbacksAPI() {
+  try {
+    const response = await axios({
+      headers,
+      url: baseUrl + `/interviewer-past-feedbacks`,
+      method: "GET",
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      return error?.response?.data;
+    } else {
+      toast.error("An unexpected error occurred");
+    }
+  }
+}
+
+export async function FetchFeedbackDetailsAPI(feedbackId: string) {
+  try {
+    const response = await axios({
+      headers,
+      url: baseUrl + `/get-feedback-details/${feedbackId}`,
+      method: "GET",
+    });
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      return error?.response?.data;
+    } else {
+      toast.error("An unexpected error occurred");
+    }
+  }
+}

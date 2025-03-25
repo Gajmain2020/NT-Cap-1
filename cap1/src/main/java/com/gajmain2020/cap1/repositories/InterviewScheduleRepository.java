@@ -143,5 +143,23 @@ public interface InterviewScheduleRepository extends JpaRepository<InterviewSche
     """)
     Optional<Map<String, Object>> findIntervieweeByInterviewId(Long interviewId);
 
+    @Query("""
+        SELECT new map(
+            i.intervieweeName as intervieweeName,
+            i.intervieweeEmail as intervieweeEmail,
+            i.startTime as startTime,
+            i.endTime as endTime,
+            i.id as interviewId,
+            i.position as position,
+            i.date as date,
+            i.stage as stage,
+            f.id as feedbackId,
+            f.finalDecision as finalStatus
+        ) 
+        FROM InterviewSchedule i
+        JOIN InterviewFeedback f ON f.interview.id = i.id
+        WHERE i.interviewer.email = :email
+    """)
+    List<Map<String, Object>> findFeedbacksByInterviewerEmail( String email);
 
 }

@@ -47,6 +47,7 @@ public class InterviewScheduleController {
     private InterviewFeedbackDetailRepository interviewFeedbackDetailRepository;
 
 
+
     @GetMapping
     public boolean HealthCheck() {
         System.out.println("hello world");
@@ -440,6 +441,122 @@ public class InterviewScheduleController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/interviewer-past-feedbacks")
+    public ResponseEntity<Map<String,Object>> getPastFeedbacksByEmail(@RequestHeader("Authorization") String authHeader){
+        Map<String, Object> response = new HashMap<>();
+
+        // Extract token from Authorization header
+        if (!authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+                    "success", false,
+                    "message", "Invalid authorization token."
+            ));
+        }
+
+        String token = authHeader.substring(7);
+        String email = jwtUtil.extractEmail(token); // Extract email from JWT token
+
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                    "success", false,
+                    "message", "User not found."
+            ));
+        }
+
+        List<Map<String, Object>> interviews = interviewScheduleRepository.findFeedbacksByInterviewerEmail(email);
+
+        if(interviews.isEmpty()){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+                    "success", false,
+                    "message", "No feedbacks submitted."
+            ));
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of(
+                "success", true,
+                "feedback", interviews
+        ));
+    }
+
+    @GetMapping("/get-feedback-details/{feedbackId}")
+    public ResponseEntity<Map<String,Object>> getFeedbackDetails(@RequestHeader("Authorization") String authHeader,@PathVariable Long feedbackId){
+        Map<String, Object> response = new HashMap<>();
+
+        // Extract token from Authorization header
+        if (!authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+                    "success", false,
+                    "message", "Invalid authorization token."
+            ));
+        }
+
+        String token = authHeader.substring(7);
+        String email = jwtUtil.extractEmail(token); // Extract email from JWT token
+
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                    "success", false,
+                    "message", "User not found."
+            ));
+        }
+
+        boolean isFeedbackAndEmailValid = interviewFeedbackRepository.validateFeedbackWithInterviewerEmail(email,feedbackId);
+
+        if(!isFeedbackAndEmailValid){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of(
+                    "success", false,
+                    "message", "Logged in and the Feedback ID are not associated."
+            ));
+        }
+
+        // Step 2: Fetch feedback details
+        List<Object[]> rawData = interviewFeedbackRepository.getFeedbackDetails(feedbackId);
+        if (rawData.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.singletonMap("error", "Feedback not found"));
+        }
+
+        // Step 3: Transform raw data into structured response
+        Map<String, Object> feedback = new HashMap<>();
+        List<Map<String, Object>> feedbackEntries = new ArrayList<>();
+
+
+        for (Object[] row : rawData) {
+            if (!feedback.containsKey("feedbackId")) { // Fix: Use feedback, not response
+                feedback.put("feedbackId", row[0]);
+                feedback.put("finalDecision", row[1]);
+                feedback.put("finalComment", row[2]);
+
+                // Fix: Add interviewee details inside the `feedback` map
+                feedback.put("interviewee", Map.of(
+                        "name", row[3],
+                        "email", row[4],
+                        "stage", row[5],
+                        "position", row[6]
+                ));
+
+                feedback.put("details", feedbackEntries);
+            }
+
+            if (row[7] != null) { // If feedback details exist
+                Map<String, Object> feedbackEntry = new HashMap<>();
+                feedbackEntry.put("id", row[7]);
+                feedbackEntry.put("skill", row[8]);
+                feedbackEntry.put("rating", row[9]);
+                feedbackEntry.put("topics", Arrays.asList(row[10] != null ? row[10].toString().split(", ") : new String[0])); // Handle null
+                feedbackEntry.put("comments", row[11]);
+                feedbackEntries.add(feedbackEntry);
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of(
+                "success",true,
+                "feedback", feedback
+        ));
+    }
+
 }
 
 

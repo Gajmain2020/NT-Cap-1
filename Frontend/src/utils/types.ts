@@ -44,6 +44,28 @@ export type ExtendedInterview = IInterview & {
   interviewerEmail: string;
 };
 
+export interface IInterviewee {
+  stage: string;
+  position: string;
+  name: string;
+  email: string;
+}
+
+interface FeedbackDetail {
+  comments: string;
+  topics: string[];
+  skill: string;
+  rating: "VERY_GOOD" | "GOOD" | "AVERAGE" | "BELOW_AVERAGE";
+  id: number;
+}
+
+export interface IFeedback {
+  finalComment: string;
+  feedbackId: number;
+  finalDecision: string;
+  details: FeedbackDetail[];
+}
+
 export interface IFeedbackEntry {
   id: number;
   skill: string;
