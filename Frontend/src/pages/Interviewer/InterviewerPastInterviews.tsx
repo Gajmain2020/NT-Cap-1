@@ -4,41 +4,14 @@ import { ExtendedScheduledInterview } from "@/utils/types";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-const dummyInterviews = [
-  {
-    id: 1,
-    name: "John Doe",
-    email: "john.doe@example.com",
-    position: "Software Engineer",
-    date: "2024-03-01",
-    time: "10:00 AM",
-    status: "L1 Passed with Comments",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    email: "jane.smith@example.com",
-    position: "Backend Developer",
-    date: "2024-03-02",
-    time: "2:00 PM",
-    status: "L1 Passed",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    email: "jane.smith@example.com",
-    position: "PHP Developer",
-    date: "2024-03-03",
-    time: "2:00 PM",
-    status: "Rejected",
-  },
-];
+type TPastInterviews = ExtendedScheduledInterview & {
+  finalStatus: string;
+  feedbackId: string;
+};
 
 export default function InterviewerPastInterviews() {
   const [loading, setLoading] = useState(true);
-  const [pastInterviews, setPastInterviews] = useState<
-    ExtendedScheduledInterview[]
-  >([]);
+  const [pastInterviews, setPastInterviews] = useState<TPastInterviews[]>([]);
 
   useEffect(() => {
     const fetchPastInterview = async () => {
@@ -49,7 +22,7 @@ export default function InterviewerPastInterviews() {
           toast.error(response.message);
           return;
         }
-
+        console.log(response);
         setPastInterviews(response.feedback);
       } catch (error) {
         console.log("Error occurred:", error);
@@ -78,7 +51,11 @@ export default function InterviewerPastInterviews() {
         </thead>
         <tbody>
           {loading ? (
-            <p className="animate-pulse">Fetching past feedbacks...</p>
+            <tr className="animate-pulse">
+              <td colSpan={6} className="text-center py-2 text-gray-800">
+                Fetching past feedbacks...
+              </td>
+            </tr>
           ) : pastInterviews?.length === 0 ? (
             <tr>
               <td colSpan={6} className="text-center py-2 text-gray-800">
@@ -91,7 +68,7 @@ export default function InterviewerPastInterviews() {
                 <td className="border p-2">
                   {interview.intervieweeName}
                   <p className="text-sm text-gray-700">
-                    ( {interview.interviewerEmail} )
+                    ( {interview.intervieweeEmail} )
                   </p>
                 </td>
                 <td className="border p-2">{interview.position}</td>
@@ -99,13 +76,15 @@ export default function InterviewerPastInterviews() {
                 <td className="border p-2">
                   {interview.startTime} - {interview.endTime}
                 </td>
-                <td className="border p-2 font-medium">{interview.stage}</td>
+                <td className="border p-2 font-medium">
+                  {interview.stage} / {interview.finalStatus}
+                </td>
                 <td className="border p-2">
                   <Button
                     variant="secondary"
                     onClick={() =>
                       window.open(
-                        `${window.location}/feedback/${interview.id}`,
+                        `${window.location}/feedback/${interview.feedbackId}`,
                         "_blank"
                       )
                     }
