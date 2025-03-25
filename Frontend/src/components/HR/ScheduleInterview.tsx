@@ -1,8 +1,10 @@
-import { scheduleInterview } from "@/services/interviewService";
-import { ExtendedScheduledInterview, IInterview } from "@/utils/types";
-import { interviewScheduleSchema } from "@/utils/validationSchema";
 import { useState } from "react";
 import { toast } from "sonner";
+
+import { scheduleInterview } from "@/services/interviewService";
+import { interviewScheduleFields } from "@/utils/constants";
+import { ExtendedScheduledInterview, IInterview } from "@/utils/types";
+import { interviewScheduleSchema } from "@/utils/validationSchema";
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -64,68 +66,23 @@ export default function ScheduleInterview({
         Schedule Interview
       </h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Input
-          type="text"
-          name="intervieweeName"
-          placeholder="Interviewee Name *"
-          value={formData.intervieweeName}
-          onChange={handleChange}
-        />
-        <Input
-          type="email"
-          name="intervieweeEmail"
-          placeholder="Interviewee Email *"
-          value={formData.intervieweeEmail}
-          onChange={handleChange}
-        />
-        <Input
-          type="text"
-          name="position"
-          placeholder="Position*"
-          value={formData.position}
-          onChange={handleChange}
-        />
-        <Input
-          type="date"
-          name="date"
-          value={formData.date}
-          onChange={handleChange}
-        />
-        <Input
-          type="time"
-          name="startTime"
-          placeholder="Start Time *"
-          value={formData.startTime}
-          onChange={handleChange}
-        />
-        <Input
-          type="time"
-          name="endTime"
-          placeholder="End Time *"
-          value={formData.endTime}
-          onChange={handleChange}
-        />
-        <Input
-          type="text"
-          name="meetLink"
-          placeholder="Meet Link (Optional)"
-          value={formData.meetLink}
-          onChange={handleChange}
-        />
-        <Input
-          type="text"
-          name="resumeLink"
-          placeholder="Resume Link (Optional)"
-          value={formData.resumeLink}
-          onChange={handleChange}
-        />
+        {interviewScheduleFields.map(({ type, name, placeholder }) => (
+          <Input
+            key={name}
+            type={type}
+            name={name}
+            placeholder={placeholder}
+            value={formData[name as keyof IInterview] || ""}
+            onChange={handleChange}
+          />
+        ))}
       </div>
+
       <div className="mt-4 flex justify-end">
         <Button onClick={handleScheduleInterview} className="w-full md:w-auto">
           Schedule Interview
         </Button>
       </div>
-
       {/* Confirmation Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
