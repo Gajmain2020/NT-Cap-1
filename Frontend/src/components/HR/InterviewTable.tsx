@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getUpcomingInterviewHr } from "@/services/interviewService";
 import type { ExtendedScheduledInterview } from "@/utils/types";
+import { calculateDuration } from "@/utils/utils";
 import {
   Select,
   SelectContent,
@@ -34,17 +35,6 @@ export default function InterviewTable({
     };
     fetchUpcomingInterviews();
   }, []);
-
-  const calculateDuration = (startTime: string, endTime: string) => {
-    const [startHour, startMinute] = startTime.split(":").map(Number);
-    const [endHour, endMinute] = endTime.split(":").map(Number);
-
-    const start = startHour * 60 + startMinute;
-    const end = endHour * 60 + endMinute;
-    const duration = end - start;
-
-    return `${Math.floor(duration / 60)}h ${duration % 60}m`;
-  };
 
   const filteredInterviews = interviews
     .filter(

@@ -1,7 +1,8 @@
+import { useState } from "react";
+
 import InterviewTable from "@/components/HR/InterviewTable";
 import ScheduleInterview from "@/components/HR/ScheduleInterview";
 import { ExtendedScheduledInterview, IInterview } from "@/utils/types";
-import { useState } from "react";
 
 export default function Homepage() {
   const [formData, setFormData] = useState<IInterview>({

@@ -1,5 +1,4 @@
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { generateDummyFeedback } from "@/utils/dummyData";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function ReportPage() {
   // Dummy Candidate Data
@@ -9,9 +8,6 @@ export default function ReportPage() {
     position: "Software Engineer",
     status: "L1 Passed with Comments",
   };
-
-  // Generate dummy feedback
-  const feedback = generateDummyFeedback();
 
   return (
     <div className="container mx-auto p-2 flex flex-col gap-8">

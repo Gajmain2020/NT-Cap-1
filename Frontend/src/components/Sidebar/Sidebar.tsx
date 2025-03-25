@@ -1,7 +1,13 @@
 import useAuthStore from "@/store/userAuthStore";
-import { useLocation, useNavigate } from "react-router-dom";
 import { ChevronUp, User2 } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Sidebar,
   SidebarContent,
@@ -13,18 +19,12 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
-import LOGO from "../../assets/logo.svg";
 import { hrNavItems, interviewerNavItems } from "@/utils/navItems";
-import SidebarNavItem from "./SidebarNavItem";
 import { useState } from "react";
+import LOGO from "../../../public/LogoIE2.png";
 import PasswordChangeDialog from "./PasswordChangeDialog";
+import SidebarNavItem from "./SidebarNavItem";
 
 export function AppSidebar() {
   const navigate = useNavigate();

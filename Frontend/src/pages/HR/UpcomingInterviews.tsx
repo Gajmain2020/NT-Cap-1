@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 
-import { EditScheduleInterviewAPI } from "@/api/hrApis";
 import EditDialog from "@/components/HR/EditScheduledInterview";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,12 +10,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { handleEditScheduledInterviewService } from "@/services/hrServices";
 import { getUpcomingInterviewHr } from "@/services/interviewService";
 import { IScheduleInterview } from "@/utils/types";
 import { calculateDuration } from "@/utils/utils";
-import { editScheduledSchema } from "@/utils/validationSchema";
 import { FilePen } from "lucide-react";
-import { toast } from "sonner";
 
 type ExtendedScheduledInterview = IScheduleInterview & {
   id: string;
@@ -64,40 +62,12 @@ export default function UpcomingInterviews() {
     });
 
   const handleEditScheduledInterview = async () => {
-    try {
-      const validateData = editScheduledSchema.safeParse(selectedInterview);
-      if (!validateData.success) {
-        validateData.error.issues.forEach((err) => toast.error(err.message));
-        return;
-      }
-
-      if (!selectedInterview) {
-        return;
-      }
-
-      const response = await EditScheduleInterviewAPI(selectedInterview);
-
-      if (!response.success) {
-        toast.error(response.message);
-        return;
-      }
-
-      setInterviews((interviews) =>
-        interviews.map((i) =>
-          i.id !== selectedInterview.id ? i : selectedInterview
-        )
-      );
-
-      // change the data in the state as well
-
-      toast.success("Interview schedule updated successfully.");
-      setSelectedInterview(null);
-    } catch (error) {
-      console.error("Interview Schedule Error:", error);
-      toast.error("Failed to schedule interview. Please try again.");
-    } finally {
-      setRescheduling(false);
-    }
+    await handleEditScheduledInterviewService(
+      selectedInterview,
+      setInterviews,
+      setRescheduling,
+      setSelectedInterview
+    );
   };
 
   return (
