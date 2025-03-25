@@ -1,29 +1,50 @@
-import { useState } from "react";
-import {
-  format,
-  startOfMonth,
-  endOfMonth,
-  startOfWeek,
-  endOfWeek,
-  addMonths,
-  subMonths,
-  eachDayOfInterval,
-  isSameMonth,
-} from "date-fns";
+import { GetAllInterviewsOfInterviewerAPI } from "@/api/interviewerApis";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
-import { DummyInterviewSchedule } from "@/utils/dummyData";
-import { IInterview } from "@/utils/types";
+import { ExtendedScheduledInterview, IInterview } from "@/utils/types";
+import {
+  addMonths,
+  eachDayOfInterval,
+  endOfMonth,
+  endOfWeek,
+  format,
+  isSameMonth,
+  startOfMonth,
+  startOfWeek,
+  subMonths,
+} from "date-fns";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function InterviewerCalendar() {
-  const [interviews, setInterviews] = useState(DummyInterviewSchedule);
+  const [interviews, setInterviews] = useState<ExtendedScheduledInterview[]>(
+    []
+  );
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
+  useEffect(() => {
+    const fetchAllInterviewerInterviews = async () => {
+      try {
+        const response = await GetAllInterviewsOfInterviewerAPI();
+        if (!response.success) {
+          toast.error(response.message);
+          return;
+        }
+        setInterviews(response.interviews);
+      } catch (error) {
+        console.log("Error occurred:", error);
+        toast.error("Error occurred while fetching interviews.");
+      }
+    };
+
+    fetchAllInterviewerInterviews();
+  }, []);
 
   // Generate the date range for the calendar
   const days = eachDayOfInterval({
@@ -34,13 +55,13 @@ export default function InterviewerCalendar() {
   // Organize interviews by date
   const interviewsByDate: Record<string, IInterview[]> = {};
   interviews.forEach((interview) => {
-    const dateKey = format(new Date(interview.schedule), "yyyy-MM-dd");
+    const dateKey = format(new Date(interview.date), "yyyy-MM-dd");
     if (!interviewsByDate[dateKey]) interviewsByDate[dateKey] = [];
     interviewsByDate[dateKey].push(interview);
   });
 
   return (
-    <div className="flex flex-col items-center bg-gray-100 p-2 min-h-screen gap-10">
+    <div className="bg-gray-100 p-2 gap-10">
       <div className="bg-white shadow-lg rounded-lg p-4">
         {/* Calendar Header */}
         <div className="flex justify-between items-center mb-4">
@@ -117,7 +138,7 @@ export default function InterviewerCalendar() {
                       interviewsOnDay.map((interview, index) => (
                         <div
                           key={index}
-                          className="p-3 border rounded-lg shadow-sm"
+                          className="p-3 border rounded-lg shadow-sm hover:bg-gray-100 transition"
                         >
                           <p className="font-medium text-gray-700">
                             Name: {interview.intervieweeName}
@@ -128,8 +149,8 @@ export default function InterviewerCalendar() {
                           <p className="text-sm text-gray-500">
                             Position: {interview.position}
                           </p>
-                          <p className="text-xs text-gray-400">
-                            {format(new Date(interview.schedule), "hh:mm a")}
+                          <p className="text-sm text-gray-500">
+                            {interview.startTime} - {interview.endTime}
                           </p>
                         </div>
                       ))

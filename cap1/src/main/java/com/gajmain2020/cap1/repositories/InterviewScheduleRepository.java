@@ -61,6 +61,27 @@ public interface InterviewScheduleRepository extends JpaRepository<InterviewSche
 
 
     @Query("""
+            SELECT new map(
+            i.id as id,
+            i.stage as stage,
+            i.intervieweeName as intervieweeName,
+            i.intervieweeEmail as intervieweeEmail,
+            i.position as position,
+            i.date as date,
+            i.startTime as startTime,
+            i.endTime as endTime,
+            i.duration as duration,
+            i.meetLink as meetLink,
+            i.resumeLink as resumeLink,
+            i.interviewer.email as interviewerEmail
+        )
+        FROM InterviewSchedule i
+        WHERE i.interviewer.email = :email
+            """)
+    List<Map<String,Object>> findInterviewsByEmail(String email);
+
+
+    @Query("""
         SELECT new map(
             i.id as id,
             i.stage as stage,

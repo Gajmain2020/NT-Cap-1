@@ -389,8 +389,46 @@ public class InterviewScheduleController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+  
+  @GetMapping("/get-interviewer-interview")
+    public ResponseEntity<Map<String, Object>> fetchInterviewerInterviews(@RequestHeader("Authorization") String authHeader) {
+        Map<String, Object> response = new HashMap<>();
 
-    @GetMapping("/check-feedback-filled/{interviewId}")
+        // Extract token from Authorization header
+        if (!authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+                    "success", false,
+                    "message", "Invalid authorization token."
+            ));
+        }
+
+        String token = authHeader.substring(7);
+        String email = jwtUtil.extractEmail(token); // Extract email from JWT token
+
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                    "success", false,
+                    "message", "User not found."
+            ));
+        }
+
+        List<Map<String, Object>> interviews = interviewScheduleRepository.findInterviewsByEmail(email);
+
+        if (interviews.isEmpty()) {
+            response.put("success", false);
+            response.put("message", "No interviews found.");
+
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+
+        response.put("success", true);
+        response.put("interviews", interviews);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+
+    }
+  @GetMapping("/check-feedback-filled/{interviewId}")
     public ResponseEntity<Map<String,Object>> checkIsFeedbackFilled(@PathVariable Long interviewId){
         // Check if an InterviewFeedback entry exists for the given interviewId
         boolean exists = interviewFeedbackRepository.existsByInterviewId(interviewId);
@@ -402,7 +440,6 @@ public class InterviewScheduleController {
 
         return ResponseEntity.ok(response);
     }
-
 }
 
 
