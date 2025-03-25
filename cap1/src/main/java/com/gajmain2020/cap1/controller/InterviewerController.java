@@ -1,12 +1,6 @@
 package com.gajmain2020.cap1.controller;
 
 import com.gajmain2020.cap1.dto.InterviewFeedbackRequest;
-import com.gajmain2020.cap1.enums.FinalDecision;
-import com.gajmain2020.cap1.enums.Rating;
-import com.gajmain2020.cap1.models.InterviewFeedback;
-import com.gajmain2020.cap1.models.InterviewFeedbackDetail;
-import com.gajmain2020.cap1.models.InterviewSchedule;
-import com.gajmain2020.cap1.models.User;
 import com.gajmain2020.cap1.repositories.InterviewFeedbackDetailRepository;
 import com.gajmain2020.cap1.repositories.InterviewFeedbackRepository;
 import com.gajmain2020.cap1.repositories.InterviewScheduleRepository;
@@ -15,14 +9,10 @@ import com.gajmain2020.cap1.security.JwtUtil;
 import com.gajmain2020.cap1.services.InterviewerServices;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/schedules")
