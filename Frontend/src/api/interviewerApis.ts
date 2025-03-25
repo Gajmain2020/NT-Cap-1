@@ -1,19 +1,12 @@
 import { apiRequest } from "@/utils/ApiWrapper";
+import { getAuthHeaders } from "@/utils/authHeaders";
 import { IFeedbackEntry } from "@/utils/types";
 
 const baseUrl = "http://localhost:8080/api/v1/schedules";
 
-const storedData = localStorage.getItem("cap-auth-storage");
-const authToken = storedData ? JSON.parse(storedData)?.state?.authToken : null;
-
-const headers = {
-  "Content-Type": "application/json",
-  ...(authToken && { Authorization: `Bearer ${authToken}` }),
-};
-
 export async function FetchUpcomingInterviewerInterviews() {
   return apiRequest({
-    headers,
+    headers: getAuthHeaders(),
     url: baseUrl + `/upcoming-interviews-interviewer`,
     method: "GET",
   });
@@ -21,7 +14,7 @@ export async function FetchUpcomingInterviewerInterviews() {
 
 export async function FetchOngoingInterviewerInterviews() {
   return apiRequest({
-    headers,
+    headers: getAuthHeaders(),
     url: baseUrl + `/ongoing-interviews-interviewer`,
     method: "GET",
   });
@@ -29,7 +22,7 @@ export async function FetchOngoingInterviewerInterviews() {
 
 export async function FetchIntervieweeDetailsAPI(interviewId: string) {
   return apiRequest({
-    headers,
+    headers: getAuthHeaders(),
     url: baseUrl + `/interviewee-details/${interviewId}`,
     method: "GET",
   });
@@ -48,7 +41,7 @@ export async function SubmitFeedbackAPI(
   }));
 
   return apiRequest({
-    headers,
+    headers: getAuthHeaders(),
     url: baseUrl + `/submit-feedback/${interviewId}`,
     method: "POST",
     data: {
@@ -61,7 +54,7 @@ export async function SubmitFeedbackAPI(
 
 export async function CheckFeedbackFilledAPI(interviewId: string | undefined) {
   return apiRequest({
-    headers,
+    headers: getAuthHeaders(),
     url: baseUrl + `/check-feedback-filled/${interviewId}`,
     method: "GET",
   });
@@ -69,7 +62,7 @@ export async function CheckFeedbackFilledAPI(interviewId: string | undefined) {
 
 export async function GetAllInterviewsOfInterviewerAPI() {
   return apiRequest({
-    headers,
+    headers: getAuthHeaders(),
     url: baseUrl + `/get-interviewer-interview`,
     method: "GET",
   });
@@ -77,7 +70,7 @@ export async function GetAllInterviewsOfInterviewerAPI() {
 
 export async function FetchInterviewerPastFeedbacksAPI() {
   return apiRequest({
-    headers,
+    headers: getAuthHeaders(),
     url: baseUrl + `/interviewer-past-feedbacks`,
     method: "GET",
   });
@@ -85,7 +78,7 @@ export async function FetchInterviewerPastFeedbacksAPI() {
 
 export async function FetchFeedbackDetailsAPI(feedbackId: string) {
   return apiRequest({
-    headers,
+    headers: getAuthHeaders(),
     url: baseUrl + `/feedback-details/${feedbackId}`,
     method: "GET",
   });

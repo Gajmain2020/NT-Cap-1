@@ -1,14 +1,7 @@
 import { apiRequest } from "@/utils/ApiWrapper";
+import { getAuthHeaders } from "@/utils/authHeaders";
 
 const baseUrl = "http://localhost:8080/api/v1/user";
-
-const storedData = localStorage.getItem("cap-auth-storage");
-const authToken = storedData ? JSON.parse(storedData)?.state?.authToken : null;
-
-const headers = {
-  "Content-Type": "application/json",
-  ...(authToken && { Authorization: `Bearer ${authToken}` }),
-};
 
 export async function LoginUserApi(loginData: {
   email: string;
@@ -41,7 +34,7 @@ export async function ChangeUserPasswordApi(passwords: {
   confirmPassword: string;
 }) {
   await apiRequest({
-    headers,
+    headers: getAuthHeaders(),
     url:
       baseUrl +
       `/change-password?oldPassword=${passwords.oldPassword}&newPassword=${passwords.newPassword}&confirmPassword=${passwords.confirmPassword}`,
