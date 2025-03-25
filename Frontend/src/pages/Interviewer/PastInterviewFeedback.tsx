@@ -1,22 +1,15 @@
 import { FetchFeedbackDetailsAPI } from "@/api/interviewerApis";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { generateDummyFeedback } from "@/utils/dummyData";
-import { useEffect } from "react";
+import { IFeedback, IInterviewee } from "@/utils/types";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 
 export default function PastInterviewFeedback() {
   const { feedbackId } = useParams<string>();
-  // Dummy Candidate Data
-  const candidate = {
-    name: "John Doe",
-    email: "john.doe@example.com",
-    position: "Software Engineer",
-    status: "L1 Passed with Comments",
-  };
 
-  // Generate dummy feedback
-  const feedback = generateDummyFeedback();
+  const [candidate, setCandidate] = useState<IInterviewee>();
+  const [feedback, setFeedback] = useState<IFeedback>();
 
   useEffect(() => {
     const fetchFeedbackDetails = async () => {
@@ -28,6 +21,9 @@ export default function PastInterviewFeedback() {
           return;
         }
         console.log(response);
+        setCandidate(response.feedback.interviewee);
+        delete response.feedback.interviewee;
+        setFeedback(response.feedback);
       } catch (error) {
         console.log("Error", error);
         toast.error(
@@ -37,6 +33,10 @@ export default function PastInterviewFeedback() {
     };
     fetchFeedbackDetails();
   }, []);
+
+  if (!candidate || !feedback) {
+    return <>Something went wrong.</>;
+  }
 
   return (
     <div className="container mx-auto p-2 flex flex-col gap-8">
@@ -56,7 +56,7 @@ export default function PastInterviewFeedback() {
             <strong>Position:</strong> {candidate.position}
           </p>
           <p>
-            <strong>Status:</strong> {candidate.status}
+            <strong>Status:</strong> {candidate.stage}
           </p>
         </CardContent>
       </Card>
@@ -80,10 +80,10 @@ export default function PastInterviewFeedback() {
               </tr>
             </thead>
             <tbody>
-              {feedback.map((item, index) => (
+              {feedback.details.map((item, index) => (
                 <tr key={index} className="text-center">
                   <td className="border border-gray-300 px-4 py-2">
-                    {item.srNo}
+                    {index + 1}
                   </td>
                   <td className="border border-gray-300 px-4 py-2">
                     {item.skill}
@@ -92,7 +92,7 @@ export default function PastInterviewFeedback() {
                     {item.rating}
                   </td>
                   <td className="border border-gray-300 px-4 py-2">
-                    {item.topicsUsed}
+                    {item.topics.join(", ")}
                   </td>
                   <td className="border border-gray-300 px-4 py-2">
                     {item.comments}
