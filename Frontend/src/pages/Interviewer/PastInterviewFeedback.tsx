@@ -1,7 +1,12 @@
+import { FetchFeedbackDetailsAPI } from "@/api/interviewerApis";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { generateDummyFeedback } from "@/utils/dummyData";
+import { useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { toast } from "sonner";
 
 export default function PastInterviewFeedback() {
+  const { feedbackId } = useParams<string>();
   // Dummy Candidate Data
   const candidate = {
     name: "John Doe",
@@ -12,6 +17,26 @@ export default function PastInterviewFeedback() {
 
   // Generate dummy feedback
   const feedback = generateDummyFeedback();
+
+  useEffect(() => {
+    const fetchFeedbackDetails = async () => {
+      try {
+        const response =
+          feedbackId && (await FetchFeedbackDetailsAPI(feedbackId));
+        if (!response.success) {
+          toast.error(response.message);
+          return;
+        }
+        console.log(response);
+      } catch (error) {
+        console.log("Error", error);
+        toast.error(
+          "Error occurred while fetching the feedback. Please try again."
+        );
+      }
+    };
+    fetchFeedbackDetails();
+  }, []);
 
   return (
     <div className="container mx-auto p-2 flex flex-col gap-8">
