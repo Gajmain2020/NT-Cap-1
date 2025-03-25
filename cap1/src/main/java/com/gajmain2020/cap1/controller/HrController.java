@@ -22,7 +22,7 @@ public class HrController {
 
     @Autowired
     private HrServices hrServices;
-    
+
     @GetMapping
     public boolean HealthCheck() {
         System.out.println("hello world");
