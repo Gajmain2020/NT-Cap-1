@@ -4,10 +4,13 @@ import { IFeedback, IInterviewee } from "@/utils/types";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "sonner";
+import Loading from "../Loading";
+import NotFound from "../NotFound";
 
 export default function PastInterviewFeedback() {
   const { feedbackId } = useParams<string>();
 
+  const [loading, setLoading] = useState(true);
   const [candidate, setCandidate] = useState<IInterviewee>();
   const [feedback, setFeedback] = useState<IFeedback>();
 
@@ -20,7 +23,6 @@ export default function PastInterviewFeedback() {
           toast.error(response.message);
           return;
         }
-        console.log(response);
         setCandidate(response.feedback.interviewee);
         delete response.feedback.interviewee;
         setFeedback(response.feedback);
@@ -29,13 +31,19 @@ export default function PastInterviewFeedback() {
         toast.error(
           "Error occurred while fetching the feedback. Please try again."
         );
+      } finally {
+        setLoading(false);
       }
     };
     fetchFeedbackDetails();
   }, []);
 
+  if (loading) {
+    return <Loading />;
+  }
+
   if (!candidate || !feedback) {
-    return <>Something went wrong.</>;
+    return <NotFound />;
   }
 
   return (

@@ -6,7 +6,7 @@ const NotFound: React.FC = () => {
     <div className="flex flex-col items-center bg-cover justify-center h-screen gap-5 bg-gray-100 text-gray-800">
       <div className="w-72 rounded-md overflow-hidden shadow-md">
         <img
-          src="https://png.pngtree.com/png-vector/20210702/ourmid/pngtree-error-404-page-not-found-website-png-image_3545448.jpg"
+          src="https://img.freepik.com/free-vector/oops-404-error-with-broken-robot-concept-illustration_114360-5529.jpg"
           alt="Page not found"
         />
       </div>
