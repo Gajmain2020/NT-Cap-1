@@ -1,4 +1,6 @@
 import { SetStateAction, useState } from "react";
+
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -6,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { IPastInterview } from "@/utils/types";
 
 const dummyInterviews = [
   {
@@ -39,29 +41,14 @@ const dummyInterviews = [
 ];
 
 export default function PastInterviews() {
-  const [selectedInterview, setSelectedInterview] = useState<{
-    id: number;
-    name: string;
-    email: string;
-    position: string;
-    date: string;
-    time: string;
-    status: string;
-  } | null>(null);
+  const [selectedInterview, setSelectedInterview] =
+    useState<IPastInterview | null>(null);
   const [rescheduleOpen, setRescheduleOpen] = useState(false);
   const [newInterviewer, setNewInterviewer] = useState("");
   const [newDate, setNewDate] = useState("");
 
   const handleReschedule = (
-    interview: SetStateAction<{
-      id: number;
-      name: string;
-      email: string;
-      position: string;
-      date: string;
-      time: string;
-      status: string;
-    } | null>
+    interview: SetStateAction<IPastInterview | null>
   ) => {
     setSelectedInterview(interview);
     setRescheduleOpen(true);

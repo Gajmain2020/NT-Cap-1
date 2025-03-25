@@ -94,3 +94,13 @@ export interface ISkill {
   topics: string[];
   comment: string;
 }
+
+export interface IPastInterview {
+  id: number;
+  name: string;
+  email: string;
+  position: string;
+  date: string;
+  time: string;
+  status: string;
+}
