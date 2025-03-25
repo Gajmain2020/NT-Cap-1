@@ -1,14 +1,9 @@
 package com.gajmain2020.cap1.controller;
 
 
-import com.gajmain2020.cap1.dto.InterviewFeedbackRequest;
 import com.gajmain2020.cap1.dto.InterviewRequest;
-import com.gajmain2020.cap1.enums.FinalDecision;
 import com.gajmain2020.cap1.enums.InterviewStage;
-import com.gajmain2020.cap1.enums.Rating;
 import com.gajmain2020.cap1.enums.Role;
-import com.gajmain2020.cap1.models.InterviewFeedback;
-import com.gajmain2020.cap1.models.InterviewFeedbackDetail;
 import com.gajmain2020.cap1.models.InterviewSchedule;
 import com.gajmain2020.cap1.models.User;
 import com.gajmain2020.cap1.repositories.InterviewFeedbackDetailRepository;
@@ -26,16 +21,16 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/schedules")
 @CrossOrigin(origins = "http://localhost:5173")
 public class HrController {
 
-    @Autowired
-    private JwtUtil jwtUtil;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -45,13 +40,11 @@ public class HrController {
     @Autowired
     private InterviewFeedbackDetailRepository interviewFeedbackDetailRepository;
 
-
     @GetMapping
     public boolean HealthCheck() {
         System.out.println("hello world");
         return true;
     }
-
 
     //API to schedule interview
     @PostMapping("/add-interview")
