@@ -389,8 +389,8 @@ public class InterviewScheduleController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-
-    @GetMapping("/get-interviewer-interview")
+  
+  @GetMapping("/get-interviewer-interview")
     public ResponseEntity<Map<String, Object>> fetchInterviewerInterviews(@RequestHeader("Authorization") String authHeader) {
         Map<String, Object> response = new HashMap<>();
 
@@ -427,6 +427,18 @@ public class InterviewScheduleController {
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
 
+    }
+  @GetMapping("/check-feedback-filled/{interviewId}")
+    public ResponseEntity<Map<String,Object>> checkIsFeedbackFilled(@PathVariable Long interviewId){
+        // Check if an InterviewFeedback entry exists for the given interviewId
+        boolean exists = interviewFeedbackRepository.existsByInterviewId(interviewId);
+
+        // Prepare Response
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("status", exists);
+
+        return ResponseEntity.ok(response);
     }
 }
 
