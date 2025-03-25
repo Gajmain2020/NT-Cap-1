@@ -1,6 +1,5 @@
+import { apiRequest } from "@/utils/ApiWrapper";
 import { IFeedbackEntry } from "@/utils/types";
-import axios from "axios";
-import { toast } from "sonner";
 
 const baseUrl = "http://localhost:8080/api/v1/schedules";
 
@@ -13,54 +12,27 @@ const headers = {
 };
 
 export async function FetchUpcomingInterviewerInterviews() {
-  try {
-    const response = await axios({
-      headers,
-      url: baseUrl + `/upcoming-interviews-interviewer`,
-      method: "GET",
-    });
-    return response.data;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      return error?.response?.data;
-    } else {
-      toast.error("An unexpected error occurred");
-    }
-  }
+  return apiRequest({
+    headers,
+    url: baseUrl + `/upcoming-interviews-interviewer`,
+    method: "GET",
+  });
 }
 
 export async function FetchOngoingInterviewerInterviews() {
-  try {
-    const response = await axios({
-      headers,
-      url: baseUrl + `/ongoing-interviews-interviewer`,
-      method: "GET",
-    });
-    return response.data;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      return error?.response?.data;
-    } else {
-      toast.error("An unexpected error occurred");
-    }
-  }
+  return apiRequest({
+    headers,
+    url: baseUrl + `/ongoing-interviews-interviewer`,
+    method: "GET",
+  });
 }
 
 export async function FetchIntervieweeDetailsAPI(interviewId: string) {
-  try {
-    const response = await axios({
-      headers,
-      url: baseUrl + `/interviewee-details/${interviewId}`,
-      method: "GET",
-    });
-    return response.data;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      return error?.response?.data;
-    } else {
-      toast.error("An unexpected error occurred");
-    }
-  }
+  return apiRequest({
+    headers,
+    url: baseUrl + `/interviewee-details/${interviewId}`,
+    method: "GET",
+  });
 }
 
 export async function SubmitFeedbackAPI(
@@ -69,97 +41,52 @@ export async function SubmitFeedbackAPI(
   finalResult: string,
   finalComment: string
 ) {
-  try {
-    //process the feedback data
-    const transformedData = feedbackData.map((data) => ({
-      ...data,
-      topics: data.topics.join(", "),
-    }));
+  //process the feedback data
+  const transformedData = feedbackData.map((data) => ({
+    ...data,
+    topics: data.topics.join(", "),
+  }));
 
-    const response = await axios({
-      headers,
-      url: baseUrl + `/submit-feedback/${interviewId}`,
-      method: "POST",
-      data: {
-        finalResult,
-        feedback: transformedData,
-        finalComment,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      return error?.response?.data;
-    } else {
-      toast.error("An unexpected error occurred");
-    }
-  }
+  return apiRequest({
+    headers,
+    url: baseUrl + `/submit-feedback/${interviewId}`,
+    method: "POST",
+    data: {
+      finalResult,
+      feedback: transformedData,
+      finalComment,
+    },
+  });
 }
 
 export async function CheckFeedbackFilledAPI(interviewId: string | undefined) {
-  try {
-    const response = await axios({
-      headers,
-      url: baseUrl + `/check-feedback-filled/${interviewId}`,
-      method: "GET",
-    });
-    return response.data;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      return error?.response?.data;
-    } else {
-      toast.error("An unexpected error occurred");
-    }
-  }
+  return apiRequest({
+    headers,
+    url: baseUrl + `/check-feedback-filled/${interviewId}`,
+    method: "GET",
+  });
 }
 
 export async function GetAllInterviewsOfInterviewerAPI() {
-  try {
-    const response = await axios({
-      headers,
-      url: baseUrl + `/get-interviewer-interview`,
-      method: "GET",
-    });
-    return response.data;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      return error?.response?.data;
-    } else {
-      toast.error("An unexpected error occurred");
-    }
-  }
+  return apiRequest({
+    headers,
+    url: baseUrl + `/get-interviewer-interview`,
+    method: "GET",
+  });
 }
 
 export async function FetchInterviewerPastFeedbacksAPI() {
-  try {
-    const response = await axios({
-      headers,
-      url: baseUrl + `/interviewer-past-feedbacks`,
-      method: "GET",
-    });
-    return response.data;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      return error?.response?.data;
-    } else {
-      toast.error("An unexpected error occurred");
-    }
-  }
+  return apiRequest({
+    headers,
+    url: baseUrl + `/interviewer-past-feedbacks`,
+    method: "GET",
+  });
 }
 
 export async function FetchFeedbackDetailsAPI(feedbackId: string) {
-  try {
-    const response = await axios({
-      headers,
-      url: baseUrl + `/get-feedback-details/${feedbackId}`,
-      method: "GET",
-    });
-    return response.data;
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      return error?.response?.data;
-    } else {
-      toast.error("An unexpected error occurred");
-    }
-  }
+  return apiRequest({
+    headers,
+    url: baseUrl + `/feedback-details/${feedbackId}`,
+    method: "GET",
+  });
 }
