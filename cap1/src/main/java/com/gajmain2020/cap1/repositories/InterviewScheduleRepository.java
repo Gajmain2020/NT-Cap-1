@@ -73,7 +73,7 @@ public interface InterviewScheduleRepository extends JpaRepository<InterviewSche
             i.duration as duration,
             i.meetLink as meetLink,
             i.resumeLink as resumeLink,
-            i.interviewer.email as interviewerEmail,
+            i.interviewer.email as interviewerEmail
         )
         FROM InterviewSchedule i
         WHERE i.interviewer.email = :email

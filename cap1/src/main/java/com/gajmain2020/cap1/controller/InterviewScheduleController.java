@@ -426,7 +426,7 @@ public class InterviewScheduleController {
         response.put("interviews", interviews);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
-        
+
     }
 }
 

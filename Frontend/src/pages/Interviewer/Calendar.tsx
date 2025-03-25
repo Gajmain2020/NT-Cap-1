@@ -1,3 +1,4 @@
+import { GetAllInterviewsOfInterviewerAPI } from "@/api/interviewerApis";
 import {
   Dialog,
   DialogContent,
@@ -5,8 +6,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { DummyInterviewSchedule } from "@/utils/dummyData";
-import { IInterview } from "@/utils/types";
+import { ExtendedScheduledInterview, IInterview } from "@/utils/types";
 import {
   addMonths,
   eachDayOfInterval,
@@ -19,13 +19,32 @@ import {
   subMonths,
 } from "date-fns";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function InterviewerCalendar() {
-  const [interviews, setInterviews] = useState(DummyInterviewSchedule);
+  const [interviews, setInterviews] = useState<ExtendedScheduledInterview[]>(
+    []
+  );
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    const fetchAllInterviewerInterviews = async () => {
+      try {
+        const response = await GetAllInterviewsOfInterviewerAPI();
+        if (!response.success) {
+          toast.error(response.message);
+          return;
+        }
+        setInterviews(response.data);
+      } catch (error) {
+        console.log("Error occurred:", error);
+        toast.error("Error occurred while fetching interviews.");
+      }
+    };
+
+    fetchAllInterviewerInterviews();
+  }, []);
 
   // Generate the date range for the calendar
   const days = eachDayOfInterval({
@@ -36,7 +55,7 @@ export default function InterviewerCalendar() {
   // Organize interviews by date
   const interviewsByDate: Record<string, IInterview[]> = {};
   interviews.forEach((interview) => {
-    const dateKey = format(new Date(interview.schedule), "yyyy-MM-dd");
+    const dateKey = format(new Date(interview.date), "yyyy-MM-dd");
     if (!interviewsByDate[dateKey]) interviewsByDate[dateKey] = [];
     interviewsByDate[dateKey].push(interview);
   });
@@ -131,7 +150,7 @@ export default function InterviewerCalendar() {
                             Position: {interview.position}
                           </p>
                           <p className="text-xs text-gray-400">
-                            {format(new Date(interview.schedule), "hh:mm a")}
+                            {format(new Date(interview.date), "hh:mm a")}
                           </p>
                         </div>
                       ))
