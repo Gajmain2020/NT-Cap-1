@@ -1,29 +1,31 @@
-import { useState } from "react";
-import {
-  format,
-  startOfMonth,
-  endOfMonth,
-  startOfWeek,
-  endOfWeek,
-  addMonths,
-  subMonths,
-  eachDayOfInterval,
-  isSameMonth,
-} from "date-fns";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { DummyInterviewSchedule } from "@/utils/dummyData";
 import { IInterview } from "@/utils/types";
+import {
+  addMonths,
+  eachDayOfInterval,
+  endOfMonth,
+  endOfWeek,
+  format,
+  isSameMonth,
+  startOfMonth,
+  startOfWeek,
+  subMonths,
+} from "date-fns";
+import { useEffect, useState } from "react";
 
 export default function InterviewerCalendar() {
   const [interviews, setInterviews] = useState(DummyInterviewSchedule);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
+  useEffect(() => {}, []);
 
   // Generate the date range for the calendar
   const days = eachDayOfInterval({
@@ -40,7 +42,7 @@ export default function InterviewerCalendar() {
   });
 
   return (
-    <div className="flex flex-col items-center bg-gray-100 p-2 min-h-screen gap-10">
+    <div className="bg-gray-100 p-2 gap-10">
       <div className="bg-white shadow-lg rounded-lg p-4">
         {/* Calendar Header */}
         <div className="flex justify-between items-center mb-4">
