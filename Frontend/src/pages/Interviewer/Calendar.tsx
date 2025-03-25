@@ -36,7 +36,7 @@ export default function InterviewerCalendar() {
           toast.error(response.message);
           return;
         }
-        setInterviews(response.data);
+        setInterviews(response.interviews);
       } catch (error) {
         console.log("Error occurred:", error);
         toast.error("Error occurred while fetching interviews.");
@@ -138,7 +138,7 @@ export default function InterviewerCalendar() {
                       interviewsOnDay.map((interview, index) => (
                         <div
                           key={index}
-                          className="p-3 border rounded-lg shadow-sm"
+                          className="p-3 border rounded-lg shadow-sm hover:bg-gray-100 transition"
                         >
                           <p className="font-medium text-gray-700">
                             Name: {interview.intervieweeName}
@@ -149,8 +149,8 @@ export default function InterviewerCalendar() {
                           <p className="text-sm text-gray-500">
                             Position: {interview.position}
                           </p>
-                          <p className="text-xs text-gray-400">
-                            {format(new Date(interview.date), "hh:mm a")}
+                          <p className="text-sm text-gray-500">
+                            {interview.startTime} - {interview.endTime}
                           </p>
                         </div>
                       ))
