@@ -14,6 +14,7 @@ import UpcomingInterviews from "./pages/HR/UpcomingInterviews";
 import InterviewerCalendar from "./pages/Interviewer/Calendar";
 import FeedbackForm from "./pages/Interviewer/FeedbackForm";
 import InterviewerHome from "./pages/Interviewer/Homepage";
+import InterviewerPastInterviews from "./pages/Interviewer/InterviewerPastInterviews";
 import InterviewerUpcomingInterviews from "./pages/Interviewer/InterviewerUpcomingInterviews";
 import Landing from "./pages/Landing";
 import NotAuthorized from "./pages/NotAuthorized";
@@ -79,7 +80,10 @@ function App() {
               path="upcoming-interviews"
               element={<InterviewerUpcomingInterviews />}
             />
-            <Route path="past-interviews" element={<>Hello world</>} />
+            <Route
+              path="past-interviews"
+              element={<InterviewerPastInterviews />}
+            />
 
             <Route path="feedback/:interviewId" element={<FeedbackForm />} />
             <Route path="calendar" element={<InterviewerCalendar />} />
