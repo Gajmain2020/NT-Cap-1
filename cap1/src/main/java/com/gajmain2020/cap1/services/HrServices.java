@@ -17,6 +17,7 @@ import org.springframework.validation.BindingResult;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.Duration;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -181,6 +182,30 @@ public class HrServices {
         response.put("message", "Interview updated successfully.");
         response.put("success", true);
         return ResponseEntity.ok(response);
+    }
+
+    public ResponseEntity<Map<String, Object>> getPastInterviews(){
+        Map<String, Object> response = new HashMap<>();
+
+        LocalDate today = LocalDate.now();
+        LocalTime time = LocalTime.now();
+
+        // Fetch past interviews
+        List<Map<String, Object>> pastInterviews = interviewScheduleRepository.findPastInterviews(today.toString(), time.toString());
+
+        if(pastInterviews.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                "success",false,
+                    "message","No past interviews found"
+            ));
+        }
+
+        response.put("status", "success");
+        response.put("pastInterviews", pastInterviews);
+
+        return ResponseEntity.ok(response);
+
+
     }
 
 
