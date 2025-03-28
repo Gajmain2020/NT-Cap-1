@@ -107,13 +107,13 @@ export default function UpcomingInterviews() {
           </>
         )}
       </CardContent>
-      <CardFooter>
-        {upcomingInterviews.length > 5 && (
+      {upcomingInterviews.length > 5 && (
+        <CardFooter>
           <Button onClick={() => navigate("/all-upcoming-interviews")}>
             Show All
           </Button>
-        )}
-      </CardFooter>
+        </CardFooter>
+      )}
     </Card>
   );
 }
