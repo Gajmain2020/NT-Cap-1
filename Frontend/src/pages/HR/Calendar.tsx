@@ -1,7 +1,3 @@
-import { FetchInterviewsAPI } from "@/api/hrApis";
-import InterviewOnDateDialog from "@/components/HR/InterviewOnDateDialog";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { ExtendedScheduledInterview } from "@/utils/types";
 import {
   addMonths,
   eachDayOfInterval,
@@ -15,6 +11,11 @@ import {
 } from "date-fns";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+
+import { FetchInterviewsAPI } from "@/api/hrApis";
+import InterviewOnDateDialog from "@/components/HR/InterviewOnDateDialog";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { ExtendedScheduledInterview } from "@/utils/types";
 
 export default function HRCalendar() {
   const [interviews, setInterviews] = useState<ExtendedScheduledInterview[]>(
@@ -56,7 +57,7 @@ export default function HRCalendar() {
   });
 
   return (
-    <div className=" bg-gray-100 p-2  gap-10">
+    <div className="  container mx-auto gap-10">
       <div className="bg-white shadow-lg rounded-lg p-4">
         {/* Calendar Header */}
         <div className="flex justify-between items-center mb-4">

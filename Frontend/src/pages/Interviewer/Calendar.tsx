@@ -27,6 +27,7 @@ export default function InterviewerCalendar() {
     []
   );
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   useEffect(() => {
@@ -62,7 +63,7 @@ export default function InterviewerCalendar() {
   });
 
   return (
-    <div className="bg-gray-100 p-2 gap-10">
+    <div className="p-2 gap-10 container mx-auto px-10">
       <div className="bg-white shadow-lg rounded-lg p-4">
         {/* Calendar Header */}
         <div className="flex justify-between items-center mb-4">
