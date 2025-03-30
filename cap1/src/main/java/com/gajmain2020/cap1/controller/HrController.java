@@ -61,8 +61,8 @@ public class HrController {
     }
 
     @GetMapping("/get-past-interviews")
-    public ResponseEntity<Map<String, Object>> getAllPastInterviews(){
-        return hrServices.getPastInterviews();
+    public ResponseEntity<Map<String, Object>> getAllPastInterviews(@RequestHeader("Authorization") String authHeader){
+        return hrServices.getPastInterviews(authHeader);
     }
 
 }

@@ -7,6 +7,7 @@ import com.gajmain2020.cap1.models.InterviewSchedule;
 import com.gajmain2020.cap1.models.User;
 import com.gajmain2020.cap1.repositories.InterviewScheduleRepository;
 import com.gajmain2020.cap1.repositories.UserRepository;
+import com.gajmain2020.cap1.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,6 +31,8 @@ public class HrServices {
     private UserRepository userRepository;
     @Autowired
     private InterviewScheduleRepository interviewScheduleRepository;
+    @Autowired
+    private JwtUtil jwtUtil;
 
     // Reusable response methods
     private ResponseEntity<Map<String, Object>> badRequestResponse(String message) {
@@ -184,8 +187,30 @@ public class HrServices {
         return ResponseEntity.ok(response);
     }
 
-    public ResponseEntity<Map<String, Object>> getPastInterviews(){
+    public ResponseEntity<Map<String, Object>> getPastInterviews(String authHeader){
         Map<String, Object> response = new HashMap<>();
+
+        // Extract token from Authorization header
+        if (!authHeader.startsWith("Bearer ")) {
+            response.put("success", false);
+            response.put("message", "Invalid authorization token.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        String token = authHeader.substring(7);
+        String email = jwtUtil.extractEmail(token); // Extract email from JWT token
+
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if (userOptional.isEmpty()) {
+            response.put("success", false);
+            response.put("message", "Auth token not valid.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+        if(userOptional.get().getRole() != Role.HR){
+            response.put("success", false);
+            response.put("message", "Access unauthorized.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
 
         LocalDate today = LocalDate.now();
         LocalTime time = LocalTime.now();
