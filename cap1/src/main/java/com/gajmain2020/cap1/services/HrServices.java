@@ -3,26 +3,31 @@ package com.gajmain2020.cap1.services;
 import com.gajmain2020.cap1.dto.InterviewRequest;
 import com.gajmain2020.cap1.enums.InterviewStage;
 import com.gajmain2020.cap1.enums.Role;
+import com.gajmain2020.cap1.models.InterviewFeedback;
+import com.gajmain2020.cap1.models.InterviewFeedbackDetail;
 import com.gajmain2020.cap1.models.InterviewSchedule;
 import com.gajmain2020.cap1.models.User;
+import com.gajmain2020.cap1.repositories.InterviewFeedbackDetailRepository;
+import com.gajmain2020.cap1.repositories.InterviewFeedbackRepository;
 import com.gajmain2020.cap1.repositories.InterviewScheduleRepository;
 import com.gajmain2020.cap1.repositories.UserRepository;
 import com.gajmain2020.cap1.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.Duration;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +38,10 @@ public class HrServices {
     private InterviewScheduleRepository interviewScheduleRepository;
     @Autowired
     private JwtUtil jwtUtil;
+    @Autowired
+    private InterviewFeedbackRepository interviewFeedbackRepository;
+    @Autowired
+    private InterviewFeedbackDetailRepository interviewFeedbackDetailRepository;
 
     // Reusable response methods
     private ResponseEntity<Map<String, Object>> badRequestResponse(String message) {
@@ -187,7 +196,7 @@ public class HrServices {
         return ResponseEntity.ok(response);
     }
 
-    public ResponseEntity<Map<String, Object>> getPastInterviews(String authHeader){
+    public ResponseEntity<Map<String, Object>> getPastInterviews(String authHeader) {
         Map<String, Object> response = new HashMap<>();
 
         // Extract token from Authorization header
@@ -206,7 +215,7 @@ public class HrServices {
             response.put("message", "Auth token not valid.");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
-        if(userOptional.get().getRole() != Role.HR){
+        if (userOptional.get().getRole() != Role.HR) {
             response.put("success", false);
             response.put("message", "Access unauthorized.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
@@ -218,10 +227,10 @@ public class HrServices {
         // Fetch past interviews
         List<Map<String, Object>> pastInterviews = interviewScheduleRepository.findPastInterviews(today.toString(), time.toString());
 
-        if(pastInterviews.isEmpty()){
+        if (pastInterviews.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
-                "success",false,
-                    "message","No past interviews found"
+                    "success", false,
+                    "message", "No past interviews found"
             ));
         }
 
@@ -229,10 +238,47 @@ public class HrServices {
         response.put("pastInterviews", pastInterviews);
 
         return ResponseEntity.ok(response);
-
-
     }
 
+    public ResponseEntity<Map<String,Object>> getPastFeedback(Long interviewId){
+        Map<String, Object> response = new HashMap<>();
+        Optional<InterviewFeedback> feedbackOptional = interviewFeedbackRepository.findByInterviewId(interviewId);
 
+        if (feedbackOptional.isPresent()) {
+            InterviewFeedback feedback = feedbackOptional.get();
+
+            Map<String, Object> interviewData = new HashMap<>();
+            interviewData.put("intervieweeName", feedback.getInterview().getIntervieweeName());
+            interviewData.put("intervieweeEmail", feedback.getInterview().getIntervieweeEmail());
+            interviewData.put("date", feedback.getInterview().getDate());
+            interviewData.put("position", feedback.getInterview().getPosition());
+            interviewData.put("interviewerName", feedback.getInterview().getInterviewer().getName());
+            interviewData.put("interviewerEmail", feedback.getInterview().getInterviewer().getEmail());
+
+            Map<String, Object> feedbackData = new HashMap<>();
+            feedbackData.put("finalDecision", feedback.getFinalDecision());
+            feedbackData.put("finalComment", feedback.getFinalComment());
+
+            List<InterviewFeedbackDetail> feedbackDetails = interviewFeedbackDetailRepository.findByFeedbackId(feedback.getId());
+            List<Map<String, Object>> feedbackDetailList = feedbackDetails.stream().map(detail -> {
+                Map<String, Object> detailMap = new HashMap<>();
+                detailMap.put("skill", detail.getSkill());
+                detailMap.put("rating", detail.getRating());
+                detailMap.put("topicsUsed", detail.getTopicsUsed());
+                detailMap.put("comments", detail.getComments());
+                return detailMap;
+            }).collect(Collectors.toList());
+
+            feedbackData.put("feedback", feedbackDetailList);
+
+            response.put("success", true);
+            response.put("interview", interviewData);
+            response.put("feedbackDetails", feedbackData);
+        } else {
+            response.put("success", false);
+            response.put("message", "Interview not found");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 
 }

@@ -65,6 +65,10 @@ public class HrController {
         return hrServices.getPastInterviews(authHeader);
     }
 
+    @GetMapping("/get-feedback-details-hr/{interviewId}")
+    public ResponseEntity<Map<String, Object>> getPastInterviewFeedback(@PathVariable Long interviewId){
+        return hrServices.getPastFeedback(interviewId);
+    }
 }
 
 

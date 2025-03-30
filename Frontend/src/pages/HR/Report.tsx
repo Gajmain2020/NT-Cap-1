@@ -1,20 +1,60 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { toast } from "sonner";
 
-export default function ReportPage() {
-  // Dummy Candidate Data
-  const candidate = {
-    name: "John Doe",
-    email: "john.doe@example.com",
-    position: "Software Engineer",
-    status: "L1 Passed with Comments",
-  };
+import { GetFeedbackDetailsAPI } from "@/api/hrApis";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { IFeedback, IInterviewee } from "@/utils/types";
+import Loading from "../Loading";
+import NotFound from "../NotFound";
+
+export default function Report() {
+  const { interviewId } = useParams<string>();
+
+  const [loading, setLoading] = useState(true);
+  const [candidate, setCandidate] = useState<IInterviewee>();
+  const [feedback, setFeedback] = useState<IFeedback>();
+
+  useEffect(() => {
+    const fetchFeedbackDetails = async () => {
+      try {
+        const response =
+          interviewId && (await GetFeedbackDetailsAPI(interviewId));
+        if (!response.success) {
+          toast.error(response.message);
+          return;
+        }
+        setCandidate(response.feedback.interviewee);
+        delete response.feedback.interviewee;
+        setFeedback(response.feedback);
+      } catch (error) {
+        console.log("Error", error);
+        toast.error(
+          "Error occurred while fetching the feedback. Please try again."
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFeedbackDetails();
+  }, []);
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (!candidate || !feedback) {
+    return <NotFound />;
+  }
 
   return (
-    <div className="container mx-auto p-2 flex flex-col gap-8">
+    <div className="container mx-auto p-2 flex flex-col gap-8" id="pdf-content">
       {/* Candidate Info */}
       <Card className="">
         <CardHeader>
-          <CardTitle>Interview Report</CardTitle>
+          <CardTitle className="flex gap-2 items-center">
+            Interview Report
+          </CardTitle>
         </CardHeader>
         <CardContent className="flex justify-around flex-col lg:flex-row">
           <p>
@@ -27,7 +67,7 @@ export default function ReportPage() {
             <strong>Position:</strong> {candidate.position}
           </p>
           <p>
-            <strong>Status:</strong> {candidate.status}
+            <strong>Status:</strong> {candidate.stage}
           </p>
         </CardContent>
       </Card>
@@ -37,6 +77,16 @@ export default function ReportPage() {
         <CardHeader>
           <CardTitle>Feedback Summary</CardTitle>
         </CardHeader>
+        <CardContent>
+          <div>
+            Status:{" "}
+            <span className="font-semibold">{feedback.finalDecision}</span>
+          </div>
+          <div>
+            Comment:{" "}
+            <span className="font-semibold">{feedback.finalComment}</span>
+          </div>
+        </CardContent>
         <CardContent className="overflow-x-auto">
           <table className="w-full border-collapse border border-gray-300">
             <thead>
@@ -50,11 +100,11 @@ export default function ReportPage() {
                 <th className="border border-gray-300 px-4 py-2">Comments</th>
               </tr>
             </thead>
-            {/* <tbody>
-              {feedback.map((item, index) => (
+            <tbody>
+              {feedback.details.map((item, index) => (
                 <tr key={index} className="text-center">
                   <td className="border border-gray-300 px-4 py-2">
-                    {item.srNo}
+                    {index + 1}
                   </td>
                   <td className="border border-gray-300 px-4 py-2">
                     {item.skill}
@@ -63,14 +113,14 @@ export default function ReportPage() {
                     {item.rating}
                   </td>
                   <td className="border border-gray-300 px-4 py-2">
-                    {item.topicsUsed}
+                    {item.topics.join(", ")}
                   </td>
                   <td className="border border-gray-300 px-4 py-2">
                     {item.comments}
                   </td>
                 </tr>
               ))}
-            </tbody> */}
+            </tbody>
           </table>
         </CardContent>
       </Card>

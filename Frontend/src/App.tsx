@@ -5,6 +5,7 @@ import {
   Routes,
 } from "react-router-dom";
 import { Toaster } from "sonner";
+
 import Layout from "./components/Layout/Layout";
 import HRCalendar from "./pages/HR/Calendar";
 import Homepage from "./pages/HR/Homepage";
@@ -61,7 +62,7 @@ function App() {
               element={<UpcomingInterviews />}
             />
             <Route path="past-interviews" element={<PastInterviews />} />
-            <Route path="past-interviews/:reportId" element={<Report />} />
+            <Route path="past-interviews/:interviewId" element={<Report />} />
             <Route path="calendar" element={<HRCalendar />} />
           </Route>
 

@@ -49,3 +49,11 @@ export async function FetchPastInterviewsAPI() {
     method: "GET",
   });
 }
+
+export async function GetFeedbackDetailsAPI(interviewId: string) {
+  return apiRequest({
+    headers: getAuthHeaders(),
+    url: baseUrl + `/get-feedback-details-hr/${interviewId}`,
+    method: "GET",
+  });
+}
