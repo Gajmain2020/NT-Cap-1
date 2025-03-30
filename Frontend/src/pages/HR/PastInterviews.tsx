@@ -1,5 +1,7 @@
-import { SetStateAction, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
+import { toast } from "sonner";
 
+import { FetchPastInterviewsAPI } from "@/api/hrApis";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,43 +11,32 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { IPastInterview } from "@/utils/types";
-
-const dummyInterviews = [
-  {
-    id: 1,
-    name: "John Doe",
-    email: "john.doe@example.com",
-    position: "Software Engineer",
-    date: "2024-03-01",
-    time: "10:00 AM",
-    status: "L1 Passed with Comments",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    email: "jane.smith@example.com",
-    position: "Backend Developer",
-    date: "2024-03-02",
-    time: "2:00 PM",
-    status: "L1 Passed",
-  },
-  {
-    id: 2,
-    name: "Jane Smith",
-    email: "jane.smith@example.com",
-    position: "PHP Developer",
-    date: "2024-03-03",
-    time: "2:00 PM",
-    status: "Rejected",
-  },
-];
+import { Delete } from "lucide-react";
 
 export default function PastInterviews() {
+  const [pastInterviews, setPastInterviews] = useState<IPastInterview[]>([]);
   const [selectedInterview, setSelectedInterview] =
     useState<IPastInterview | null>(null);
   const [rescheduleOpen, setRescheduleOpen] = useState(false);
   const [newInterviewer, setNewInterviewer] = useState("");
   const [newDate, setNewDate] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPastInterview = async () => {
+      try {
+        const response = await FetchPastInterviewsAPI();
+
+        setPastInterviews(response.pastInterviews);
+      } catch (error) {
+        console.log("Error occurred:", error);
+        toast.error("Error occurred while fetching past interviews.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPastInterview();
+  }, []);
 
   const handleReschedule = (
     interview: SetStateAction<IPastInterview | null>
@@ -60,37 +51,57 @@ export default function PastInterviews() {
       <table className="w-full border-collapse border border-gray-300">
         <thead>
           <tr className="bg-gray-200">
-            <th className="border p-2">Name</th>
-            <th className="border p-2">Email</th>
+            <th className="border p-2">Candidate</th>
+            <th className="border p-2">Interviewer</th>
             <th className="border p-2">Position</th>
             <th className="border p-2">Date</th>
-            <th className="border p-2">Time</th>
-            <th className="border p-2">Status</th>
+            <th className="border p-2">Decision</th>
             <th className="border p-2">Actions</th>
+            <th className="border p-2">Delete</th>
           </tr>
         </thead>
         <tbody>
-          {dummyInterviews.map((interview) => (
-            <tr key={interview.id} className="text-center border">
-              <td
-                className="border p-2 cursor-pointer text-blue-600 hover:underline"
-                onClick={() =>
-                  window.open(`${window.location}/${interview.id}`, "_blank")
-                }
-              >
-                {interview.name}
+          {pastInterviews.map((interview) => (
+            <tr key={interview.interviewId} className="text-center border">
+              <td className="border p-2">
+                <div className="flex flex-col">
+                  <span>{interview.intervieweeName}</span>
+                  <span className="text-xs">{interview.intervieweeEmail}</span>
+                </div>
               </td>
-              <td className="border p-2">{interview.email}</td>
+              <td className="border p-2">
+                <div className="flex flex-col">
+                  <span>{interview.interviewerName}</span>
+                  <span className="text-xs">{interview.interviewerEmail}</span>
+                </div>
+              </td>
               <td className="border p-2">{interview.position}</td>
               <td className="border p-2">{interview.date}</td>
-              <td className="border p-2">{interview.time}</td>
-              <td className="border p-2 font-medium">{interview.status}</td>
-              <td className="border p-2">
-                {interview.status === "L1 Passed with Comments" && (
+              <td className="border p-2 font-medium">
+                {interview.finalDecision}
+              </td>
+              <td className="border p-2 ">
+                {interview.finalDecision === "L1_PASSED_WITH_COMMENT" && (
                   <Button onClick={() => handleReschedule(interview)}>
                     Reschedule L2
                   </Button>
                 )}
+                &nbsp; &nbsp;
+                <Button
+                  onClick={() =>
+                    window.open(
+                      `${window.location}/${interview.interviewId}`,
+                      "_blank"
+                    )
+                  }
+                >
+                  View
+                </Button>
+              </td>
+              <td className="border p-2">
+                <div className="flex justify-center cursor-pointer hover:scale-110 transition">
+                  <Delete color="red" />
+                </div>
               </td>
             </tr>
           ))}

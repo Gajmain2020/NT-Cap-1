@@ -41,3 +41,11 @@ export async function FetchInterviewsAPI() {
     method: "GET",
   });
 }
+
+export async function FetchPastInterviewsAPI() {
+  return apiRequest({
+    headers: getAuthHeaders(),
+    url: baseUrl + `/get-past-interviews`,
+    method: "GET",
+  });
+}

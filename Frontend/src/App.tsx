@@ -44,7 +44,7 @@ function App() {
           />
           <Route path="/test" element={<>Route testing</>} />
 
-          {/* Protected Routes for student */}
+          {/* Protected Routes for HR */}
           <Route
             path="/user/hr/:id"
             element={
@@ -65,7 +65,7 @@ function App() {
             <Route path="calendar" element={<HRCalendar />} />
           </Route>
 
-          {/* Protected Routes for faculty */}
+          {/* Protected Routes for interviewer */}
           <Route
             path="/user/interviewer/:id"
             element={
