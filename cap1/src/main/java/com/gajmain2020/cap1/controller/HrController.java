@@ -8,6 +8,7 @@ import com.gajmain2020.cap1.repositories.InterviewScheduleRepository;
 import com.gajmain2020.cap1.repositories.UserRepository;
 import com.gajmain2020.cap1.services.HrServices;
 import jakarta.validation.Valid;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -57,6 +58,11 @@ public class HrController {
             @Valid @RequestBody InterviewRequest interviewRequest,
             BindingResult result) {
         return hrServices.editInterview(id, interviewRequest, result);
+    }
+
+    @GetMapping("/get-past-interviews")
+    public ResponseEntity<Map<String, Object>> getAllPastInterviews(@RequestHeader("Authorization") String authHeader){
+        return hrServices.getPastInterviews(authHeader);
     }
 
 }

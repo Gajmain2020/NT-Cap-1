@@ -96,11 +96,12 @@ export interface ISkill {
 }
 
 export interface IPastInterview {
-  id: number;
-  name: string;
-  email: string;
-  position: string;
   date: string;
-  time: string;
-  status: string;
+  finalDecision: string;
+  interviewId: number;
+  position: string;
+  intervieweeName: string;
+  intervieweeEmail: string;
+  interviewerName: string;
+  interviewerEmail: string;
 }

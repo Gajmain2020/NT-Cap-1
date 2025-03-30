@@ -72,8 +72,8 @@ export default function UpcomingInterviews() {
 
   return (
     <>
-      <div className="flex flex-col items-center bg-gray-100 p-2 min-h-full gap-10">
-        <div className="bg-white shadow-lg rounded-lg p-4 flex flex-col gap-6 w-full">
+      <div className="flex flex-col items-center p-2 min-h-full gap-10">
+        <div className="bg-white shadow-lg rounded-lg p-4 flex flex-col gap-6 border w-full">
           <h2 className="text-lg font-semibold text-gray-700">
             Upcoming Interviews
           </h2>

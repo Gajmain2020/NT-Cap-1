@@ -1,9 +1,15 @@
-import { FetchFeedbackDetailsAPI } from "@/api/interviewerApis";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { IFeedback, IInterviewee } from "@/utils/types";
+import domtoimage from "dom-to-image";
+import jsPDF from "jspdf";
+
+import { Download } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "sonner";
+
+import { FetchFeedbackDetailsAPI } from "@/api/interviewerApis";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { IFeedback, IInterviewee } from "@/utils/types";
 import Loading from "../Loading";
 import NotFound from "../NotFound";
 
@@ -38,6 +44,35 @@ export default function PastInterviewFeedback() {
     fetchFeedbackDetails();
   }, []);
 
+  const captureAndSaveAsPDF = () => {
+    const element = document.getElementById("pdf-content");
+
+    domtoimage
+      .toPng(element)
+      .then((dataUrl) => {
+        const pdf = new jsPDF("p", "mm", "a4");
+        const pageHeight = 297; // A4 height in mm
+        const imgWidth = 210;
+        const imgHeight =
+          (element.offsetHeight * imgWidth) / element.offsetWidth;
+
+        let yPosition = 0;
+
+        while (yPosition < imgHeight) {
+          pdf.addImage(dataUrl, "PNG", 0, yPosition, imgWidth, imgHeight);
+          yPosition += pageHeight; // Move to the next page
+          if (yPosition < imgHeight) {
+            pdf.addPage();
+          }
+        }
+
+        pdf.save("download.pdf");
+      })
+      .catch((error) => {
+        console.error("Error capturing image:", error);
+      });
+  };
+
   if (loading) {
     return <Loading />;
   }
@@ -47,11 +82,16 @@ export default function PastInterviewFeedback() {
   }
 
   return (
-    <div className="container mx-auto p-2 flex flex-col gap-8">
+    <div className="container mx-auto p-2 flex flex-col gap-8" id="pdf-content">
       {/* Candidate Info */}
       <Card className="">
         <CardHeader>
-          <CardTitle>Interview Report</CardTitle>
+          <CardTitle className="flex gap-2 items-center">
+            Interview Report
+            <Button variant={"ghost"} onClick={handleDownloadPDF}>
+              <Download />
+            </Button>
+          </CardTitle>
         </CardHeader>
         <CardContent className="flex justify-around flex-col lg:flex-row">
           <p>

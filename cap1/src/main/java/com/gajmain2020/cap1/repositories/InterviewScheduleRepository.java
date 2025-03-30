@@ -3,6 +3,7 @@ package com.gajmain2020.cap1.repositories;
 import com.gajmain2020.cap1.models.InterviewSchedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -161,5 +162,24 @@ public interface InterviewScheduleRepository extends JpaRepository<InterviewSche
         WHERE i.interviewer.email = :email
     """)
     List<Map<String, Object>> findFeedbacksByInterviewerEmail( String email);
+
+    @Query("""
+            SELECT new map(
+                i.id as interviewId,
+                i.intervieweeName as intervieweeName,
+                i.intervieweeEmail as intervieweeEmail,
+                u.name as interviewerName,
+                u.email as interviewerEmail,
+                i.date as date,
+                i.position as position,
+                f.finalDecision finalDecision)
+                FROM InterviewSchedule i
+                JOIN i.interviewer u
+                JOIN InterviewFeedback f ON i.id = f.interview.id
+                WHERE i.date < :today
+                OR (i.date = :today AND i.endTime < :currentTime)
+    """)
+    List<Map<String, Object>> findPastInterviews(String today, String currentTime);
+
 
 }
