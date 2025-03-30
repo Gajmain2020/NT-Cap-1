@@ -2,13 +2,8 @@ package com.gajmain2020.cap1.controller;
 
 
 import com.gajmain2020.cap1.dto.InterviewRequest;
-import com.gajmain2020.cap1.repositories.InterviewFeedbackDetailRepository;
-import com.gajmain2020.cap1.repositories.InterviewFeedbackRepository;
-import com.gajmain2020.cap1.repositories.InterviewScheduleRepository;
-import com.gajmain2020.cap1.repositories.UserRepository;
 import com.gajmain2020.cap1.services.HrServices;
 import jakarta.validation.Valid;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -61,10 +56,19 @@ public class HrController {
     }
 
     @GetMapping("/get-past-interviews")
-    public ResponseEntity<Map<String, Object>> getAllPastInterviews(@RequestHeader("Authorization") String authHeader){
+    public ResponseEntity<Map<String, Object>> getAllPastInterviews(@RequestHeader("Authorization") String authHeader) {
         return hrServices.getPastInterviews(authHeader);
     }
 
+    @GetMapping("/get-feedback-details-hr/{interviewId}")
+    public ResponseEntity<Map<String, Object>> getPastInterviewFeedback(@PathVariable Long interviewId, @RequestHeader("Authorization") String authHeader) {
+        return hrServices.getPastFeedback(interviewId, authHeader);
+    }
+
+    @DeleteMapping("/delete-interview/{interviewId}")
+    public ResponseEntity<Map<String,Object>> deleteInterview(@PathVariable Long interviewId, @RequestHeader("Authorization") String authHeader){
+        return hrServices.deleteSingleInterview(interviewId, authHeader);
+    }
 }
 
 

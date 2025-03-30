@@ -49,3 +49,19 @@ export async function FetchPastInterviewsAPI() {
     method: "GET",
   });
 }
+
+export async function GetFeedbackDetailsAPI(interviewId: string) {
+  return apiRequest({
+    headers: getAuthHeaders(),
+    url: baseUrl + `/get-feedback-details-hr/${interviewId}`,
+    method: "GET",
+  });
+}
+
+export async function DeleteFeedbackAPI(interviewId: number) {
+  return apiRequest({
+    headers: getAuthHeaders(),
+    url: baseUrl + `/delete-interview/${interviewId}`,
+    method: "DELETE",
+  });
+}

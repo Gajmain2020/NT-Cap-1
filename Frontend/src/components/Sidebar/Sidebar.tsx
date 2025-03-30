@@ -22,9 +22,9 @@ import {
 
 import { hrNavItems, interviewerNavItems } from "@/utils/navItems";
 import { useState } from "react";
-import LOGO from "../../../public/LogoIE2.png";
 import PasswordChangeDialog from "./PasswordChangeDialog";
 import SidebarNavItem from "./SidebarNavItem";
+import LOGO from "/LogoIE2.png";
 
 export function AppSidebar() {
   const navigate = useNavigate();

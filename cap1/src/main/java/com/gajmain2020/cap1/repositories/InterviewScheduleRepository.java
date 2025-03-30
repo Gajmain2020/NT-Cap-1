@@ -182,4 +182,6 @@ public interface InterviewScheduleRepository extends JpaRepository<InterviewSche
     List<Map<String, Object>> findPastInterviews(String today, String currentTime);
 
 
+
+
 }

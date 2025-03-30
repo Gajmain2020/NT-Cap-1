@@ -1,7 +1,7 @@
 import { SetStateAction, useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import { FetchPastInterviewsAPI } from "@/api/hrApis";
+import { DeleteFeedbackAPI, FetchPastInterviewsAPI } from "@/api/hrApis";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -21,21 +21,38 @@ import { IPastInterview } from "@/utils/types";
 import { Delete } from "lucide-react";
 
 export default function PastInterviews() {
-  const [pastInterviews, setPastInterviews] = useState<IPastInterview[]>([]);
-  const [selectedInterview, setSelectedInterview] =
-    useState<IPastInterview | null>(null);
-  const [rescheduleOpen, setRescheduleOpen] = useState(false);
-  const [newInterviewer, setNewInterviewer] = useState("");
-  const [newDate, setNewDate] = useState("");
   const [loading, setLoading] = useState(true);
+
+  // Stores the data coming from the server
+  const [pastInterviews, setPastInterviews] = useState<IPastInterview[]>([]);
+
+  // Search and filter states
   const [search, setSearch] = useState("");
   const [filterPosition, setFilterPosition] = useState("");
   const [numberOfRowsToShow, setNumberOfRowsToShow] = useState(10);
+
+  //For Rescheduling the interview
+  const [selectedInterview, setSelectedInterview] =
+    useState<IPastInterview | null>(null);
+  const [rescheduleOpen, setRescheduleOpen] = useState(false);
+
+  // State to reschedule interviewer details
+  const [newInterviewer, setNewInterviewer] = useState("");
+  const [newDate, setNewDate] = useState("");
+
+  // Delete interview confirmation
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<number>(-1);
 
   useEffect(() => {
     const fetchPastInterview = async () => {
       try {
         const response = await FetchPastInterviewsAPI();
+
+        if (!response.pastInterviews) {
+          setPastInterviews([]);
+          return;
+        }
 
         setPastInterviews(response.pastInterviews);
       } catch (error) {
@@ -74,6 +91,23 @@ export default function PastInterviews() {
       if (a.date !== b.date) return a.date.localeCompare(b.date);
       return 0; // Return 0 if dates are equal
     });
+
+  async function handleConfirmDelete() {
+    const response = await DeleteFeedbackAPI(deleteId);
+
+    if (!response.success) {
+      console.log("There is an error.", response);
+      toast.error(response.message);
+      return;
+    }
+
+    toast.success(response.message);
+
+    setPastInterviews((inv) =>
+      inv.filter((inv) => inv.interviewId !== deleteId)
+    );
+    return;
+  }
 
   return (
     <div className="flex flex-col items-center p-2 min-h-full gap-10">
@@ -207,7 +241,13 @@ export default function PastInterviews() {
                           </Button>
                         </td>
                         <td className="border p-2">
-                          <div className="flex justify-center cursor-pointer hover:scale-110 transition">
+                          <div
+                            onClick={() => {
+                              setConfirmDeleteOpen(true);
+                              setDeleteId(interview.interviewId);
+                            }}
+                            className="flex justify-center cursor-pointer hover:scale-110 transition"
+                          >
                             <Delete color="red" />
                           </div>
                         </td>
@@ -224,6 +264,37 @@ export default function PastInterviews() {
             )}
           </table>
         </div>
+
+        {/* Confirmation to delete interview */}
+        <Dialog open={confirmDeleteOpen} onOpenChange={setConfirmDeleteOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>
+                Are you sure you want to delete this interview?
+              </DialogTitle>
+            </DialogHeader>
+            <div className="flex justify-end gap-4">
+              <Button
+                onClick={() => {
+                  setDeleteId(-1);
+                  setConfirmDeleteOpen(false);
+                }}
+                variant="secondary"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  handleConfirmDelete();
+                  setConfirmDeleteOpen(false);
+                }}
+                variant="destructive"
+              >
+                Delete
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* Reschedule Modal */}
         <Dialog open={rescheduleOpen} onOpenChange={setRescheduleOpen}>

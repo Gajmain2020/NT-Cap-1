@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface InterviewFeedbackRepository extends JpaRepository<InterviewFeedback, Long> {
@@ -32,4 +33,13 @@ public interface InterviewFeedbackRepository extends JpaRepository<InterviewFeed
         WHERE f.id = :feedbackId
     """, nativeQuery = true)
     List<Object[]> getFeedbackDetails(Long feedbackId);
+
+    @Query("""
+        SELECT f FROM InterviewFeedback f
+        JOIN FETCH f.interview i
+        JOIN FETCH i.interviewer
+        WHERE i.id = :interviewId
+    """)
+    Optional<InterviewFeedback> findByInterviewId(Long interviewId);
+
 }
