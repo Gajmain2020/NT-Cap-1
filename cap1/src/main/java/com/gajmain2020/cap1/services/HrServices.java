@@ -13,7 +13,6 @@ import com.gajmain2020.cap1.repositories.InterviewScheduleRepository;
 import com.gajmain2020.cap1.repositories.UserRepository;
 import com.gajmain2020.cap1.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -240,7 +239,7 @@ public class HrServices {
         return ResponseEntity.ok(response);
     }
 
-    public ResponseEntity<Map<String,Object>> getPastFeedback(Long interviewId, String authHeader){
+    public ResponseEntity<Map<String, Object>> getPastFeedback(Long interviewId, String authHeader) {
         Map<String, Object> response = new HashMap<>();
 
         // Extract token from Authorization header
@@ -273,7 +272,8 @@ public class HrServices {
             Map<String, Object> interviewData = new HashMap<>();
 
             interviewData.put("intervieweeName", feedback.getInterview().getIntervieweeName());
-            interviewData.put("stage", feedback.getInterview().getStage());            interviewData.put("date", feedback.getInterview().getDate());
+            interviewData.put("stage", feedback.getInterview().getStage());
+            interviewData.put("date", feedback.getInterview().getDate());
             interviewData.put("intervieweeEmail", feedback.getInterview().getIntervieweeEmail());
             interviewData.put("position", feedback.getInterview().getPosition());
             interviewData.put("interviewerName", feedback.getInterview().getInterviewer().getName());
@@ -302,6 +302,44 @@ public class HrServices {
             response.put("success", false);
             response.put("message", "Interview not found");
         }
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    public ResponseEntity<Map<String, Object>> deleteSingleInterview(Long interviewId) {
+        Map<String, Object> response = new HashMap<>();
+
+        Optional<InterviewSchedule> interviewOptional = interviewScheduleRepository.findById(interviewId);
+
+        if (interviewOptional.isEmpty()) {
+            response.put("success", false);
+            response.put("message", "Interview not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        InterviewSchedule interview = interviewOptional.get();
+
+        // Delete related feedback details first
+        Optional<InterviewFeedback> feedbackOptional = interviewFeedbackRepository.findByInterviewId(interviewId);
+        if (feedbackOptional.isPresent()) {
+            InterviewFeedback feedback = feedbackOptional.get();
+
+            // Delete feedback details and check if they were deleted
+            int deletedCount = interviewFeedbackDetailRepository.deleteByFeedbackId(feedback.getId());
+            if (deletedCount == 0) {
+                response.put("success", false);
+                response.put("message", "Failed to delete feedback details");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            }
+
+            // Delete feedback
+            interviewFeedbackRepository.delete(feedback);
+        }
+
+        // Now delete the interview
+        interviewScheduleRepository.delete(interview);
+
+        response.put("success", true);
+        response.put("message", "Interview and related data deleted successfully");
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

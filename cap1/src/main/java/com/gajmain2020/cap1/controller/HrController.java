@@ -64,6 +64,11 @@ public class HrController {
     public ResponseEntity<Map<String, Object>> getPastInterviewFeedback(@PathVariable Long interviewId, @RequestHeader("Authorization") String authHeader) {
         return hrServices.getPastFeedback(interviewId, authHeader);
     }
+
+    @DeleteMapping("/delete-interview/{interviewId}")
+    public ResponseEntity<Map<String,Object>> deleteInterview(@PathVariable Long interviewId){
+        return hrServices.deleteSingleInterview(interviewId);
+    }
 }
 
 
