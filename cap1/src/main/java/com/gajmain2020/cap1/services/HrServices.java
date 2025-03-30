@@ -305,8 +305,30 @@ public class HrServices {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    public ResponseEntity<Map<String, Object>> deleteSingleInterview(Long interviewId) {
+    public ResponseEntity<Map<String, Object>> deleteSingleInterview(Long interviewId, String authHeader) {
         Map<String, Object> response = new HashMap<>();
+
+        // Extract token from Authorization header
+        if (!authHeader.startsWith("Bearer ")) {
+            response.put("success", false);
+            response.put("message", "Invalid authorization token.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        String token = authHeader.substring(7);
+        String email = jwtUtil.extractEmail(token); // Extract email from JWT token
+
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if (userOptional.isEmpty()) {
+            response.put("success", false);
+            response.put("message", "Auth token not valid.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+        if (userOptional.get().getRole() != Role.HR) {
+            response.put("success", false);
+            response.put("message", "Access unauthorized.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
 
         Optional<InterviewSchedule> interviewOptional = interviewScheduleRepository.findById(interviewId);
 
