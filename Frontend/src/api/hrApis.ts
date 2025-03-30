@@ -57,3 +57,11 @@ export async function GetFeedbackDetailsAPI(interviewId: string) {
     method: "GET",
   });
 }
+
+export async function DeleteFeedbackAPI(interviewId: number) {
+  return apiRequest({
+    headers: getAuthHeaders(),
+    url: baseUrl + `/delete-interview/${interviewId}`,
+    method: "DELETE",
+  });
+}

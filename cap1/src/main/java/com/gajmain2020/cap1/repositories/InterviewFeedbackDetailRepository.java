@@ -1,6 +1,7 @@
 package com.gajmain2020.cap1.repositories;
 
 import com.gajmain2020.cap1.models.InterviewFeedbackDetail;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -16,7 +17,8 @@ public interface InterviewFeedbackDetailRepository extends JpaRepository<Intervi
             WHERE d.feedback.id = :feedbackId
     """)
     List<InterviewFeedbackDetail> findByFeedbackId(Long feedbackId);
-
+    
+    @Transactional
     @Modifying
     @Query("DELETE FROM InterviewFeedbackDetail d WHERE d.feedback.id = :feedbackId")
     int deleteByFeedbackId(@Param("feedbackId") Long feedbackId);

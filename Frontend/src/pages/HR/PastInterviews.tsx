@@ -1,7 +1,7 @@
 import { SetStateAction, useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import { FetchPastInterviewsAPI } from "@/api/hrApis";
+import { DeleteFeedbackAPI, FetchPastInterviewsAPI } from "@/api/hrApis";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -49,6 +49,11 @@ export default function PastInterviews() {
       try {
         const response = await FetchPastInterviewsAPI();
 
+        if (!response.pastInterviews) {
+          setPastInterviews([]);
+          return;
+        }
+
         setPastInterviews(response.pastInterviews);
       } catch (error) {
         console.log("Error occurred:", error);
@@ -87,8 +92,17 @@ export default function PastInterviews() {
       return 0; // Return 0 if dates are equal
     });
 
-  function handleConfirmDelete() {
-    console.log("hello world", deleteId);
+  async function handleConfirmDelete() {
+    const response = await DeleteFeedbackAPI(deleteId);
+
+    if (!response.success) {
+      console.log("There is an error.", response);
+      toast.error(response.message);
+      return;
+    }
+
+    toast.success(response.message);
+
     setPastInterviews((inv) =>
       inv.filter((inv) => inv.interviewId !== deleteId)
     );
