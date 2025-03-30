@@ -175,7 +175,7 @@ public interface InterviewScheduleRepository extends JpaRepository<InterviewSche
                 f.finalDecision finalDecision)
                 FROM InterviewSchedule i
                 JOIN i.interviewer u
-                LEFT JOIN InterviewFeedback f ON i.id = f.interview.id
+                JOIN InterviewFeedback f ON i.id = f.interview.id
                 WHERE i.date < :today
                 OR (i.date = :today AND i.endTime < :currentTime)
     """)
