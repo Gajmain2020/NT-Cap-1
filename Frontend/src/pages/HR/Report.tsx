@@ -4,16 +4,37 @@ import { toast } from "sonner";
 
 import { GetFeedbackDetailsAPI } from "@/api/hrApis";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { IFeedback, IInterviewee } from "@/utils/types";
 import Loading from "../Loading";
 import NotFound from "../NotFound";
+
+interface IInterviewReport {
+  intervieweeName: string;
+  intervieweeEmail: string;
+  position: string;
+  interviewerName: string;
+  interviewerEmail: string;
+  stage: string;
+}
+
+export interface FeedbackDetail {
+  topicsUsed: string;
+  comments: string;
+  skill: string;
+  rating: "VERY_GOOD" | "GOOD" | "AVERAGE" | "BELOW_AVERAGE" | "POOR"; // Adjust based on possible values
+}
+
+export interface IInterviewFeedback {
+  feedback: FeedbackDetail[];
+  finalComment: string;
+  finalDecision: string; // You can use an enum if values are fixed
+}
 
 export default function Report() {
   const { interviewId } = useParams<string>();
 
   const [loading, setLoading] = useState(true);
-  const [candidate, setCandidate] = useState<IInterviewee>();
-  const [feedback, setFeedback] = useState<IFeedback>();
+  const [interview, setInterview] = useState<IInterviewReport>();
+  const [feedback, setFeedback] = useState<IInterviewFeedback>();
 
   useEffect(() => {
     const fetchFeedbackDetails = async () => {
@@ -24,9 +45,9 @@ export default function Report() {
           toast.error(response.message);
           return;
         }
-        setCandidate(response.feedback.interviewee);
-        delete response.feedback.interviewee;
-        setFeedback(response.feedback);
+        console.log(response);
+        setInterview(response.interview);
+        setFeedback(response.feedbackDetails);
       } catch (error) {
         console.log("Error", error);
         toast.error(
@@ -43,13 +64,13 @@ export default function Report() {
     return <Loading />;
   }
 
-  if (!candidate || !feedback) {
+  if (!interview || !feedback) {
     return <NotFound />;
   }
 
   return (
     <div className="container mx-auto p-2 flex flex-col gap-8" id="pdf-content">
-      {/* Candidate Info */}
+      {/* Interview Info */}
       <Card className="">
         <CardHeader>
           <CardTitle className="flex gap-2 items-center">
@@ -58,16 +79,22 @@ export default function Report() {
         </CardHeader>
         <CardContent className="flex justify-around flex-col lg:flex-row">
           <p>
-            <strong>Name:</strong> {candidate.name}
+            <strong>Candidate:</strong> {interview.intervieweeName} -{" "}
+            <span className="text-xs text-gray-700">
+              {interview.intervieweeEmail}
+            </span>
           </p>
           <p>
-            <strong>Email:</strong> {candidate.email}
+            <strong>Interviewer:</strong> {interview.interviewerName} -{" "}
+            <span className="text-xs text-gray-700">
+              {interview.interviewerEmail}
+            </span>
           </p>
           <p>
-            <strong>Position:</strong> {candidate.position}
+            <strong>Position:</strong> {interview.position}
           </p>
           <p>
-            <strong>Status:</strong> {candidate.stage}
+            <strong>Status:</strong> {interview.stage}
           </p>
         </CardContent>
       </Card>
@@ -101,7 +128,7 @@ export default function Report() {
               </tr>
             </thead>
             <tbody>
-              {feedback.details.map((item, index) => (
+              {feedback.feedback.map((item, index) => (
                 <tr key={index} className="text-center">
                   <td className="border border-gray-300 px-4 py-2">
                     {index + 1}
@@ -113,7 +140,7 @@ export default function Report() {
                     {item.rating}
                   </td>
                   <td className="border border-gray-300 px-4 py-2">
-                    {item.topics.join(", ")}
+                    {item.topicsUsed}
                   </td>
                   <td className="border border-gray-300 px-4 py-2">
                     {item.comments}

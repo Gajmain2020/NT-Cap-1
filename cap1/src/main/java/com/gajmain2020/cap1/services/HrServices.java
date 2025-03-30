@@ -248,9 +248,10 @@ public class HrServices {
             InterviewFeedback feedback = feedbackOptional.get();
 
             Map<String, Object> interviewData = new HashMap<>();
+
             interviewData.put("intervieweeName", feedback.getInterview().getIntervieweeName());
+            interviewData.put("stage", feedback.getInterview().getStage());            interviewData.put("date", feedback.getInterview().getDate());
             interviewData.put("intervieweeEmail", feedback.getInterview().getIntervieweeEmail());
-            interviewData.put("date", feedback.getInterview().getDate());
             interviewData.put("position", feedback.getInterview().getPosition());
             interviewData.put("interviewerName", feedback.getInterview().getInterviewer().getName());
             interviewData.put("interviewerEmail", feedback.getInterview().getInterviewer().getEmail());
