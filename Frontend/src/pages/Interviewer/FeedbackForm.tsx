@@ -245,11 +245,13 @@ export default function FeedbackForm() {
 
         {/* Select Component for Stage Options */}
         <CardContent className="relative flex flex-col gap-2">
-          <div className="lg:absolute sm:flex top-0 right-0 lg:p-2">
-            <Button variant="secondary" onClick={() => setShowL1Report(true)}>
-              View L1 Feedback
-            </Button>
-          </div>
+          {interviewee?.stage === "L2" && (
+            <div className="lg:absolute sm:flex top-0 right-0 lg:p-2">
+              <Button variant="secondary" onClick={() => setShowL1Report(true)}>
+                View L1 Feedback
+              </Button>
+            </div>
+          )}
           <div>Final Result</div>
           <Select
             value={finalFeedback}

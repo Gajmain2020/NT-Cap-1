@@ -55,7 +55,7 @@ public class InterviewSchedule {
     private InterviewStage stage;
 
     @OneToOne
-    @JoinColumn(name = "previous_interview_id", referencedColumnName = "id", nullable = true)
+    @JoinColumn(name = "previousInterviewId", referencedColumnName = "id", nullable = true)
     private InterviewSchedule previousInterview;
 
 }
