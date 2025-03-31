@@ -116,7 +116,7 @@ export default function PastInterviewFeedback() {
                     {item.topics.join(", ")}
                   </td>
                   <td className="border border-gray-300 px-4 py-2">
-                    {item.comments}
+                    {item.comments === "" ? "-" : item.comments}
                   </td>
                 </tr>
               ))}
