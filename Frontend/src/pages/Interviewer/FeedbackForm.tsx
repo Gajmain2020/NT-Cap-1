@@ -1,9 +1,15 @@
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "sonner";
+
 import {
   CheckFeedbackFilledAPI,
+  FetchFeedbackDetailsViaInterviewIdAPI,
   FetchIntervieweeDetailsAPI,
   SubmitFeedbackAPI,
 } from "@/api/interviewerApis";
 import IntervieweeDetails from "@/components/Interviewer/IntervieweeDetails";
+import L1Report from "@/components/Interviewer/L1Report";
 import NewSkillForm from "@/components/Interviewer/NewSkillForm";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -32,9 +38,19 @@ import {
 } from "@/components/ui/select";
 import { fixedForm, ratingOptions, topicOptions } from "@/lib/utils";
 import { IFeedbackEntry, IIntervieweeDetails, ISkill } from "@/utils/types";
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "sonner";
+
+export interface FeedbackDetail {
+  topicsUsed: string;
+  comments: string;
+  skill: string;
+  rating: "VERY_GOOD" | "GOOD" | "AVERAGE" | "BELOW_AVERAGE" | "POOR"; // Adjust based on possible values
+}
+
+export interface IInterviewFeedback {
+  feedback: FeedbackDetail[];
+  finalComment: string;
+  finalDecision: string; // You can use an enum if values are fixed
+}
 
 export default function FeedbackForm() {
   const navigate = useNavigate();
@@ -56,6 +72,13 @@ export default function FeedbackForm() {
     comment: "",
   });
 
+  // For past interview feedback
+  const [showL1Report, setShowL1Report] = useState(false);
+  const [pastFeedbackReport, setPastFeedbackReport] =
+    useState<IInterviewFeedback>();
+  const [fetchingPastFeedbackReport, setFetchingPastFeedbackReport] =
+    useState(false);
+
   const [isFeedbackFilled, setIsFeedbackFilled] = useState(false);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -64,6 +87,40 @@ export default function FeedbackForm() {
     interviewee?.stage === "L1"
       ? ["L1 Passed", "L1 Passed with comment", "Rejected"]
       : ["L2 Passed", "Rejected"];
+
+  useEffect(() => {
+    const fetchPastReport = async () => {
+      setFetchingPastFeedbackReport(true);
+      try {
+        if (!interviewee?.l1Id) {
+          toast.error("Invalid L1 ID.");
+          return;
+        }
+        const response = await FetchFeedbackDetailsViaInterviewIdAPI(
+          interviewee.l1Id
+        );
+        if (!response.success) {
+          toast.error(response.message);
+          return;
+        }
+        setPastFeedbackReport(response.feedback);
+      } catch (error) {
+        console.log(
+          "Error occurred while fetching the past interview feedback.",
+          error
+        );
+        toast.error(
+          "Error occurred while fetching the past interview feedback."
+        );
+      } finally {
+        setFetchingPastFeedbackReport(false);
+      }
+    };
+
+    if (!pastFeedbackReport) {
+      fetchPastReport();
+    }
+  }, [showL1Report]);
 
   useEffect(() => {
     const checkIsFeedbackAlreadyFilled = async () => {
@@ -240,7 +297,14 @@ export default function FeedbackForm() {
         </CardHeader>
 
         {/* Select Component for Stage Options */}
-        <CardContent className="flex flex-col gap-2">
+        <CardContent className="relative flex flex-col gap-2">
+          {interviewee?.stage === "L2" && (
+            <div className="lg:absolute sm:flex top-0 right-0 lg:p-2">
+              <Button variant="secondary" onClick={() => setShowL1Report(true)}>
+                View L1 Feedback
+              </Button>
+            </div>
+          )}
           <div>Final Result</div>
           <Select
             value={finalFeedback}
@@ -257,6 +321,7 @@ export default function FeedbackForm() {
               ))}
             </SelectContent>
           </Select>
+          pastFeedback
           <Input
             type="text"
             onChange={(e) => setFinalComment(e.target.value)}
@@ -428,6 +493,15 @@ export default function FeedbackForm() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Modal for past interview report */}
+
+      <L1Report
+        pastFeedback={pastFeedbackReport}
+        open={showL1Report}
+        onOpenChange={setShowL1Report}
+        loading={fetchingPastFeedbackReport}
+      />
     </div>
   );
 }

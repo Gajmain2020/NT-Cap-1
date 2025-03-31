@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/schedules")
@@ -45,12 +45,14 @@ public class InterviewerController {
     public ResponseEntity<Map<String, Object>> getIntervieweeDetails(@PathVariable Long interviewId) {
         return interviewerServices.getIntervieweeDetails(interviewId);
     }
+
     @PostMapping("/submit-feedback/{interviewId}")
     public ResponseEntity<Map<String, Object>> submitFeedback(
             @Valid @RequestBody InterviewFeedbackRequest feedbackRequest,
             @PathVariable Long interviewId) {
         return interviewerServices.submitFeedback(interviewId, feedbackRequest);
     }
+
     @GetMapping("/get-interviewer-interview")
     public ResponseEntity<Map<String, Object>> fetchInterviewerInterviews(@RequestHeader("Authorization") String authHeader) {
         return interviewerServices.fetchInterviewerInterviews(authHeader);
@@ -68,7 +70,12 @@ public class InterviewerController {
 
     @GetMapping("/get-feedback-details-interviewer/{feedbackId}")
     public ResponseEntity<Map<String, Object>> getFeedbackDetailsInterviewer(@RequestHeader("Authorization") String authHeader,
-                                                                  @PathVariable Long feedbackId) {
+                                                                             @PathVariable Long feedbackId) {
         return interviewerServices.getFeedbackDetails(authHeader, feedbackId);
+    }
+
+    @GetMapping("/get-feedback-details-interviewer-via-interviewId/{interviewId}")
+    public ResponseEntity<Map<String, Object>> getFeedbackDetailsViaInterviewId(@PathVariable Long interviewId) {
+        return interviewerServices.getFeedbackDetailsViewInterviewIdService(interviewId);
     }
 }

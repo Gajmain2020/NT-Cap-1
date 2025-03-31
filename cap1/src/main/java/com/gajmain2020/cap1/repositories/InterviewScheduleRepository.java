@@ -128,6 +128,7 @@ public interface InterviewScheduleRepository extends JpaRepository<InterviewSche
     @Query("""
     SELECT new map(
         i.id as id,
+        i.previousInterview.id as l1Id,
         i.intervieweeName as intervieweeName,
         i.intervieweeEmail as intervieweeEmail,
         i.stage as stage,
