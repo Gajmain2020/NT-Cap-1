@@ -1,6 +1,7 @@
 package com.gajmain2020.cap1.services;
 
 import com.gajmain2020.cap1.dto.InterviewRequest;
+import com.gajmain2020.cap1.dto.RescheduleInterviewRequest;
 import com.gajmain2020.cap1.enums.InterviewStage;
 import com.gajmain2020.cap1.enums.Role;
 import com.gajmain2020.cap1.models.InterviewFeedback;
@@ -363,6 +364,59 @@ public class HrServices {
         response.put("success", true);
         response.put("message", "Interview and related data deleted successfully");
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    public ResponseEntity<Map<String, Object>> rescheduleInterviewService(Long interviewId, RescheduleInterviewRequest rescheduleData) {
+        Map<String, Object> response = new HashMap<>();
+        // Find the interview by ID
+        Optional<InterviewSchedule> interviewOptional = interviewScheduleRepository.findById(interviewId);
+        if (interviewOptional.isEmpty()) {
+            response.put("success", false);
+            response.put("message", "Interview not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        // Find the existing interview
+        Optional<InterviewSchedule> existingInterviewOpt = interviewScheduleRepository.findById(interviewId);
+        if (existingInterviewOpt.isEmpty()) {
+            response.put("success", false);
+            response.put("message", "Original interview not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+        InterviewSchedule existingInterview = existingInterviewOpt.get();
+
+        // Find the new interviewer
+        Optional<User> interviewerOpt = userRepository.findByEmail(rescheduleData.getInterviewerEmail());
+        if (interviewerOpt.isEmpty()) {
+            response.put("success", false);
+            response.put("message", "Interviewer not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        // Create a new interview entry
+        InterviewSchedule newInterview = InterviewSchedule.builder()
+                .intervieweeName(existingInterview.getIntervieweeName())
+                .intervieweeEmail(existingInterview.getIntervieweeEmail())
+                .position(existingInterview.getPosition())
+                .date(rescheduleData.getDate())
+                .startTime(rescheduleData.getStartTime())
+                .endTime(rescheduleData.getEndTime())
+                .duration(existingInterview.getDuration())
+                .interviewer(interviewerOpt.get())
+                .meetLink(existingInterview.getMeetLink())
+                .resumeLink(existingInterview.getResumeLink())
+                .stage(InterviewStage.L2)  // Keep the same interview stage
+                .previousInterview(existingInterview) // Reference to the past interview
+                .build();
+
+        // Save the new interview
+        interviewScheduleRepository.save(newInterview);
+
+        response.put("success", true);
+        response.put("message", "Interview rescheduled successfully");
+        response.put("newInterviewId", newInterview.getId());
+
+        return ResponseEntity.ok(response);
     }
 
 }

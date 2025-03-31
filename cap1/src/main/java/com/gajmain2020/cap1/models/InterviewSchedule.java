@@ -53,4 +53,9 @@ public class InterviewSchedule {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "VARCHAR(10) DEFAULT 'L1'")
     private InterviewStage stage;
+
+    @OneToOne
+    @JoinColumn(name = "previous_interview_id", referencedColumnName = "id", nullable = true)
+    private InterviewSchedule previousInterview;
+
 }

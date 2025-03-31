@@ -172,12 +172,11 @@ public interface InterviewScheduleRepository extends JpaRepository<InterviewSche
                 u.email as interviewerEmail,
                 i.date as date,
                 i.position as position,
-                f.finalDecision finalDecision)
+                f.finalDecision as finalDecision)
                 FROM InterviewSchedule i
                 JOIN i.interviewer u
                 JOIN InterviewFeedback f ON i.id = f.interview.id
-                WHERE i.date < :today
-                OR (i.date = :today AND i.endTime < :currentTime)
+                WHERE i.id IN (SELECT f2.interview.id FROM InterviewFeedback f2)
     """)
     List<Map<String, Object>> findPastInterviews(String today, String currentTime);
 

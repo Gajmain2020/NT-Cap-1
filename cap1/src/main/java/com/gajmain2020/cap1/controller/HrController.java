@@ -2,6 +2,7 @@ package com.gajmain2020.cap1.controller;
 
 
 import com.gajmain2020.cap1.dto.InterviewRequest;
+import com.gajmain2020.cap1.dto.RescheduleInterviewRequest;
 import com.gajmain2020.cap1.services.HrServices;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +70,19 @@ public class HrController {
     public ResponseEntity<Map<String,Object>> deleteInterview(@PathVariable Long interviewId, @RequestHeader("Authorization") String authHeader){
         return hrServices.deleteSingleInterview(interviewId, authHeader);
     }
+
+    @PostMapping("/reschedule-interview/{interviewId}")
+    public ResponseEntity<Map<String, Object>> rescheduleInterview(@PathVariable Long interviewId,@Valid @RequestBody RescheduleInterviewRequest rescheduleData,  BindingResult result){
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "message", result.getFieldError().getDefaultMessage(),
+                    "success", false
+            ));
+        }
+
+        return hrServices.rescheduleInterviewService(interviewId, rescheduleData);
+    }
+
 }
 
 
