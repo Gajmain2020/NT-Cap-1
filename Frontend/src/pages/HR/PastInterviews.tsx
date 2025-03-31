@@ -39,6 +39,8 @@ export default function PastInterviews() {
   // State to reschedule interviewer details
   const [newInterviewer, setNewInterviewer] = useState("");
   const [newDate, setNewDate] = useState("");
+  const [newStartTime, setNewStartTime] = useState("");
+  const [newEndTime, setNewEndTime] = useState("");
 
   // Delete interview confirmation
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
@@ -305,17 +307,47 @@ export default function PastInterviews() {
               </DialogTitle>
             </DialogHeader>
             <div className="flex flex-col gap-4">
-              <Input
-                type="text"
-                placeholder="New Interviewer"
-                value={newInterviewer}
-                onChange={(e) => setNewInterviewer(e.target.value)}
-              />
-              <Input
-                type="datetime-local"
-                value={newDate}
-                onChange={(e) => setNewDate(e.target.value)}
-              />
+              <div>
+                <label className="text-sm font-medium text-gray-700">
+                  Interviewer Email
+                </label>
+                <Input
+                  type="text"
+                  placeholder="New Interviewer Email"
+                  value={newInterviewer}
+                  onChange={(e) => setNewInterviewer(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700">
+                  Interview Date
+                </label>
+                <Input
+                  type="date"
+                  value={newDate}
+                  onChange={(e) => setNewDate(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700">
+                  Interview Start Time
+                </label>
+                <Input
+                  type="time"
+                  value={newStartTime}
+                  onChange={(e) => setNewStartTime(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700">
+                  Interview End Time
+                </label>
+                <Input
+                  type="time"
+                  value={newEndTime}
+                  onChange={(e) => setNewEndTime(e.target.value)}
+                />
+              </div>
               <Button
                 onClick={() => {
                   console.log("Rescheduled Interview: ", {
