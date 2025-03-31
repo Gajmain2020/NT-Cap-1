@@ -4,6 +4,7 @@ import {
   SubmitFeedbackAPI,
 } from "@/api/interviewerApis";
 import IntervieweeDetails from "@/components/Interviewer/IntervieweeDetails";
+import L1Report from "@/components/Interviewer/L1Report";
 import NewSkillForm from "@/components/Interviewer/NewSkillForm";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -55,6 +56,9 @@ export default function FeedbackForm() {
     topics: [],
     comment: "",
   });
+
+  // For past interview feedback model
+  const [showL1Report, setShowL1Report] = useState(false);
 
   const [isFeedbackFilled, setIsFeedbackFilled] = useState(false);
 
@@ -240,7 +244,12 @@ export default function FeedbackForm() {
         </CardHeader>
 
         {/* Select Component for Stage Options */}
-        <CardContent className="flex flex-col gap-2">
+        <CardContent className="relative flex flex-col gap-2">
+          <div className="lg:absolute sm:flex top-0 right-0 lg:p-2">
+            <Button variant="secondary" onClick={() => setShowL1Report(true)}>
+              View L1 Feedback
+            </Button>
+          </div>
           <div>Final Result</div>
           <Select
             value={finalFeedback}
@@ -428,6 +437,8 @@ export default function FeedbackForm() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <L1Report open={showL1Report} onOpenChange={setShowL1Report} />
     </div>
   );
 }
