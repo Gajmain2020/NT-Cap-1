@@ -83,3 +83,15 @@ export async function FetchFeedbackDetailsAPI(feedbackId: string) {
     method: "GET",
   });
 }
+
+export async function FetchFeedbackDetailsViaInterviewIdAPI(
+  interviewId: string
+) {
+  return apiRequest({
+    headers: getAuthHeaders(),
+    url:
+      baseUrl +
+      `/get-feedback-details-interviewer-via-interviewId/${interviewId}`,
+    method: "GET",
+  });
+}

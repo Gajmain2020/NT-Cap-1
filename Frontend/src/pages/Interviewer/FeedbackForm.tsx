@@ -1,5 +1,6 @@
 import {
   CheckFeedbackFilledAPI,
+  FetchFeedbackDetailsViaInterviewIdAPI,
   FetchIntervieweeDetailsAPI,
   SubmitFeedbackAPI,
 } from "@/api/interviewerApis";
@@ -37,6 +38,19 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 
+export interface FeedbackDetail {
+  topicsUsed: string;
+  comments: string;
+  skill: string;
+  rating: "VERY_GOOD" | "GOOD" | "AVERAGE" | "BELOW_AVERAGE" | "POOR"; // Adjust based on possible values
+}
+
+export interface IInterviewFeedback {
+  feedback: FeedbackDetail[];
+  finalComment: string;
+  finalDecision: string; // You can use an enum if values are fixed
+}
+
 export default function FeedbackForm() {
   const navigate = useNavigate();
   const { interviewId } = useParams<string>();
@@ -57,8 +71,12 @@ export default function FeedbackForm() {
     comment: "",
   });
 
-  // For past interview feedback model
+  // For past interview feedback
   const [showL1Report, setShowL1Report] = useState(false);
+  const [pastFeedbackReport, setPastFeedbackReport] =
+    useState<IInterviewFeedback>();
+  const [fetchingPastFeedbackReport, setFetchingPastFeedbackReport] =
+    useState(false);
 
   const [isFeedbackFilled, setIsFeedbackFilled] = useState(false);
 
@@ -68,6 +86,40 @@ export default function FeedbackForm() {
     interviewee?.stage === "L1"
       ? ["L1 Passed", "L1 Passed with comment", "Rejected"]
       : ["L2 Passed", "Rejected"];
+
+  useEffect(() => {
+    const fetchPastReport = async () => {
+      setFetchingPastFeedbackReport(true);
+      try {
+        if (!interviewee?.l1Id) {
+          toast.error("Invalid L1 ID.");
+          return;
+        }
+        const response = await FetchFeedbackDetailsViaInterviewIdAPI(
+          interviewee.l1Id
+        );
+        if (!response.success) {
+          toast.error(response.message);
+          return;
+        }
+        setPastFeedbackReport(response.feedbackDetails);
+      } catch (error) {
+        console.log(
+          "Error occurred while fetching the past interview feedback.",
+          error
+        );
+        toast.error(
+          "Error occurred while fetching the past interview feedback."
+        );
+      } finally {
+        setFetchingPastFeedbackReport(false);
+      }
+    };
+
+    if (!pastFeedbackReport) {
+      fetchPastReport();
+    }
+  }, [showL1Report]);
 
   useEffect(() => {
     const checkIsFeedbackAlreadyFilled = async () => {
@@ -268,6 +320,7 @@ export default function FeedbackForm() {
               ))}
             </SelectContent>
           </Select>
+          pastFeedback
           <Input
             type="text"
             onChange={(e) => setFinalComment(e.target.value)}
@@ -440,7 +493,14 @@ export default function FeedbackForm() {
         </DialogContent>
       </Dialog>
 
-      <L1Report open={showL1Report} onOpenChange={setShowL1Report} />
+      {/* Modal for past interview report */}
+
+      <L1Report
+        pastFeedback={pastFeedbackReport}
+        open={showL1Report}
+        onOpenChange={setShowL1Report}
+        loading={fetchingPastFeedbackReport}
+      />
     </div>
   );
 }

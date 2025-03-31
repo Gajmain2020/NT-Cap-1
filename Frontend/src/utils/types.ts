@@ -86,6 +86,7 @@ export interface IIntervieweeDetails {
   meetLink: string;
   stage: string;
   resumeLink: string;
+  l1Id?: string;
 }
 
 export interface ISkill {
