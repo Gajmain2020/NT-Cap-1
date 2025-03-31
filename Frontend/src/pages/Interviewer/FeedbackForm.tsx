@@ -1,3 +1,7 @@
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { toast } from "sonner";
+
 import {
   CheckFeedbackFilledAPI,
   FetchFeedbackDetailsViaInterviewIdAPI,
@@ -34,9 +38,6 @@ import {
 } from "@/components/ui/select";
 import { fixedForm, ratingOptions, topicOptions } from "@/lib/utils";
 import { IFeedbackEntry, IIntervieweeDetails, ISkill } from "@/utils/types";
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "sonner";
 
 export interface FeedbackDetail {
   topicsUsed: string;
@@ -102,7 +103,7 @@ export default function FeedbackForm() {
           toast.error(response.message);
           return;
         }
-        setPastFeedbackReport(response.feedbackDetails);
+        setPastFeedbackReport(response.feedback);
       } catch (error) {
         console.log(
           "Error occurred while fetching the past interview feedback.",
