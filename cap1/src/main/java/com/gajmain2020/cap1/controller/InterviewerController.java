@@ -66,8 +66,8 @@ public class InterviewerController {
         return interviewerServices.getPastFeedbacksByEmail(authHeader);
     }
 
-    @GetMapping("/get-feedback-details/{feedbackId}")
-    public ResponseEntity<Map<String, Object>> getFeedbackDetails(@RequestHeader("Authorization") String authHeader,
+    @GetMapping("/get-feedback-details-interviewer/{feedbackId}")
+    public ResponseEntity<Map<String, Object>> getFeedbackDetailsInterviewer(@RequestHeader("Authorization") String authHeader,
                                                                   @PathVariable Long feedbackId) {
         return interviewerServices.getFeedbackDetails(authHeader, feedbackId);
     }

@@ -79,7 +79,7 @@ export async function FetchInterviewerPastFeedbacksAPI() {
 export async function FetchFeedbackDetailsAPI(feedbackId: string) {
   return apiRequest({
     headers: getAuthHeaders(),
-    url: baseUrl + `/feedback-details/${feedbackId}`,
+    url: baseUrl + `/get-feedback-details-interviewer/${feedbackId}`,
     method: "GET",
   });
 }
