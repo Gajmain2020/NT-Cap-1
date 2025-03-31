@@ -65,3 +65,22 @@ export async function DeleteFeedbackAPI(interviewId: number) {
     method: "DELETE",
   });
 }
+
+interface IRescheduleInterview {
+  date: string;
+  startTime: string;
+  endTime: string;
+  interviewerEmail: string;
+}
+
+export async function RescheduleInterviewAPI(
+  interviewId: number,
+  data: IRescheduleInterview
+) {
+  return apiRequest({
+    headers: getAuthHeaders(),
+    url: baseUrl + `/reschedule-interview/${interviewId}`,
+    method: "POST",
+    data,
+  });
+}

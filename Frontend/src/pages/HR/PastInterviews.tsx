@@ -1,7 +1,11 @@
 import { SetStateAction, useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import { DeleteFeedbackAPI, FetchPastInterviewsAPI } from "@/api/hrApis";
+import {
+  DeleteFeedbackAPI,
+  FetchPastInterviewsAPI,
+  RescheduleInterviewAPI,
+} from "@/api/hrApis";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -35,10 +39,13 @@ export default function PastInterviews() {
   const [selectedInterview, setSelectedInterview] =
     useState<IPastInterview | null>(null);
   const [rescheduleOpen, setRescheduleOpen] = useState(false);
+  const [rescheduling, setRescheduling] = useState(false);
 
   // State to reschedule interviewer details
   const [newInterviewer, setNewInterviewer] = useState("");
   const [newDate, setNewDate] = useState("");
+  const [newStartTime, setNewStartTime] = useState("");
+  const [newEndTime, setNewEndTime] = useState("");
 
   // Delete interview confirmation
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
@@ -107,6 +114,34 @@ export default function PastInterviews() {
       inv.filter((inv) => inv.interviewId !== deleteId)
     );
     return;
+  }
+
+  async function handleConfirmReschedule() {
+    try {
+      setRescheduling(true);
+      const response = await RescheduleInterviewAPI(
+        selectedInterview?.interviewId as number,
+        {
+          date: newDate,
+          startTime: newStartTime,
+          endTime: newEndTime,
+          interviewerEmail: newInterviewer,
+        }
+      );
+
+      if (!response.success) {
+        toast.error(response.message);
+        return;
+      }
+      toast.success("Interview rescheduled successfully.");
+      setRescheduleOpen(false);
+      setSelectedInterview(null);
+    } catch (error) {
+      console.log("Error occurred:", error);
+      toast.error("Error occurred while rescheduling the interview.");
+    } finally {
+      setRescheduling(false);
+    }
   }
 
   return (
@@ -305,27 +340,54 @@ export default function PastInterviews() {
               </DialogTitle>
             </DialogHeader>
             <div className="flex flex-col gap-4">
-              <Input
-                type="text"
-                placeholder="New Interviewer"
-                value={newInterviewer}
-                onChange={(e) => setNewInterviewer(e.target.value)}
-              />
-              <Input
-                type="datetime-local"
-                value={newDate}
-                onChange={(e) => setNewDate(e.target.value)}
-              />
+              <div>
+                <label className="text-sm font-medium text-gray-700">
+                  Interviewer Email
+                </label>
+                <Input
+                  type="text"
+                  placeholder="New Interviewer Email"
+                  value={newInterviewer}
+                  onChange={(e) => setNewInterviewer(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700">
+                  Interview Date
+                </label>
+                <Input
+                  type="date"
+                  value={newDate}
+                  onChange={(e) => setNewDate(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700">
+                  Interview Start Time
+                </label>
+                <Input
+                  type="time"
+                  value={newStartTime}
+                  onChange={(e) => setNewStartTime(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700">
+                  Interview End Time
+                </label>
+                <Input
+                  type="time"
+                  value={newEndTime}
+                  onChange={(e) => setNewEndTime(e.target.value)}
+                />
+              </div>
               <Button
                 onClick={() => {
-                  console.log("Rescheduled Interview: ", {
-                    newInterviewer,
-                    newDate,
-                  });
-                  setRescheduleOpen(false);
+                  handleConfirmReschedule();
                 }}
+                disabled={rescheduling}
               >
-                Confirm Reschedule
+                {rescheduling ? "Rescheduling..." : "Confirm Reschedule"}
               </Button>
             </div>
           </DialogContent>
