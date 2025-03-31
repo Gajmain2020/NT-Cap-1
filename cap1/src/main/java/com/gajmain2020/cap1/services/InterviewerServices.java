@@ -13,6 +13,7 @@ import com.gajmain2020.cap1.repositories.InterviewScheduleRepository;
 import com.gajmain2020.cap1.repositories.UserRepository;
 import com.gajmain2020.cap1.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -349,6 +350,55 @@ public class InterviewerServices {
         }
         String token = authHeader.substring(7);
         return jwtUtil.extractEmail(token);
+    }
+
+    public ResponseEntity<Map<String, Object>> getFeedbackDetailsViewInterviewIdService(Long interviewId){
+
+        Optional<InterviewSchedule> interview = interviewScheduleRepository.findById(interviewId);
+
+        if(interview.isEmpty()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("success",false,
+                    "message","Interview not found with given interview ID."));
+        }
+
+        // find the feedback id
+        Optional<InterviewFeedback> feedbackInDB = interviewFeedbackRepository.findByInterviewId(interviewId);
+
+        // Fetch feedback details using id from the feedback
+        List<Object[]> rawData = interviewFeedbackRepository.getFeedbackDetails(feedbackInDB.get().getId());
+        if (rawData.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("success", false, "message", "Feedback not found."));
+        }
+
+        // Transform raw data into structured response
+        Map<String, Object> feedback = new HashMap<>();
+        List<Map<String, Object>> feedbackEntries = new ArrayList<>();
+
+        for (Object[] row : rawData) {
+            if (!feedback.containsKey("feedbackId")) {
+                feedback.put("feedbackId", row[0]);
+                feedback.put("finalDecision", row[1]);
+                feedback.put("finalComment", row[2]);
+
+                feedback.put("details", feedbackEntries);
+            }
+
+            if (row[7] != null) { // Check if feedback details exist
+                Map<String, Object> feedbackEntry = new HashMap<>();
+                feedbackEntry.put("id", row[7]);
+                feedbackEntry.put("skill", row[8]);
+                feedbackEntry.put("rating", row[9]);
+                feedbackEntry.put("topics", row[10] != null ? Arrays.asList(row[10].toString().split(", ")) : List.of());
+                feedbackEntry.put("comments", row[11]);
+                feedbackEntries.add(feedbackEntry);
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(Map.of(
+                "success", true,
+                "feedback", feedback
+        ));
     }
 
 }

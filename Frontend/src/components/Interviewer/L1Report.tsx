@@ -31,7 +31,10 @@ export default function L1Report({
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent>
-          <DialogHeader>No interview feedback found.</DialogHeader>
+          <DialogHeader>
+            <DialogTitle>L1 Feedback</DialogTitle>
+          </DialogHeader>
+          <p>No feedback details found.</p>
         </DialogContent>
       </Dialog>
     );
