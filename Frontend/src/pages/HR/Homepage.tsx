@@ -31,7 +31,7 @@ export default function Homepage() {
   };
 
   return (
-    <div className="flex flex-col items-center bg-gray-100 p-2 min-h-screen gap-10">
+    <div className="flex flex-col items-center p-2 min-h-screen gap-10">
       <ScheduleInterview
         setFormData={setFormData}
         formData={formData}

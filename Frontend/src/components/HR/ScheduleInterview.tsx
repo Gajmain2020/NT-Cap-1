@@ -61,7 +61,7 @@ export default function ScheduleInterview({
   };
 
   return (
-    <div className="max-w-4xl w-full bg-white shadow-lg h-fit rounded-lg p-6">
+    <div className="max-w-6xl w-full border bg-white shadow-lg h-fit rounded-lg p-6">
       <h1 className="text-center text-2xl font-semibold mb-6 text-gray-700">
         Schedule Interview
       </h1>
