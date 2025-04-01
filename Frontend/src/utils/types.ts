@@ -105,4 +105,5 @@ export interface IPastInterview {
   intervieweeEmail: string;
   interviewerName: string;
   interviewerEmail: string;
+  isRescheduled: boolean;
 }
