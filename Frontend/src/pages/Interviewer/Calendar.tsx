@@ -152,7 +152,8 @@ export default function InterviewerCalendar() {
                             Position: {interview.position}
                           </p>
                           <p className="text-sm text-gray-500">
-                            {interview.startTime} - {interview.endTime}
+                            Schedule: {interview.startTime} -{" "}
+                            {interview.endTime}
                           </p>
                         </div>
                       ))

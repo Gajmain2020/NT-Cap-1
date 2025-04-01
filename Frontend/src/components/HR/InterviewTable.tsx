@@ -57,7 +57,7 @@ export default function InterviewTable({
     });
 
   return (
-    <div className="bg-white shadow-lg rounded-lg p-4 flex flex-col gap-6">
+    <div className="bg-white shadow-lg  border rounded-lg p-4 flex flex-col gap-6">
       <h2 className="text-lg font-semibold text-gray-700">
         Scheduled Interviews
       </h2>

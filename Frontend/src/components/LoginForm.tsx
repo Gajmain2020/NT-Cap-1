@@ -1,9 +1,13 @@
-import { Eye, EyeOff, Mail, User } from "lucide-react";
-import { Input } from "./ui/input";
-import { useState } from "react";
-import { Button } from "./ui/button";
+import {
+  handleUserLogin,
+  handleUserRegistration,
+} from "@/services/userService";
 import useAuthStore from "@/store/userAuthStore";
+import { Eye, EyeOff, Mail, User } from "lucide-react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
 import {
   Select,
   SelectContent,
@@ -11,10 +15,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-import {
-  handleUserLogin,
-  handleUserRegistration,
-} from "@/services/userService";
 
 export default function AuthForm() {
   const navigate = useNavigate();
@@ -53,8 +53,21 @@ export default function AuthForm() {
     );
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      if (isRegister) {
+        handleRegister();
+      } else {
+        handleLogin();
+      }
+    }
+  };
+
   return (
-    <div className="w-full max-w-xl h-full mx-auto bg-gray-200 rounded-lg shadow-lg p-8 flex flex-col gap-6">
+    <div
+      onKeyDown={(e) => handleKeyDown(e)}
+      className="w-full max-w-xl h-full mx-auto bg-white rounded-lg shadow-lg p-8 flex flex-col gap-6"
+    >
       <h2 className="text-2xl font-semibold text-gray-800 text-center">
         {isRegister ? "Register" : "Login"}
       </h2>
@@ -124,7 +137,7 @@ export default function AuthForm() {
       <Button
         disabled={loading}
         onClick={isRegister ? handleRegister : handleLogin}
-        className="cursor-pointer w-full bg-teal-500 hover:bg-teal-600 hover:shadow text-white font-medium py-2 px-4 rounded-lg"
+        className="cursor-pointer w-full hover:shadow text-white font-medium py-2 px-4 rounded-lg"
       >
         {isRegister
           ? loading
