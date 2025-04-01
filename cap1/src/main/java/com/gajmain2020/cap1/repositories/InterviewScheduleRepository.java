@@ -166,20 +166,33 @@ public interface InterviewScheduleRepository extends JpaRepository<InterviewSche
     List<Map<String, Object>> findFeedbacksByInterviewerEmail(String email);
 
     @Query("""
-                    SELECT new map(
-                        i.id as interviewId,
-                        i.intervieweeName as intervieweeName,
-                        i.intervieweeEmail as intervieweeEmail,
-                        u.name as interviewerName,
-                        u.email as interviewerEmail,
-                        i.date as date,
-                        i.position as position,
-                        f.finalDecision as finalDecision)
-                        FROM InterviewSchedule i
-                        JOIN i.interviewer u
-                        JOIN InterviewFeedback f ON i.id = f.interview.id
-                        WHERE i.id IN (SELECT f2.interview.id FROM InterviewFeedback f2)
-            """)
+        SELECT new map(
+            i.id as interviewId,
+            i.intervieweeName as intervieweeName,
+            i.intervieweeEmail as intervieweeEmail,
+            u.name as interviewerName,
+            u.email as interviewerEmail,
+            i.date as date,
+            i.startTime as startTime,
+            i.endTime as endTime,
+            i.position as position,
+            f.finalDecision as finalDecision,
+            CASE 
+                WHEN i.stage = 'L1' AND f.finalDecision = 'L1_PASSED_WITH_COMMENT' 
+                THEN EXISTS (
+                    SELECT 1 FROM InterviewSchedule i2
+                    WHERE i2.intervieweeEmail = i.intervieweeEmail
+                    AND i2.stage = 'L2'
+                    AND i2.previousInterview.id = i.id
+                )
+                ELSE false
+            END as isRescheduled
+        )
+        FROM InterviewSchedule i
+        JOIN i.interviewer u
+        JOIN InterviewFeedback f ON i.id = f.interview.id
+        WHERE (i.date < :today OR (i.date = :today AND i.endTime < :currentTime))
+    """)
     List<Map<String, Object>> findPastInterviews(LocalDate today, LocalTime currentTime);
 
 
