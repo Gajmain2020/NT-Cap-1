@@ -258,9 +258,14 @@ export default function PastInterviews() {
                         </td>
                         <td className="border p-2 ">
                           {interview.finalDecision ===
-                            "L1_PASSED_WITH_COMMENT" && (
+                            "L1_PASSED_WITH_COMMENT" &&
+                          !interview.isRescheduled ? (
                             <Button onClick={() => handleReschedule(interview)}>
                               Reschedule L2
+                            </Button>
+                          ) : (
+                            <Button variant="ghost" disabled>
+                              Rescheduled
                             </Button>
                           )}
                           &nbsp; &nbsp;
