@@ -321,7 +321,6 @@ export default function FeedbackForm() {
               ))}
             </SelectContent>
           </Select>
-          pastFeedback
           <Input
             type="text"
             onChange={(e) => setFinalComment(e.target.value)}
