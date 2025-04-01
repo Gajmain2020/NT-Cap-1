@@ -78,7 +78,7 @@ public class InterviewerServices {
         LocalTime currentTime = LocalTime.now();
         LocalDate currentDate = LocalDate.now();
 
-        List<Map<String, Object>> interviews = interviewScheduleRepository.findUpcomingInterviewsViaEmail(email, currentDate.toString(), currentTime.toString());
+        List<Map<String, Object>> interviews = interviewScheduleRepository.findUpcomingInterviewsViaEmail(email, currentDate, currentTime);
 
         if (interviews.isEmpty()) {
             return notFoundResponse("No interviews found.");
@@ -108,7 +108,7 @@ public class InterviewerServices {
         LocalTime currentTime = LocalTime.now();
         LocalDate currentDate = LocalDate.now();
 
-        List<Map<String, Object>> interviews = interviewScheduleRepository.findOngoingInterviewsViaEmail(email, currentDate.toString(), currentTime.toString());
+        List<Map<String, Object>> interviews = interviewScheduleRepository.findOngoingInterviewsViaEmail(email, currentDate, currentTime);
 
         if (interviews.isEmpty()) {
             return notFoundResponse("No interviews found.");
