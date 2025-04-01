@@ -77,11 +77,14 @@ public class HrServices {
         }
 
         // Parse and validate times
-        LocalTime start = LocalTime.parse(interviewRequest.getStartTime());
-        LocalTime end = LocalTime.parse(interviewRequest.getEndTime());
+        LocalTime start = LocalTime.parse(interviewRequest.getStartTime());  // Convert string to LocalTime
+        LocalTime end = LocalTime.parse(interviewRequest.getEndTime());      // Convert string to LocalTime
         if (start.isAfter(end)) {
             return badRequestResponse("Start time cannot be after end time.");
         }
+
+        // Parse date string to LocalDate
+        LocalDate interviewDate = LocalDate.parse(interviewRequest.getDate());  // Convert string to LocalDate
 
         int duration = (int) Duration.between(start, end).toMinutes();
 
@@ -90,9 +93,9 @@ public class HrServices {
                 .intervieweeName(interviewRequest.getIntervieweeName())
                 .intervieweeEmail(interviewRequest.getIntervieweeEmail())
                 .position(interviewRequest.getPosition())
-                .date(interviewRequest.getDate())
-                .startTime(interviewRequest.getStartTime())
-                .endTime(interviewRequest.getEndTime())
+                .date(interviewDate)
+                .startTime(start)
+                .endTime(end)
                 .meetLink(interviewRequest.getMeetLink())
                 .resumeLink(interviewRequest.getResumeLink())
                 .stage(InterviewStage.L1)
@@ -104,6 +107,7 @@ public class HrServices {
 
         return successResponse("Interview scheduled successfully.");
     }
+
 
     public ResponseEntity<Map<String, Object>> getAllInterviews() {
         Map<String, Object> response = new HashMap<>();
@@ -128,7 +132,7 @@ public class HrServices {
         LocalTime currentTime = LocalTime.now();
 
         // Fetch upcoming interviews
-        List<Map<String, Object>> interviews = interviewScheduleRepository.findUpcomingInterviews(today.toString(), currentTime.toString());
+        List<Map<String, Object>> interviews = interviewScheduleRepository.findUpcomingInterviews(today, currentTime);
 
         if (interviews.isEmpty()) {
             return notFoundResponse("No upcoming interviews found.");
@@ -166,8 +170,8 @@ public class HrServices {
         }
 
         // Parse start and end time
-        LocalTime start = LocalTime.parse(interviewRequest.getStartTime());
-        LocalTime end = LocalTime.parse(interviewRequest.getEndTime());
+        LocalTime start = LocalTime.parse(interviewRequest.getStartTime());  // Convert start time string to LocalTime
+        LocalTime end = LocalTime.parse(interviewRequest.getEndTime());      // Convert end time string to LocalTime
 
         // Calculate duration in minutes
         int duration = (int) Duration.between(start, end).toMinutes();
@@ -177,13 +181,16 @@ public class HrServices {
             return badRequestResponse("Start time cannot be after end time.");
         }
 
+        // Parse the interview date string to LocalDate
+        LocalDate interviewDate = LocalDate.parse(interviewRequest.getDate());  // Convert date string to LocalDate
+
         // Update interview details
         interview.setIntervieweeName(interviewRequest.getIntervieweeName());
         interview.setIntervieweeEmail(interviewRequest.getIntervieweeEmail());
         interview.setPosition(interviewRequest.getPosition());
-        interview.setDate(interviewRequest.getDate());
-        interview.setStartTime(interviewRequest.getStartTime());
-        interview.setEndTime(interviewRequest.getEndTime());
+        interview.setDate(interviewDate);
+        interview.setStartTime(start);
+        interview.setEndTime(end);
         interview.setMeetLink(interviewRequest.getMeetLink());
         interview.setResumeLink(interviewRequest.getResumeLink());
         interview.setInterviewer(interviewer);
@@ -225,7 +232,7 @@ public class HrServices {
         LocalTime time = LocalTime.now();
 
         // Fetch past interviews
-        List<Map<String, Object>> pastInterviews = interviewScheduleRepository.findPastInterviews(today.toString(), time.toString());
+        List<Map<String, Object>> pastInterviews = interviewScheduleRepository.findPastInterviews(today, time);
 
         if (pastInterviews.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
@@ -368,6 +375,7 @@ public class HrServices {
 
     public ResponseEntity<Map<String, Object>> rescheduleInterviewService(Long interviewId, RescheduleInterviewRequest rescheduleData) {
         Map<String, Object> response = new HashMap<>();
+
         // Find the interview by ID
         Optional<InterviewSchedule> interviewOptional = interviewScheduleRepository.findById(interviewId);
         if (interviewOptional.isEmpty()) {
@@ -377,13 +385,7 @@ public class HrServices {
         }
 
         // Find the existing interview
-        Optional<InterviewSchedule> existingInterviewOpt = interviewScheduleRepository.findById(interviewId);
-        if (existingInterviewOpt.isEmpty()) {
-            response.put("success", false);
-            response.put("message", "Original interview not found");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        }
-        InterviewSchedule existingInterview = existingInterviewOpt.get();
+        InterviewSchedule existingInterview = interviewOptional.get();
 
         // Find the new interviewer
         Optional<User> interviewerOpt = userRepository.findByEmail(rescheduleData.getInterviewerEmail());
@@ -393,20 +395,35 @@ public class HrServices {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
-        // Create a new interview entry
+        // Parse the new interview date and times
+        LocalDate newInterviewDate = LocalDate.parse(rescheduleData.getDate());  // Convert date string to LocalDate
+        LocalTime newStartTime = LocalTime.parse(rescheduleData.getStartTime());  // Convert start time string to LocalTime
+        LocalTime newEndTime = LocalTime.parse(rescheduleData.getEndTime());      // Convert end time string to LocalTime
+
+        // Calculate the new duration based on the start and end times
+        int newDuration = (int) Duration.between(newStartTime, newEndTime).toMinutes();
+
+        // Validate duration
+        if (newDuration < 0) {
+            response.put("success", false);
+            response.put("message", "Start time cannot be after end time.");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        // Create a new interview entry (rescheduled interview)
         InterviewSchedule newInterview = InterviewSchedule.builder()
                 .intervieweeName(existingInterview.getIntervieweeName())
                 .intervieweeEmail(existingInterview.getIntervieweeEmail())
                 .position(existingInterview.getPosition())
-                .date(rescheduleData.getDate())
-                .startTime(rescheduleData.getStartTime())
-                .endTime(rescheduleData.getEndTime())
-                .duration(existingInterview.getDuration())
-                .interviewer(interviewerOpt.get())
+                .date(newInterviewDate)  // Store LocalDate
+                .startTime(newStartTime)  // Store LocalTime
+                .endTime(newEndTime)      // Store LocalTime
+                .duration(newDuration)    // Updated duration
+                .interviewer(interviewerOpt.get())  // New interviewer
                 .meetLink(existingInterview.getMeetLink())
                 .resumeLink(existingInterview.getResumeLink())
-                .stage(InterviewStage.L2)  // Keep the same interview stage
-                .previousInterview(existingInterview) // Reference to the past interview
+                .stage(InterviewStage.L2)  // Setting the stage as L2
+                .previousInterview(existingInterview)  // Reference to the previous interview
                 .build();
 
         // Save the new interview
@@ -418,5 +435,6 @@ public class HrServices {
 
         return ResponseEntity.ok(response);
     }
+
 
 }
