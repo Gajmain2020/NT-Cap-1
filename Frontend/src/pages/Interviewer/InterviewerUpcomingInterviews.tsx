@@ -67,7 +67,7 @@ export default function InterviewerUpcomingInterviews() {
     });
 
   return (
-    <Card className="flex flex-col gap-6">
+    <Card className="flex flex-col gap-6 container mx-auto">
       <CardHeader>
         <CardTitle className="text-center text-xl">
           Upcoming Interviews
