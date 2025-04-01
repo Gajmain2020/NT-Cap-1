@@ -1,15 +1,15 @@
 import { toast } from "sonner";
 
 import {
-  loginSchema,
-  passwordChangeSchema,
-  registerSchema,
-} from "@/utils/validationSchema";
-import {
   ChangeUserPasswordApi,
   LoginUserApi,
   RegisterUserApi,
 } from "@/api/userApis";
+import {
+  loginSchema,
+  passwordChangeSchema,
+  registerSchema,
+} from "@/utils/validationSchema";
 
 export async function handleUserRegistration(
   registerData: { email: string; password: string; name: string; role: string },
@@ -22,6 +22,11 @@ export async function handleUserRegistration(
 
     if (!result.success) {
       result.error.issues.forEach((err) => toast.error(err.message));
+      return;
+    }
+
+    if (!registerData.email.toLowerCase().includes("nucleusteq")) {
+      toast.error("Please use company  email address.");
       return;
     }
 

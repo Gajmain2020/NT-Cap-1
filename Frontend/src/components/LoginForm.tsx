@@ -137,7 +137,7 @@ export default function AuthForm() {
       <Button
         disabled={loading}
         onClick={isRegister ? handleRegister : handleLogin}
-        className="cursor-pointer w-full bg-teal-500 hover:bg-teal-600 hover:shadow text-white font-medium py-2 px-4 rounded-lg"
+        className="cursor-pointer w-full hover:shadow text-white font-medium py-2 px-4 rounded-lg"
       >
         {isRegister
           ? loading
