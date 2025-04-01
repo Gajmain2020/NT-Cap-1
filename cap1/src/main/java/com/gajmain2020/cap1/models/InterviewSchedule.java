@@ -32,13 +32,13 @@ public class InterviewSchedule {
     private String position;
 
     @Column(nullable = false)
-    private String date;
+    private LocalDate date;
 
     @Column(nullable = false)
-    private String startTime;
+    private LocalTime startTime;
 
     @Column(nullable = false)
-    private String endTime;
+    private LocalTime endTime;
 
     @Column(nullable = false)
     private  int duration;
