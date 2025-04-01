@@ -230,8 +230,6 @@ public class InterviewerServices {
     }
 
     public ResponseEntity<Map<String, Object>> getPastFeedbacksByEmail(String authHeader) {
-        Map<String, Object> response = new HashMap<>();
-
         String email = extractEmailFromToken(authHeader);
 
         Optional<User> userOptional = userRepository.findByEmail(email);
