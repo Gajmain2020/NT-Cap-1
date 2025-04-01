@@ -132,7 +132,7 @@ public class HrServices {
         LocalTime currentTime = LocalTime.now();
 
         // Fetch upcoming interviews
-        List<Map<String, Object>> interviews = interviewScheduleRepository.findUpcomingInterviews(today.toString(), currentTime.toString());
+        List<Map<String, Object>> interviews = interviewScheduleRepository.findUpcomingInterviews(today, currentTime);
 
         if (interviews.isEmpty()) {
             return notFoundResponse("No upcoming interviews found.");
@@ -232,7 +232,7 @@ public class HrServices {
         LocalTime time = LocalTime.now();
 
         // Fetch past interviews
-        List<Map<String, Object>> pastInterviews = interviewScheduleRepository.findPastInterviews(today.toString(), time.toString());
+        List<Map<String, Object>> pastInterviews = interviewScheduleRepository.findPastInterviews(today, time);
 
         if (pastInterviews.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(

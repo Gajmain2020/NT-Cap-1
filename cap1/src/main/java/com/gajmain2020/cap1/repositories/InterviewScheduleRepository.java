@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,7 +38,7 @@ public interface InterviewScheduleRepository extends JpaRepository<InterviewSche
         WHERE (i.date > :date OR (i.date = :date AND i.startTime > :time))
         ORDER BY i.date ASC, i.startTime ASC
     """)
-    List<Map<String, Object>> findUpcomingInterviews(String date, String time);
+    List<Map<String, Object>> findUpcomingInterviews(LocalDate date, LocalTime time);
 
     @Query("""
         SELECT new map(
@@ -179,7 +181,7 @@ public interface InterviewScheduleRepository extends JpaRepository<InterviewSche
                 JOIN InterviewFeedback f ON i.id = f.interview.id
                 WHERE i.id IN (SELECT f2.interview.id FROM InterviewFeedback f2)
     """)
-    List<Map<String, Object>> findPastInterviews(String today, String currentTime);
+    List<Map<String, Object>> findPastInterviews(LocalDate today, LocalTime currentTime);
 
 
 
