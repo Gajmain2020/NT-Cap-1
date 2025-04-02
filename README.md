@@ -37,7 +37,7 @@ The Interview Feedback Management System (IFMS) is a web-based platform designed
 
 ## Technologies Used
 
-**Frontend**: HTML, CSS, JavaScript.
+**Frontend**: ReactJS, TailwindCSS, ShcadCN.
 
 **Backend**: Java 17, SpringBoot.
 
