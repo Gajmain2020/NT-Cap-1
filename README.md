@@ -60,6 +60,8 @@ The Interview Feedback Management System (IFMS) is a web-based platform designed
 1. Clone the following repository [`https://github.com/Gajmain2020/NT-Cap-1.git`](https://github.com/Gajmain2020/NT-Cap-1.git)
 2. Open the cloned and install the dependencies.
 
+   NOTE : All updated code is in the `dev` branch so change the branch before setting up completely.
+
 ### Setting up **Backend**
 
 1.  Open the cloned repository and open `cap1` in desired code editor or `IntelliJ` preferably.
