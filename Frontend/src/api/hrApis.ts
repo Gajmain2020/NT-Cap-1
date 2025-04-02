@@ -2,7 +2,7 @@ import { apiRequest } from "@/utils/ApiWrapper";
 import { getAuthHeaders } from "@/utils/authHeaders";
 import { IScheduleInterview } from "@/utils/types";
 
-const baseUrl = "http://localhost:8080/api/v1/schedules";
+const baseUrl = "http://localhost:8080/api/v2/hr";
 
 export async function ScheduleInterviewAPI(data: IScheduleInterview) {
   return apiRequest({

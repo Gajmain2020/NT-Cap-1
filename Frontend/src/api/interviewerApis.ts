@@ -2,7 +2,7 @@ import { apiRequest } from "@/utils/ApiWrapper";
 import { getAuthHeaders } from "@/utils/authHeaders";
 import { IFeedbackEntry } from "@/utils/types";
 
-const baseUrl = "http://localhost:8080/api/v1/schedules";
+const baseUrl = "http://localhost:8080/api/v2/interviewer";
 
 export async function FetchUpcomingInterviewerInterviews() {
   return apiRequest({

@@ -13,7 +13,6 @@ import com.gajmain2020.cap1.repositories.InterviewScheduleRepository;
 import com.gajmain2020.cap1.repositories.UserRepository;
 import com.gajmain2020.cap1.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,14 +57,52 @@ public class InterviewerServices {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("success", false, "message", message));
     }
 
+    // Convert final decision safely
+    private FinalDecision parseFinalDecision(String decision) {
+        try {
+            return FinalDecision.valueOf(decision.toUpperCase().replace(" ", "_"));
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid final decision: " + decision);
+        }
+    }
 
+    // Save all feedback details
+    private void saveFeedbackDetails(InterviewFeedback feedback, InterviewFeedbackRequest request) {
+        List<InterviewFeedbackDetail> feedbackDetails = request.getFeedback().stream()
+                .map(skillDto -> InterviewFeedbackDetail.builder()
+                        .feedback(feedback)
+                        .skill(skillDto.getSkill())
+                        .rating(parseRating(skillDto.getRating()))
+                        .topicsUsed(skillDto.getTopics())
+                        .comments(Optional.ofNullable(skillDto.getComments()).orElse(""))
+                        .build())
+                .collect(Collectors.toList());
+
+        interviewFeedbackDetailRepository.saveAll(feedbackDetails);
+    }
+
+    // Convert rating safely
+    private Rating parseRating(String rating) {
+        try {
+            return Rating.valueOf(rating.toUpperCase().replace(" ", "_"));
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid rating: " + rating);
+        }
+    }
+
+    private String extractEmailFromToken(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return null;
+        }
+        String token = authHeader.substring(7);
+        return jwtUtil.extractEmail(token);
+    }
+
+
+
+    // __________________________________________________________ Main services from here ___________________________________________________________
     public ResponseEntity<Map<String, Object>> getUpcomingInterviewerInterviews(String authHeader) {
         Map<String, Object> response = new HashMap<>();
-
-        // Validate Authorization Header
-        if (!authHeader.startsWith("Bearer ")) {
-            return unauthorizedResponse("Invalid authorization token.");
-        }
 
         String token = authHeader.substring(7);
         String email = jwtUtil.extractEmail(token); // Extract email from JWT token
@@ -91,11 +128,6 @@ public class InterviewerServices {
 
     public ResponseEntity<Map<String, Object>> getOngoingInterviewerInterviews(String authHeader) {
         Map<String, Object> response = new HashMap<>();
-
-        // Validate Authorization Header
-        if (!authHeader.startsWith("Bearer ")) {
-            return unauthorizedResponse("Invalid authorization token.");
-        }
 
         String token = authHeader.substring(7);
         String email = jwtUtil.extractEmail(token); // Extract email from JWT token
@@ -158,51 +190,12 @@ public class InterviewerServices {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // Convert final decision safely
-    private FinalDecision parseFinalDecision(String decision) {
-        try {
-            return FinalDecision.valueOf(decision.toUpperCase().replace(" ", "_"));
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Invalid final decision: " + decision);
-        }
-    }
 
-    // Save all feedback details
-    private void saveFeedbackDetails(InterviewFeedback feedback, InterviewFeedbackRequest request) {
-        List<InterviewFeedbackDetail> feedbackDetails = request.getFeedback().stream()
-                .map(skillDto -> InterviewFeedbackDetail.builder()
-                        .feedback(feedback)
-                        .skill(skillDto.getSkill())
-                        .rating(parseRating(skillDto.getRating()))
-                        .topicsUsed(skillDto.getTopics())
-                        .comments(Optional.ofNullable(skillDto.getComments()).orElse(""))
-                        .build())
-                .collect(Collectors.toList());
-
-        interviewFeedbackDetailRepository.saveAll(feedbackDetails);
-    }
-
-    // Convert rating safely
-    private Rating parseRating(String rating) {
-        try {
-            return Rating.valueOf(rating.toUpperCase().replace(" ", "_"));
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Invalid rating: " + rating);
-        }
-    }
 
     public ResponseEntity<Map<String, Object>> fetchInterviewerInterviews(String authHeader) {
         Map<String, Object> response = new HashMap<>();
 
-        // Extract token from Authorization header
-        if (!authHeader.startsWith("Bearer ")) {
-            response.put("success", false);
-            response.put("message", "Invalid authorization token.");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-        }
-
-        String token = authHeader.substring(7);
-        String email = jwtUtil.extractEmail(token); // Extract email from JWT token
+        String email = extractEmailFromToken(authHeader); // Extract email from JWT token
 
         Optional<User> userOptional = userRepository.findByEmail(email);
         if (userOptional.isEmpty()) {
@@ -237,18 +230,7 @@ public class InterviewerServices {
     }
 
     public ResponseEntity<Map<String, Object>> getPastFeedbacksByEmail(String authHeader) {
-        Map<String, Object> response = new HashMap<>();
-
-        // Validate Authorization token
-        if (!authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
-                    "success", false,
-                    "message", "Invalid authorization token."
-            ));
-        }
-
-        String token = authHeader.substring(7);
-        String email = jwtUtil.extractEmail(token);
+        String email = extractEmailFromToken(authHeader);
 
         Optional<User> userOptional = userRepository.findByEmail(email);
         if (userOptional.isEmpty()) {
@@ -276,12 +258,6 @@ public class InterviewerServices {
     public ResponseEntity<Map<String, Object>> getFeedbackDetails(String authHeader, Long feedbackId) {
         // Extract and validate user
         String email = extractEmailFromToken(authHeader);
-        if (email == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
-                    "success", false,
-                    "message", "Invalid authorization token."
-            ));
-        }
 
         Optional<User> userOptional = userRepository.findByEmail(email);
         if (userOptional.isEmpty()) {
@@ -342,14 +318,6 @@ public class InterviewerServices {
                 "success", true,
                 "feedback", feedback
         ));
-    }
-
-    private String extractEmailFromToken(String authHeader) {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return null;
-        }
-        String token = authHeader.substring(7);
-        return jwtUtil.extractEmail(token);
     }
 
     public ResponseEntity<Map<String, Object>> getFeedbackDetailsViewInterviewIdService(Long interviewId){

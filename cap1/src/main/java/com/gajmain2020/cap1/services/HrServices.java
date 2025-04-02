@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -206,13 +207,6 @@ public class HrServices {
     public ResponseEntity<Map<String, Object>> getPastInterviews(String authHeader) {
         Map<String, Object> response = new HashMap<>();
 
-        // Extract token from Authorization header
-        if (!authHeader.startsWith("Bearer ")) {
-            response.put("success", false);
-            response.put("message", "Invalid authorization token.");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-        }
-
         String token = authHeader.substring(7);
         String email = jwtUtil.extractEmail(token); // Extract email from JWT token
 
@@ -249,13 +243,6 @@ public class HrServices {
 
     public ResponseEntity<Map<String, Object>> getPastFeedback(Long interviewId, String authHeader) {
         Map<String, Object> response = new HashMap<>();
-
-        // Extract token from Authorization header
-        if (!authHeader.startsWith("Bearer ")) {
-            response.put("success", false);
-            response.put("message", "Invalid authorization token.");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-        }
 
         String token = authHeader.substring(7);
         String email = jwtUtil.extractEmail(token); // Extract email from JWT token
@@ -315,13 +302,6 @@ public class HrServices {
 
     public ResponseEntity<Map<String, Object>> deleteSingleInterview(Long interviewId, String authHeader) {
         Map<String, Object> response = new HashMap<>();
-
-        // Extract token from Authorization header
-        if (!authHeader.startsWith("Bearer ")) {
-            response.put("success", false);
-            response.put("message", "Invalid authorization token.");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-        }
 
         String token = authHeader.substring(7);
         String email = jwtUtil.extractEmail(token); // Extract email from JWT token
