@@ -125,15 +125,15 @@ The backend API is hosted at `http://localhost:8080/api/`.
 
 | Method   | Endpoint                                                          | Params           | Description                                           |
 | -------- | ----------------------------------------------------------------- | -------------------- | ----------------------------------------------------- |
-| **GET**  | `/upcoming-interviews-interviewer`                                | None                 | Fetch upcoming interviews for the interviewer.        |
-| **GET**  | `/ongoing-interviews-interviewer`                                 | None                 | Fetch ongoing interviews for the interviewer.         |
-| **GET**  | `/interviewee-details/{interviewId}`                              | `interviewId` (Path) | Get details of a specific interviewee.                |
-| **POST** | `/submit-feedback/{interviewId}`                                  | `interviewId` (Path) | Submit feedback for an interview.                     |
-| **GET**  | `/get-interviewer-interview`                                      | None                 | Fetch all interviews assigned to the interviewer.     |
-| **GET**  | `/check-feedback-filled/{interviewId}`                            | `interviewId` (Path) | Check if feedback is already filled for an interview. |
-| **GET**  | `/interviewer-past-feedbacks`                                     | None                 | Retrieve past feedback submitted by the interviewer.  |
-| **GET**  | `/get-feedback-details-interviewer/{feedbackId}`                  | `feedbackId` (Path)  | Get feedback details using feedback ID.               |
-| **GET**  | `/get-feedback-details-interviewer-via-interviewId/{interviewId}` | `interviewId` (Path) | Get feedback details using interview ID.              |
+| **GET**  | `api/interviewer/upcoming-interviews-interviewer`                                | None                 | Fetch upcoming interviews for the interviewer.        |
+| **GET**  | `api/interviewer/ongoing-interviews-interviewer`                                 | None                 | Fetch ongoing interviews for the interviewer.         |
+| **GET**  | `api/interviewer/interviewee-details/{interviewId}`                              | `interviewId` (Path) | Get details of a specific interviewee.                |
+| **POST** | `api/interviewer/submit-feedback/{interviewId}`                                  | `interviewId` (Path) | Submit feedback for an interview.                     |
+| **GET**  | `api/interviewer/get-interviewer-interview`                                      | None                 | Fetch all interviews assigned to the interviewer.     |
+| **GET**  | `api/interviewer/check-feedback-filled/{interviewId}`                            | `interviewId` (Path) | Check if feedback is already filled for an interview. |
+| **GET**  | `api/interviewer/interviewer-past-feedbacks`                                     | None                 | Retrieve past feedback submitted by the interviewer.  |
+| **GET**  | `api/interviewer/get-feedback-details-interviewer/{feedbackId}`                  | `feedbackId` (Path)  | Get feedback details using feedback ID.               |
+| **GET**  | `api/interviewer/get-feedback-details-interviewer-via-interviewId/{interviewId}` | `interviewId` (Path) | Get feedback details using interview ID.              |
 
 ## Authentication
 
