@@ -110,34 +110,54 @@ The backend API is hosted at `http://localhost:8080/api/`.
 
 ### Endpoints for **_HR_**
 
-| Method     | Endpoint | Description| Params|
-| ---------- | ------------------- | -------------------------- |--------------------- | 
+| Method     | Endpoint                                           | Description                          | Params                | Headers                                                           |
+| ---------- | -------------------------------------------------- | ------------------------------------ | --------------------- | ----------------------------------------------------------------- |
 | **POST**   | `/api/v2/hr/add-interview`                         | Schedule an interview.               | None                  | `Authorization: Bearer <token>`, `Content-Type: application/json` |
 | **GET**    | `/api/v2/hr/interviews-hr`                         | Get all scheduled interviews.        | None                  | None                                                              |
-| **GET**    | `/api/v2/hr/upcoming-interviews-hr`                | Get upcoming interviews.             | None                  |
-| **GET**    | `/api/v2/hr/get-past-interviews`                   | Fetch past interviews.               | None                  |
-| **GET**    | `/api/v2/hr/get-feedback-details-hr/{interviewId}` | Get feedback for a past interview.   | `{interviewId}`       |
-| **PUT**    | `/api/v2/hr/edit-scheduled-interview/{id}`         | Edit an existing interview schedule. | `{id}` (Interview ID) |
-| **DELETE** | `/api/v2/hr/delete-interview/{interviewId}`        | Delete an interview record.          | `{interviewId}`       |
-| **POST**   | `/api/v2/hr/reschedule-interview/{interviewId}`    | Reschedule an interview.             | `{interviewId}`       |
+| **GET**    | `/api/v2/hr/upcoming-interviews-hr`                | Get upcoming interviews.             | None                  | None                                                              |
+| **GET**    | `/api/v2/hr/get-past-interviews`                   | Fetch past interviews.               | None                  | None                                                              |
+| **GET**    | `/api/v2/hr/get-feedback-details-hr/{interviewId}` | Get feedback for a past interview.   | `{interviewId}`       | None                                                              |
+| **PUT**    | `/api/v2/hr/edit-scheduled-interview/{id}`         | Edit an existing interview schedule. | `{id}` (Interview ID) | None                                                              |
+| **DELETE** | `/api/v2/hr/delete-interview/{interviewId}`        | Delete an interview record.          | `{interviewId}`       | None                                                              |
+| **POST**   | `/api/v2/hr/reschedule-interview/{interviewId}`    | Reschedule an interview.             | `{interviewId}`       | None                                                              |
 
 ### Endpoints for **_INTERVIEWER_**
 
-| Method   | Endpoint                                                          | Params           | Description                                           |
-| -------- | ----------------------------------------------------------------- | -------------------- | ----------------------------------------------------- |
-| **GET**  | `api/interviewer/upcoming-interviews-interviewer`                                | None                 | Fetch upcoming interviews for the interviewer.        |
-| **GET**  | `api/interviewer/ongoing-interviews-interviewer`                                 | None                 | Fetch ongoing interviews for the interviewer.         |
-| **GET**  | `api/interviewer/interviewee-details/{interviewId}`                              | `interviewId` (Path) | Get details of a specific interviewee.                |
-| **POST** | `api/interviewer/submit-feedback/{interviewId}`                                  | `interviewId` (Path) | Submit feedback for an interview.                     |
-| **GET**  | `api/interviewer/get-interviewer-interview`                                      | None                 | Fetch all interviews assigned to the interviewer.     |
-| **GET**  | `api/interviewer/check-feedback-filled/{interviewId}`                            | `interviewId` (Path) | Check if feedback is already filled for an interview. |
-| **GET**  | `api/interviewer/interviewer-past-feedbacks`                                     | None                 | Retrieve past feedback submitted by the interviewer.  |
-| **GET**  | `api/interviewer/get-feedback-details-interviewer/{feedbackId}`                  | `feedbackId` (Path)  | Get feedback details using feedback ID.               |
-| **GET**  | `api/interviewer/get-feedback-details-interviewer-via-interviewId/{interviewId}` | `interviewId` (Path) | Get feedback details using interview ID.              |
+| Method   | Endpoint                                                                             | Params               | Description                                           |
+| -------- | ------------------------------------------------------------------------------------ | -------------------- | ----------------------------------------------------- |
+| **GET**  | `/api/v2/interviewer/upcoming-interviews-interviewer`                                | None                 | Fetch upcoming interviews for the interviewer.        |
+| **GET**  | `/api/v2/interviewer/ongoing-interviews-interviewer`                                 | None                 | Fetch ongoing interviews for the interviewer.         |
+| **GET**  | `/api/v2/interviewer/interviewee-details/{interviewId}`                              | `interviewId` (Path) | Get details of a specific interviewee.                |
+| **POST** | `/api/v2/interviewer/submit-feedback/{interviewId}`                                  | `interviewId` (Path) | Submit feedback for an interview.                     |
+| **GET**  | `/api/v2/interviewer/get-interviewer-interview`                                      | None                 | Fetch all interviews assigned to the interviewer.     |
+| **GET**  | `/api/v2/interviewer/check-feedback-filled/{interviewId}`                            | `interviewId` (Path) | Check if feedback is already filled for an interview. |
+| **GET**  | `/api/v2/interviewer/interviewer-past-feedbacks`                                     | None                 | Retrieve past feedback submitted by the interviewer.  |
+| **GET**  | `/api/v2/interviewer/get-feedback-details-interviewer/{feedbackId}`                  | `feedbackId` (Path)  | Get feedback details using feedback ID.               |
+| **GET**  | `/api/v2/interviewer/get-feedback-details-interviewer-via-interviewId/{interviewId}` | `interviewId` (Path) | Get feedback details using interview ID.              |
 
 ## Authentication
 
-All endpoints for ***HR*** and ***INTERVIEWER*** require an `Authorization` header with a valid token.
+All endpoints for **_HR_** and **_INTERVIEWER_** require an `Authorization` header with a valid **_JWT token_**.
+
+## ERD
+
+<div style="flex: 1; text-align: center;">
+        <img src="Screenshots/ERD.png" alt="Screenshot 4" style="max-width: 100%; height: auto;">
+        <p>ERD for Interview Feedback Management System</p>
+</div>
+
+## Screenshots
+
+<div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+    <div style="flex: 1; text-align: center;">
+        <img src="Screenshots/Login.png" alt="Login Page 3" style="max-width: 100%; height: auto;">
+        <p>Login Page</p>
+    </div>
+    <div style="flex: 1; text-align: center;">
+        <img src="Screenshots/Register.png" alt="Screenshot 4" style="max-width: 100%; height: auto;">
+        <p>Register Page</p>
+    </div>
+</div>
 
 ## Project Structure
 
